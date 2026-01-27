@@ -1,0 +1,54 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\CookieConsent\Domain\ValueObjects;
+
+use InvalidArgumentException;
+use Ramsey\Uuid\Uuid;
+use Stringable;
+
+/**
+ * UUID for anonymous visitors.
+ * Generated client-side and stored in localStorage.
+ */
+final readonly class VisitorId implements Stringable
+{
+    public function __construct(
+        public string $value,
+    ) {
+        $this->validate($value);
+    }
+
+    public static function generate(): self
+    {
+        return new self(Uuid::uuid4()->toString());
+    }
+
+    public static function fromString(string $value): self
+    {
+        return new self($value);
+    }
+
+    public function __toString(): string
+    {
+        return $this->value;
+    }
+
+    public function value(): string
+    {
+        return $this->value;
+    }
+
+    public function equals(self $other): bool
+    {
+        return $this->value === $other->value;
+    }
+
+    private function validate(string $value): void
+    {
+        if (! Uuid::isValid($value)) {
+            throw new InvalidArgumentException("Invalid visitor ID: {$value}");
+        }
+    }
+}
