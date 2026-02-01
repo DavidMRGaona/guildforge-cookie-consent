@@ -94,7 +94,7 @@ export async function saveConsent(
 
     // Sync to server (fire and forget)
     try {
-        await fetch('/api/cookie-consent/consent', {
+        await fetch('/consentimiento-cookies/consentir', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
