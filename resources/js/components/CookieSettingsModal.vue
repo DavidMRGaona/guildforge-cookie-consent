@@ -93,14 +93,14 @@ function close(): void {
             >
                 <!-- Header -->
                 <div
-                    class="flex items-center justify-between p-4 border-b border-stone-200 dark:border-stone-700"
+                    class="flex items-center justify-between p-4 border-b border-default"
                 >
                     <h2 class="text-xl font-semibold">
                         {{ config.texts.settings }}
                     </h2>
                     <button
                         type="button"
-                        class="p-1 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                        class="p-1 rounded-full hover:bg-muted transition-colors"
                         @click="close"
                     >
                         <svg
@@ -134,7 +134,7 @@ function close(): void {
                         >
                             {{ config.texts.acceptAll }}
                         </button>
-                        <span class="text-stone-400">|</span>
+                        <span class="text-base-muted">|</span>
                         <button
                             type="button"
                             class="text-sm text-primary hover:underline"
@@ -149,7 +149,7 @@ function close(): void {
                         <div
                             v-for="category in categories"
                             :key="category.id"
-                            class="border border-stone-200 dark:border-stone-700 rounded-lg overflow-hidden"
+                            class="border border-default rounded-lg overflow-hidden"
                         >
                             <!-- Category header -->
                             <div
@@ -162,7 +162,7 @@ function close(): void {
                                         </h3>
                                         <span
                                             v-if="category.isRequired"
-                                            class="text-xs bg-stone-200 dark:bg-stone-700 px-2 py-0.5 rounded"
+                                            class="text-xs bg-muted px-2 py-0.5 rounded"
                                         >
                                             Obligatoria
                                         </span>
@@ -176,10 +176,10 @@ function close(): void {
                                 <button
                                     type="button"
                                     :class="[
-                                        'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:ring-offset-2',
+                                        'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
                                         preferences[category.slug]
-                                            ? 'bg-amber-600 dark:bg-amber-500'
-                                            : 'bg-stone-200 dark:bg-stone-600',
+                                            ? 'bg-primary'
+                                            : 'bg-neutral-200 dark:bg-neutral-600',
                                         category.isRequired
                                             ? 'cursor-not-allowed opacity-70'
                                             : '',
@@ -203,11 +203,11 @@ function close(): void {
                             <!-- Cookie list (expandable) -->
                             <div
                                 v-if="category.cookies.length > 0"
-                                class="border-t border-stone-200 dark:border-stone-700"
+                                class="border-t border-default"
                             >
                                 <button
                                     type="button"
-                                    class="w-full flex items-center justify-between p-3 text-sm hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors"
+                                    class="w-full flex items-center justify-between p-3 text-sm hover:bg-muted transition-colors"
                                     @click="toggleCookieList(category.slug)"
                                 >
                                     <span>
@@ -254,10 +254,10 @@ function close(): void {
                                         class="overflow-hidden"
                                     >
                                         <table
-                                            class="w-full text-xs border-t border-stone-200 dark:border-stone-700"
+                                            class="w-full text-xs border-t border-default"
                                         >
                                             <thead
-                                                class="bg-stone-100 dark:bg-stone-800"
+                                                class="bg-muted"
                                             >
                                                 <tr>
                                                     <th
@@ -281,7 +281,7 @@ function close(): void {
                                                 <tr
                                                     v-for="cookie in category.cookies"
                                                     :key="cookie.id"
-                                                    class="border-t border-stone-100 dark:border-stone-700"
+                                                    class="border-t border-default"
                                                 >
                                                     <td
                                                         class="px-3 py-2 font-mono"
@@ -309,7 +309,7 @@ function close(): void {
 
                 <!-- Footer -->
                 <div
-                    class="flex items-center justify-between p-4 border-t border-stone-200 dark:border-stone-700"
+                    class="flex items-center justify-between p-4 border-t border-default"
                 >
                     <a
                         v-if="config.texts.privacyUrl"
@@ -321,14 +321,14 @@ function close(): void {
                     <div class="flex gap-2">
                         <button
                             type="button"
-                            class="px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-md transition-colors"
+                            class="px-4 py-2 text-sm font-medium text-base-secondary hover:bg-muted rounded-md transition-colors"
                             @click="close"
                         >
                             Cancelar
                         </button>
                         <button
                             type="button"
-                            class="px-4 py-2 text-sm font-medium text-white bg-amber-600 dark:bg-amber-500 hover:bg-amber-700 dark:hover:bg-amber-600 rounded-md transition-colors"
+                            class="px-4 py-2 text-sm font-medium text-white bg-primary hover:opacity-90 rounded-md transition-colors"
                             @click="save"
                         >
                             {{ config.texts.save }}
