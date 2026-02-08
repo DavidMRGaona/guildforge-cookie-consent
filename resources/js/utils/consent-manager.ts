@@ -4,6 +4,14 @@ const STORAGE_KEY = 'guildforge_cookie_consent';
 const VISITOR_ID_KEY = 'guildforge_visitor_id';
 
 /**
+ * Read the XSRF-TOKEN cookie set by Laravel for CSRF protection.
+ */
+function getXsrfToken(): string | null {
+    const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/);
+    return match?.[1] ? decodeURIComponent(match[1]) : null;
+}
+
+/**
  * Generate a UUID v4.
  */
 function generateUUID(): string {
@@ -94,12 +102,18 @@ export async function saveConsent(
 
     // Sync to server (fire and forget)
     try {
+        const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+        };
+        const xsrfToken = getXsrfToken();
+        if (xsrfToken) {
+            headers['X-XSRF-TOKEN'] = xsrfToken;
+        }
+
         await fetch('/consentimiento-cookies/consentir', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-            },
+            headers,
             body: JSON.stringify({
                 visitor_id: visitorId,
                 preferences,

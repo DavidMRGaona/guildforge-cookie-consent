@@ -62,10 +62,7 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
     {
         parent::register();
 
-        $this->mergeConfigFrom(
-            $this->modulePath('config/module.php'),
-            'cookie-consent'
-        );
+        $this->forceLoadConfig($this->modulePath('config/module.php'), 'cookie-consent');
 
         // Bind repository interfaces to implementations
         $this->app->bind(CookieCategoryRepositoryInterface::class, EloquentCookieCategoryRepository::class);
