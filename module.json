@@ -1,7 +1,7 @@
 {
   "name": "cookie-consent",
   "displayName": "Consentimiento de cookies",
-  "version": "1.0.1-beta",
+  "version": "1.0.2-beta",
   "namespace": "Modules\\CookieConsent",
   "provider": "CookieConsentServiceProvider",
   "description": "Gestión de consentimiento de cookies GDPR",
