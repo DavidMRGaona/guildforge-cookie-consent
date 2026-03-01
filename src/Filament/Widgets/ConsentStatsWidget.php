@@ -11,7 +11,7 @@ use Modules\CookieConsent\Domain\Repositories\CookieConsentRepositoryInterface;
 
 class ConsentStatsWidget extends StatsOverviewWidget
 {
-    protected static ?int $sort = 10;
+    protected static ?int $sort = 90;
 
     protected function getStats(): array
     {
