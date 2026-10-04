@@ -1,7 +1,7 @@
 {
   "name": "cookie-consent",
   "displayName": "Consentimiento de cookies",
-  "version": "1.0.8-beta",
+  "version": "1.0.9-beta",
   "repository": "DavidMRGaona/guildforge-cookie-consent",
   "namespace": "Modules\\CookieConsent",
   "provider": "CookieConsentServiceProvider",
