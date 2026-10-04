@@ -45,8 +45,9 @@ final class CookieConsentSettingsSeeder extends Seeder
             'config_version' => '1',
         ];
 
+        // Only add missing settings: never reset what an admin configured
         foreach ($settings as $key => $value) {
-            SettingModel::updateOrCreate(
+            SettingModel::firstOrCreate(
                 ['key' => 'cookie-consent.'.$key],
                 ['value' => $value]
             );
