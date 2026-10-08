@@ -297,7 +297,7 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
                                 ->label(__('cookie-consent::cookie_consent.settings.text_color'))
                                 ->default('#1F2937'),
                         ])
-                        ->visible(fn (Get $get): bool => $get('banner_theme') === 'custom'),
+                        ->visible(fn (Get $get): bool => $get('banner_theme') === BannerTheme::Custom),
 
                     Toggle::make('show_logo')
                         ->label(__('cookie-consent::cookie_consent.settings.show_logo'))

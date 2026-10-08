@@ -17,8 +17,8 @@ class ViewCookieConsent extends ViewRecord
 
     public function infolist(Schema $schema): Schema
     {
-        return $infolist
-            ->schema([
+        return $schema
+            ->components([
                 Section::make('Información del visitante')
                     ->schema([
                         TextEntry::make('visitor_id')
