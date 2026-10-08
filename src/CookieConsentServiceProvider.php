@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent;
 
+use Throwable;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Resources\Resource;
 use App\Application\Modules\DTOs\NavigationItemDTO;
 use App\Application\Modules\DTOs\PermissionDTO;
 use App\Application\Modules\DTOs\SlotRegistrationDTO;
 use App\Modules\ModuleServiceProvider;
 use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Get;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Event;
 use Inertia\Inertia;
@@ -110,7 +112,7 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
                         ),
                         'config' => $bannerConfigService->getBannerConfig()->toArray(),
                     ];
-                } catch (\Throwable) {
+                } catch (Throwable) {
                     return null;
                 }
             });
@@ -131,7 +133,7 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
     }
 
     /**
-     * @return array<class-string<\Filament\Resources\Resource>>
+     * @return array<class-string<Resource>>
      */
     public function registerFilamentResources(): array
     {
@@ -251,7 +253,7 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
     }
 
     /**
-     * @return array<\Filament\Forms\Components\Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public function getSettingsSchema(): array
     {

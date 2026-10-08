@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Filament\Resources\CookieConsentResource\Pages;
 
-use Filament\Infolists\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
 use Modules\CookieConsent\Filament\Resources\CookieConsentResource;
 use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieConsentModel;
@@ -15,7 +15,7 @@ class ViewCookieConsent extends ViewRecord
 {
     protected static string $resource = CookieConsentResource::class;
 
-    public function infolist(Infolist $infolist): Infolist
+    public function infolist(Schema $schema): Schema
     {
         return $infolist
             ->schema([

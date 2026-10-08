@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Filament\Resources;
 
+use Filament\Actions\ViewAction;
+use Modules\CookieConsent\Filament\Resources\CookieConsentResource\Pages\ListCookieConsents;
+use Modules\CookieConsent\Filament\Resources\CookieConsentResource\Pages\ViewCookieConsent;
 use App\Filament\Resources\BaseResource;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -19,7 +21,7 @@ class CookieConsentResource extends BaseResource
 {
     protected static ?string $model = CookieConsentModel::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-shield-check';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-shield-check';
 
     protected static ?int $navigationSort = 2;
 
@@ -130,7 +132,7 @@ class CookieConsentResource extends BaseResource
                     ->query(fn (Builder $query): Builder => $query->whereDate('consented_at', today()))
                     ->toggle(),
             ])
-            ->actions([
+            ->recordActions([
                 ViewAction::make(),
             ])
             ->defaultSort('consented_at', 'desc');
@@ -139,8 +141,8 @@ class CookieConsentResource extends BaseResource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCookieConsents::route('/'),
-            'view' => Pages\ViewCookieConsent::route('/{record}'),
+            'index' => ListCookieConsents::route('/'),
+            'view' => ViewCookieConsent::route('/{record}'),
         ];
     }
 }

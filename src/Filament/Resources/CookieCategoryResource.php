@@ -4,18 +4,23 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\RelationManagers\CookiesRelationManager;
+use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\RelationManagers\ScriptsRelationManager;
+use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\Pages\ListCookieCategories;
+use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\Pages\CreateCookieCategory;
+use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\Pages\EditCookieCategory;
 use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Forms\Set;
 use App\Filament\Resources\BaseResource;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -30,7 +35,7 @@ class CookieCategoryResource extends BaseResource
 {
     protected static ?string $model = CookieCategoryModel::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-squares-2x2';
 
     protected static ?int $navigationSort = 1;
 
@@ -54,10 +59,10 @@ class CookieCategoryResource extends BaseResource
         return __('cookie-consent::cookie_consent.categories.plural_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make()
                     ->schema([
                         TextInput::make('name')
@@ -164,13 +169,13 @@ class CookieCategoryResource extends BaseResource
             ])
             ->reorderable('sort_order')
             ->defaultSort('sort_order')
-            ->actions([
+            ->recordActions([
                 EditAction::make(),
                 DeleteAction::make()
                     ->hidden(fn (CookieCategoryModel $record): bool => $record->is_system),
             ])
             ->checkIfRecordIsSelectableUsing(fn (CookieCategoryModel $record): bool => ! $record->is_system)
-            ->bulkActions([
+            ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
                         ->deselectRecordsAfterCompletion()
@@ -185,17 +190,17 @@ class CookieCategoryResource extends BaseResource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\CookiesRelationManager::class,
-            RelationManagers\ScriptsRelationManager::class,
+            CookiesRelationManager::class,
+            ScriptsRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCookieCategories::route('/'),
-            'create' => Pages\CreateCookieCategory::route('/create'),
-            'edit' => Pages\EditCookieCategory::route('/{record}/edit'),
+            'index' => ListCookieCategories::route('/'),
+            'create' => CreateCookieCategory::route('/create'),
+            'edit' => EditCookieCategory::route('/{record}/edit'),
         ];
     }
 }

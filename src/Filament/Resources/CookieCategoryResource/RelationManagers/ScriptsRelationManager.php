@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Filament\Resources\CookieCategoryResource\RelationManagers;
 
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -37,10 +37,10 @@ class ScriptsRelationManager extends RelationManager
         return __('cookie-consent::cookie_consent.scripts.label');
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make()
                     ->schema([
                         TextInput::make('name')
@@ -131,7 +131,7 @@ class ScriptsRelationManager extends RelationManager
                         ));
                     }),
             ])
-            ->actions([
+            ->recordActions([
                 EditAction::make()
                     ->after(function ($record) {
                         event(new CookieConfigurationChanged(
@@ -149,7 +149,7 @@ class ScriptsRelationManager extends RelationManager
                         ));
                     }),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
