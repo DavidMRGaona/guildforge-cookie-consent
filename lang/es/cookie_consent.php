@@ -150,6 +150,8 @@ return [
         'save_settings_text' => 'Texto "Guardar preferencias"',
         'privacy_policy_link_text' => 'Texto del enlace a la política de privacidad',
         'privacy_policy_url' => 'URL de la política de privacidad',
+        'privacy_policy_url_help' => 'Una página de este sitio (por ejemplo, /politica-de-privacidad) o una dirección completa que empiece por https://',
+        'privacy_policy_url_invalid' => 'Escribe una ruta que empiece por / o una dirección que empiece por http:// o https://.',
 
         'behavior' => 'Comportamiento',
         'show_reject_all' => 'Mostrar botón "Rechazar todas"',

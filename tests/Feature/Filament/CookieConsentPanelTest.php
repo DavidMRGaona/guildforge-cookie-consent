@@ -92,6 +92,33 @@ final class CookieConsentPanelTest extends ModuleTestCase
             ->assertFormFieldIsVisible('primary_color');
     }
 
+    public function test_the_privacy_policy_url_can_be_a_path_of_the_site(): void
+    {
+        // updateSettings() rewrites the module's config/settings.php: put it back afterwards
+        $settingsFile = dirname(__DIR__, 3).'/config/settings.php';
+        $original = (string) file_get_contents($settingsFile);
+
+        try {
+            Livewire::test(ModuleSettingsPage::class, ['module' => 'cookie-consent'])
+                ->assertDontSeeHtml('type="url"')
+                ->fillForm(['privacy_policy_url' => '/politica-de-privacidad'])
+                ->call('save')
+                ->assertHasNoFormErrors();
+
+            $this->assertSame('/politica-de-privacidad', (require $settingsFile)['privacy_policy_url'] ?? null);
+        } finally {
+            file_put_contents($settingsFile, $original);
+        }
+    }
+
+    public function test_the_privacy_policy_url_must_be_a_path_or_a_web_address(): void
+    {
+        Livewire::test(ModuleSettingsPage::class, ['module' => 'cookie-consent'])
+            ->fillForm(['privacy_policy_url' => 'javascript:alert(1)'])
+            ->call('save')
+            ->assertHasFormErrors(['privacy_policy_url']);
+    }
+
     private function category(): CookieCategoryModel
     {
         return CookieCategoryModel::query()->orderBy('sort_order')->firstOrFail();

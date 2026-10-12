@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent;
 
+use Closure;
 use Throwable;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Grid;
@@ -343,8 +344,25 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
 
                     TextInput::make('privacy_policy_url')
                         ->label(__('cookie-consent::cookie_consent.settings.privacy_policy_url'))
-                        ->url()
-                        ->placeholder('/politica-de-privacidad'),
+                        ->helperText(__('cookie-consent::cookie_consent.settings.privacy_policy_url_help'))
+                        ->placeholder('/politica-de-privacidad')
+                        // A page of this site ("/politica-de-privacidad") or a web address: the
+                        // default is relative, so ->url() blocked the whole form
+                        ->rules([
+                            fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
+                                if (! is_string($value) || $value === '') {
+                                    return;
+                                }
+
+                                $isSitePath = str_starts_with($value, '/') && ! str_starts_with($value, '//');
+                                $isWebAddress = filter_var($value, FILTER_VALIDATE_URL) !== false
+                                    && in_array(strtolower((string) parse_url($value, PHP_URL_SCHEME)), ['http', 'https'], true);
+
+                                if (! $isSitePath && ! $isWebAddress) {
+                                    $fail(__('cookie-consent::cookie_consent.settings.privacy_policy_url_invalid'));
+                                }
+                            },
+                        ]),
                 ])
                 ->columns(2),
 
