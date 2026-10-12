@@ -265,7 +265,8 @@ final class CookieConsentSettings extends Page implements HasForms
                                     return;
                                 }
 
-                                $isSitePath = str_starts_with($value, '/') && ! str_starts_with($value, '//');
+                                // Not "//host" nor "/\host", which browsers also read as another site
+                                $isSitePath = str_starts_with($value, '/') && ! in_array(substr($value, 1, 1), ['/', '\\'], true);
                                 $isWebAddress = filter_var($value, FILTER_VALIDATE_URL) !== false
                                     && in_array(strtolower((string) parse_url($value, PHP_URL_SCHEME)), ['http', 'https'], true);
 

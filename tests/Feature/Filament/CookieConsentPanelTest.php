@@ -23,6 +23,7 @@ use Modules\CookieConsent\Filament\Resources\CookieConsentResource\Pages\ViewCoo
 use Modules\CookieConsent\Filament\Widgets\ConsentStatsWidget;
 use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieCategoryModel;
 use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieConsentModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\Modules\InteractsWithModulePanel;
 use Tests\Support\Modules\ModuleTestCase;
 
@@ -127,12 +128,25 @@ final class CookieConsentPanelTest extends ModuleTestCase
             ->assertHasNoFormErrors();
     }
 
-    public function test_the_privacy_policy_url_must_be_a_path_or_a_web_address(): void
+    #[DataProvider('notAPathOrAWebAddress')]
+    public function test_the_privacy_policy_url_must_be_a_path_or_a_web_address(string $url): void
     {
         Livewire::test(CookieConsentSettings::class)
-            ->fillForm(['privacy_policy_url' => 'javascript:alert(1)'])
+            ->fillForm(['privacy_policy_url' => $url])
             ->call('save')
             ->assertHasFormErrors(['privacy_policy_url']);
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function notAPathOrAWebAddress(): array
+    {
+        return [
+            'script' => ['javascript:alert(1)'],
+            // Browsers read "/\host" as "//host": another site
+            'backslash after the slash' => ['/\\evil.example'],
+        ];
     }
 
     public function test_saved_settings_reach_the_banner_without_touching_the_module_files(): void
