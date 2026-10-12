@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Tests\Feature\Filament;
 
+use App\Application\Services\SettingsServiceInterface;
 use App\Filament\Pages\ModuleSettingsPage;
+use App\Infrastructure\Persistence\Eloquent\Models\SettingModel;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
+use Modules\CookieConsent\Application\Services\BannerConfigServiceInterface;
+use Modules\CookieConsent\Filament\Pages\CookieConsentSettings;
 use Modules\CookieConsent\Filament\Resources\CookieCategoryResource;
 use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\Pages\CreateCookieCategory;
 use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\Pages\EditCookieCategory;
@@ -34,7 +38,10 @@ final class CookieConsentPanelTest extends ModuleTestCase
     {
         parent::setUp();
 
-        $this->registerOnAdminPanel([CookieCategoryResource::class, CookieConsentResource::class]);
+        $this->registerOnAdminPanel(
+            [CookieCategoryResource::class, CookieConsentResource::class],
+            [CookieConsentSettings::class],
+        );
         $this->actingAsPanelAdmin();
     }
 
@@ -105,7 +112,7 @@ final class CookieConsentPanelTest extends ModuleTestCase
 
     public function test_custom_banner_theme_shows_the_colour_pickers(): void
     {
-        Livewire::test(ModuleSettingsPage::class, ['module' => 'cookie-consent'])
+        Livewire::test(CookieConsentSettings::class)
             ->assertOk()
             ->fillForm(['banner_theme' => 'custom'])
             ->assertFormFieldIsVisible('primary_color');
@@ -113,29 +120,73 @@ final class CookieConsentPanelTest extends ModuleTestCase
 
     public function test_the_privacy_policy_url_can_be_a_path_of_the_site(): void
     {
-        // updateSettings() rewrites the module's config/settings.php: put it back afterwards
-        $settingsFile = dirname(__DIR__, 3).'/config/settings.php';
-        $original = (string) file_get_contents($settingsFile);
-
-        try {
-            Livewire::test(ModuleSettingsPage::class, ['module' => 'cookie-consent'])
-                ->assertDontSeeHtml('type="url"')
-                ->fillForm(['privacy_policy_url' => '/politica-de-privacidad'])
-                ->call('save')
-                ->assertHasNoFormErrors();
-
-            $this->assertSame('/politica-de-privacidad', (require $settingsFile)['privacy_policy_url'] ?? null);
-        } finally {
-            file_put_contents($settingsFile, $original);
-        }
+        Livewire::test(CookieConsentSettings::class)
+            ->assertDontSeeHtml('type="url"')
+            ->fillForm(['privacy_policy_url' => '/politica-de-privacidad'])
+            ->call('save')
+            ->assertHasNoFormErrors();
     }
 
     public function test_the_privacy_policy_url_must_be_a_path_or_a_web_address(): void
     {
-        Livewire::test(ModuleSettingsPage::class, ['module' => 'cookie-consent'])
+        Livewire::test(CookieConsentSettings::class)
             ->fillForm(['privacy_policy_url' => 'javascript:alert(1)'])
             ->call('save')
             ->assertHasFormErrors(['privacy_policy_url']);
+    }
+
+    public function test_saved_settings_reach_the_banner_without_touching_the_module_files(): void
+    {
+        $settingsFile = dirname(__DIR__, 3).'/config/settings.php';
+        $checksum = md5_file($settingsFile);
+        $settings = app(SettingsServiceInterface::class);
+        $settings->set('cookie-consent.privacy_policy_url', 'https://old.example/privacy');
+        $settings->set('cookie-consent.show_reject_all', '1');
+        $settings->set('cookie-consent.config_version', '7');
+
+        Livewire::test(CookieConsentSettings::class)
+            ->fillForm([
+                'privacy_policy_url' => '/politica-de-privacidad',
+                'banner_theme' => 'custom',
+                'primary_color' => '#123456',
+                'show_reject_all' => false,
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $config = app(BannerConfigServiceInterface::class)->getBannerConfig();
+        $this->assertSame('/politica-de-privacidad', $config->texts['privacyUrl']);
+        $this->assertSame('custom', $config->theme);
+        $this->assertSame('#123456', $config->colors['primary']);
+        $this->assertFalse($config->showRejectAll);
+        $this->assertSame('0', $settings->get('cookie-consent.show_reject_all'));
+        $this->assertSame('7', $settings->get('cookie-consent.config_version'));
+        $this->assertSame($checksum, md5_file($settingsFile));
+    }
+
+    public function test_the_settings_page_shows_the_stored_settings_or_the_module_defaults(): void
+    {
+        $settings = app(SettingsServiceInterface::class);
+        $settings->set('cookie-consent.banner_title', 'Cookies en la guarida');
+        $settings->set('cookie-consent.show_logo', '0');
+        SettingModel::query()->where('key', 'cookie-consent.primary_color')->delete();
+        $settings->clearCache();
+
+        Livewire::test(CookieConsentSettings::class)
+            ->assertOk()
+            ->assertFormSet([
+                'banner_title' => 'Cookies en la guarida',
+                'show_logo' => false,
+                'primary_color' => '#10B981',
+            ]);
+    }
+
+    public function test_the_generic_module_settings_page_no_longer_edits_the_banner(): void
+    {
+        Livewire::test(ModuleSettingsPage::class, ['module' => 'cookie-consent'])
+            ->assertOk()
+            ->assertSee(__('modules.filament.settings_page.no_settings'))
+            ->assertDontSeeHtml('wire:submit="save"');
     }
 
     private function category(): CookieCategoryModel

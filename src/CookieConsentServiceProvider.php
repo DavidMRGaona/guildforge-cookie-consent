@@ -4,21 +4,13 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent;
 
-use Closure;
 use Throwable;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Utilities\Get;
+use Filament\Pages\Page;
 use Filament\Resources\Resource;
 use App\Application\Modules\DTOs\NavigationItemDTO;
 use App\Application\Modules\DTOs\PermissionDTO;
 use App\Application\Modules\DTOs\SlotRegistrationDTO;
 use App\Modules\ModuleServiceProvider;
-use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Event;
 use Inertia\Inertia;
@@ -27,14 +19,12 @@ use Modules\CookieConsent\Application\Services\BannerConfigServiceInterface;
 use Modules\CookieConsent\Application\Services\ConsentModeServiceInterface;
 use Modules\CookieConsent\Application\Services\ConsentServiceInterface;
 use Modules\CookieConsent\Application\Services\ScriptInjectorServiceInterface;
-use Modules\CookieConsent\Domain\Enums\BannerLayout;
-use Modules\CookieConsent\Domain\Enums\BannerPosition;
-use Modules\CookieConsent\Domain\Enums\BannerTheme;
 use Modules\CookieConsent\Domain\Events\CookieConfigurationChanged;
 use Modules\CookieConsent\Domain\Repositories\CookieCategoryRepositoryInterface;
 use Modules\CookieConsent\Domain\Repositories\CookieConsentRepositoryInterface;
 use Modules\CookieConsent\Domain\Repositories\CookieRepositoryInterface;
 use Modules\CookieConsent\Domain\Repositories\CookieScriptRepositoryInterface;
+use Modules\CookieConsent\Filament\Pages\CookieConsentSettings;
 use Modules\CookieConsent\Filament\Resources\CookieCategoryResource;
 use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\RelationManagers\CookiesRelationManager;
 use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\RelationManagers\ScriptsRelationManager;
@@ -141,6 +131,16 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
         return [
             CookieCategoryResource::class,
             CookieConsentResource::class,
+        ];
+    }
+
+    /**
+     * @return array<class-string<Page>>
+     */
+    public function registerFilamentPages(): array
+    {
+        return [
+            CookieConsentSettings::class,
         ];
     }
 
@@ -254,166 +254,15 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
     }
 
     /**
+     * The banner settings have their own page (CookieConsentSettings), which stores
+     * them where the banner reads them: the generic module settings page would
+     * write them to config/settings.php instead.
+     *
      * @return array<\Filament\Schemas\Components\Component>
      */
     public function getSettingsSchema(): array
     {
-        return [
-            Section::make(__('cookie-consent::cookie_consent.settings.appearance'))
-                ->schema([
-                    Select::make('banner_position')
-                        ->label(__('cookie-consent::cookie_consent.settings.banner_position'))
-                        ->options(BannerPosition::class)
-                        ->native(false)
-                        ->default('bottom'),
-
-                    Select::make('banner_layout')
-                        ->label(__('cookie-consent::cookie_consent.settings.banner_layout'))
-                        ->options(BannerLayout::class)
-                        ->native(false)
-                        ->default('bar'),
-
-                    Select::make('banner_theme')
-                        ->label(__('cookie-consent::cookie_consent.settings.banner_theme'))
-                        ->options(BannerTheme::class)
-                        ->native(false)
-                        ->default('light')
-                        ->live(),
-
-                    Grid::make(2)
-                        ->schema([
-                            ColorPicker::make('primary_color')
-                                ->label(__('cookie-consent::cookie_consent.settings.primary_color'))
-                                ->default('#10B981'),
-
-                            ColorPicker::make('secondary_color')
-                                ->label(__('cookie-consent::cookie_consent.settings.secondary_color'))
-                                ->default('#6B7280'),
-
-                            ColorPicker::make('background_color')
-                                ->label(__('cookie-consent::cookie_consent.settings.background_color'))
-                                ->default('#FFFFFF'),
-
-                            ColorPicker::make('text_color')
-                                ->label(__('cookie-consent::cookie_consent.settings.text_color'))
-                                ->default('#1F2937'),
-                        ])
-                        ->visible(fn (Get $get): bool => $get('banner_theme') === BannerTheme::Custom),
-
-                    Toggle::make('show_logo')
-                        ->label(__('cookie-consent::cookie_consent.settings.show_logo'))
-                        ->default(true),
-                ])
-                ->columns(2),
-
-            Section::make(__('cookie-consent::cookie_consent.settings.texts'))
-                ->description(__('cookie-consent::cookie_consent.settings.texts_description'))
-                ->schema([
-                    TextInput::make('banner_title')
-                        ->label(__('cookie-consent::cookie_consent.settings.banner_title'))
-                        ->default('Utilizamos cookies'),
-
-                    Textarea::make('banner_description')
-                        ->label(__('cookie-consent::cookie_consent.settings.banner_description'))
-                        ->rows(3)
-                        ->default('Usamos cookies propias y de terceros para mejorar tu experiencia y mostrar contenido personalizado.')
-                        ->columnSpanFull(),
-
-                    Grid::make(2)
-                        ->schema([
-                            TextInput::make('accept_all_text')
-                                ->label(__('cookie-consent::cookie_consent.settings.accept_all_text'))
-                                ->default('Aceptar todas'),
-
-                            TextInput::make('reject_all_text')
-                                ->label(__('cookie-consent::cookie_consent.settings.reject_all_text'))
-                                ->default('Rechazar todas'),
-
-                            TextInput::make('settings_text')
-                                ->label(__('cookie-consent::cookie_consent.settings.settings_text'))
-                                ->default('Configurar'),
-
-                            TextInput::make('save_settings_text')
-                                ->label(__('cookie-consent::cookie_consent.settings.save_settings_text'))
-                                ->default('Guardar preferencias'),
-                        ]),
-
-                    TextInput::make('privacy_policy_link_text')
-                        ->label(__('cookie-consent::cookie_consent.settings.privacy_policy_link_text'))
-                        ->default('Política de privacidad'),
-
-                    TextInput::make('privacy_policy_url')
-                        ->label(__('cookie-consent::cookie_consent.settings.privacy_policy_url'))
-                        ->helperText(__('cookie-consent::cookie_consent.settings.privacy_policy_url_help'))
-                        ->placeholder('/politica-de-privacidad')
-                        // A page of this site ("/politica-de-privacidad") or a web address: the
-                        // default is relative, so ->url() blocked the whole form
-                        ->rules([
-                            fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
-                                if (! is_string($value) || $value === '') {
-                                    return;
-                                }
-
-                                $isSitePath = str_starts_with($value, '/') && ! str_starts_with($value, '//');
-                                $isWebAddress = filter_var($value, FILTER_VALIDATE_URL) !== false
-                                    && in_array(strtolower((string) parse_url($value, PHP_URL_SCHEME)), ['http', 'https'], true);
-
-                                if (! $isSitePath && ! $isWebAddress) {
-                                    $fail(__('cookie-consent::cookie_consent.settings.privacy_policy_url_invalid'));
-                                }
-                            },
-                        ]),
-                ])
-                ->columns(2),
-
-            Section::make(__('cookie-consent::cookie_consent.settings.behavior'))
-                ->schema([
-                    Toggle::make('show_reject_all')
-                        ->label(__('cookie-consent::cookie_consent.settings.show_reject_all'))
-                        ->default(true),
-
-                    Toggle::make('show_settings_button')
-                        ->label(__('cookie-consent::cookie_consent.settings.show_settings_button'))
-                        ->default(true),
-
-                    Toggle::make('block_page_until_consent')
-                        ->label(__('cookie-consent::cookie_consent.settings.block_page_until_consent'))
-                        ->helperText(__('cookie-consent::cookie_consent.settings.block_page_until_consent_help'))
-                        ->default(false),
-
-                    TextInput::make('consent_validity_days')
-                        ->label(__('cookie-consent::cookie_consent.settings.consent_validity_days'))
-                        ->numeric()
-                        ->minValue(1)
-                        ->maxValue(365)
-                        ->default(365)
-                        ->helperText(__('cookie-consent::cookie_consent.settings.consent_validity_days_help')),
-
-                    Toggle::make('reconsent_on_change')
-                        ->label(__('cookie-consent::cookie_consent.settings.reconsent_on_change'))
-                        ->helperText(__('cookie-consent::cookie_consent.settings.reconsent_on_change_help'))
-                        ->default(true),
-                ])
-                ->columns(2),
-
-            Section::make(__('cookie-consent::cookie_consent.settings.integrations'))
-                ->schema([
-                    Toggle::make('gtm_enabled')
-                        ->label(__('cookie-consent::cookie_consent.settings.gtm_enabled'))
-                        ->live(),
-
-                    TextInput::make('gtm_container_id')
-                        ->label(__('cookie-consent::cookie_consent.settings.gtm_container_id'))
-                        ->placeholder('GTM-XXXXXX')
-                        ->visible(fn (Get $get): bool => (bool) $get('gtm_enabled')),
-
-                    Toggle::make('consent_mode_enabled')
-                        ->label(__('cookie-consent::cookie_consent.settings.consent_mode_enabled'))
-                        ->helperText(__('cookie-consent::cookie_consent.settings.consent_mode_enabled_help'))
-                        ->default(true),
-                ])
-                ->columns(2),
-        ];
+        return [];
     }
 
     private function registerLivewireComponents(): void

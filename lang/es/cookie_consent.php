@@ -130,6 +130,10 @@ return [
 
     // Settings
     'settings' => [
+        'navigation' => 'Banner de cookies',
+        'title' => 'Ajustes del banner de cookies',
+        'saved' => 'Ajustes guardados',
+
         'appearance' => 'Apariencia',
         'banner_position' => 'Posición del banner',
         'banner_layout' => 'Diseño del banner',
