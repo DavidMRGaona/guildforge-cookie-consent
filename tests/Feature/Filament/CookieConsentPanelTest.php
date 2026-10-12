@@ -6,6 +6,7 @@ namespace Modules\CookieConsent\Tests\Feature\Filament;
 
 use App\Application\Services\SettingsServiceInterface;
 use App\Filament\Pages\ModuleSettingsPage;
+use App\Filament\Pages\ModulesPage;
 use App\Infrastructure\Persistence\Eloquent\Models\SettingModel;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
@@ -197,10 +198,25 @@ final class CookieConsentPanelTest extends ModuleTestCase
 
     public function test_the_generic_module_settings_page_no_longer_edits_the_banner(): void
     {
-        Livewire::test(ModuleSettingsPage::class, ['module' => 'cookie-consent'])
-            ->assertOk()
-            ->assertSee(__('modules.filament.settings_page.no_settings'))
-            ->assertDontSeeHtml('wire:submit="save"');
+        $bannerSettings = fn (): array => SettingModel::query()
+            ->where('key', 'like', 'cookie-consent.%')
+            ->orderBy('key')
+            ->pluck('value', 'key')
+            ->all();
+        $before = $bannerSettings();
+
+        $response = $this->get(ModuleSettingsPage::getUrl(['module' => 'cookie-consent']));
+
+        // Core 3.0.1 shows the page without a form; newer cores send a module without a schema back to the module list
+        if ($response->isRedirect()) {
+            $response->assertRedirect(ModulesPage::getUrl());
+        } else {
+            $response->assertOk()
+                ->assertSee(__('modules.filament.settings_page.no_settings'))
+                ->assertDontSee('wire:submit="save"', false);
+        }
+
+        $this->assertSame($before, $bannerSettings());
     }
 
     private function category(): CookieCategoryModel
