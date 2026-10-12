@@ -45,21 +45,6 @@ class CookieConsentResource extends BaseResource
         return __('cookie-consent::cookie_consent.consents.plural_label');
     }
 
-    public static function canCreate(): bool
-    {
-        return false;
-    }
-
-    public static function canEdit(mixed $record): bool
-    {
-        return false;
-    }
-
-    public static function canDelete(mixed $record): bool
-    {
-        return false;
-    }
-
     public static function table(Table $table): Table
     {
         return $table

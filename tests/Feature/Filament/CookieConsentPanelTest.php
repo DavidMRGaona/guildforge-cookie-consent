@@ -79,6 +79,25 @@ final class CookieConsentPanelTest extends ModuleTestCase
             ->assertSee('visitor-1');
     }
 
+    public function test_consents_cannot_be_created_edited_or_deleted(): void
+    {
+        $consent = CookieConsentModel::create([
+            'id' => (string) Str::uuid(),
+            'visitor_id' => 'visitor-1',
+            'ip_hash' => hash('sha256', '127.0.0.1'),
+            'user_agent' => 'PHPUnit',
+            'preferences' => ['analytics' => true],
+            'config_version' => 1,
+            'consent_method' => 'banner',
+            'consented_at' => now(),
+            'expires_at' => now()->addYear(),
+        ]);
+
+        $this->assertFalse(CookieConsentResource::canCreate());
+        $this->assertFalse(CookieConsentResource::canEdit($consent));
+        $this->assertFalse(CookieConsentResource::canDelete($consent));
+    }
+
     public function test_stats_widget_renders(): void
     {
         Livewire::test(ConsentStatsWidget::class)->assertOk();
