@@ -82,11 +82,11 @@ El banner siempre envía `banner`.
 
 `InjectCookieScripts` se añade al grupo `web` y actúa en las respuestas HTML. Lee la cookie `guildforge_cookie_consent` y añade:
 
-- en `<head>`: los valores por defecto de Consent Mode (si está activo), el contenedor de GTM (si está activo y tiene ID) y los scripts de cabecera de las categorías aceptadas;
+- en `<head>`: los valores por defecto de Consent Mode y, si el visitante ya eligió, su actualización con las categorías aceptadas (si Consent Mode está activo), el contenedor de GTM (si está activo y tiene ID) y los scripts de cabecera de las categorías aceptadas;
 - al empezar `<body>`: el `noscript` de GTM y los scripts de esa posición de las categorías aceptadas;
 - antes de `</body>`: los scripts de esa posición de las categorías aceptadas.
 
-GTM se carga con independencia del consentimiento; las etiquetas de Google respetan el estado de Consent Mode, que el banner actualiza al consentir.
+La cookie se escribe en el navegador y el módulo la excluye del cifrado de cookies de Laravel para poder leerla. GTM se carga con independencia del consentimiento; las etiquetas de Google respetan el estado de Consent Mode, que el banner actualiza al consentir y el middleware restaura en cada página.
 
 ## Configuración
 
@@ -209,7 +209,7 @@ Los administradores tienen todos los permisos. La página **Banner de cookies** 
 | Evento | Cuándo se dispara |
 |--------|-------------------|
 | `ConsentGranted` | Al registrar el primer consentimiento de un visitante |
-| `ConsentUpdated` | Al cambiar un visitante sus preferencias (también al rechazar categorías que había aceptado) |
+| `ConsentUpdated` | Al registrar un nuevo consentimiento de un visitante que ya tenía uno, aunque no cambie sus preferencias (por ejemplo, al rechazar categorías que había aceptado o al volver a consentir tras un cambio de configuración) |
 | `CookieConfigurationChanged` | Al crear o editar categorías y al crear, editar o eliminar cookies o scripts (sube la versión de configuración) |
 
 ## Categorías por defecto
