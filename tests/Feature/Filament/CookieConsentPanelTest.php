@@ -8,9 +8,11 @@ use App\Application\Services\SettingsServiceInterface;
 use App\Filament\Pages\ModuleSettingsPage;
 use App\Filament\Pages\ModulesPage;
 use App\Infrastructure\Persistence\Eloquent\Models\SettingModel;
+use App\Infrastructure\Persistence\Eloquent\Models\UserModel;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Modules\CookieConsent\Application\Services\BannerConfigServiceInterface;
+use Modules\CookieConsent\CookieConsentServiceProvider;
 use Modules\CookieConsent\Filament\Pages\CookieConsentSettings;
 use Modules\CookieConsent\Filament\Resources\CookieCategoryResource;
 use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\Pages\CreateCookieCategory;
@@ -110,6 +112,22 @@ final class CookieConsentPanelTest extends ModuleTestCase
     public function test_stats_widget_renders(): void
     {
         Livewire::test(ConsentStatsWidget::class)->assertOk();
+    }
+
+    public function test_the_stats_widget_is_registered_on_the_dashboard(): void
+    {
+        // The panel discovers module widgets the same way
+        $provider = new CookieConsentServiceProvider($this->app);
+
+        $this->assertContains(ConsentStatsWidget::class, $provider->registerFilamentWidgets());
+        $this->assertTrue(ConsentStatsWidget::canView());
+    }
+
+    public function test_the_stats_widget_is_hidden_from_users_who_cannot_list_consents(): void
+    {
+        $this->actingAs(UserModel::factory()->create());
+
+        $this->assertFalse(ConsentStatsWidget::canView());
     }
 
     public function test_custom_banner_theme_shows_the_colour_pickers(): void

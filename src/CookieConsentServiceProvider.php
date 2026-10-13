@@ -7,6 +7,7 @@ namespace Modules\CookieConsent;
 use Throwable;
 use Filament\Pages\Page;
 use Filament\Resources\Resource;
+use Filament\Widgets\Widget;
 use App\Application\Modules\DTOs\NavigationItemDTO;
 use App\Application\Modules\DTOs\PermissionDTO;
 use App\Application\Modules\DTOs\SlotRegistrationDTO;
@@ -29,6 +30,7 @@ use Modules\CookieConsent\Filament\Resources\CookieCategoryResource;
 use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\RelationManagers\CookiesRelationManager;
 use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\RelationManagers\ScriptsRelationManager;
 use Modules\CookieConsent\Filament\Resources\CookieConsentResource;
+use Modules\CookieConsent\Filament\Widgets\ConsentStatsWidget;
 use Modules\CookieConsent\Http\Middleware\InjectCookieScripts;
 use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieCategoryModel;
 use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieConsentModel;
@@ -141,6 +143,18 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
     {
         return [
             CookieConsentSettings::class,
+        ];
+    }
+
+    /**
+     * Dashboard widgets, discovered by the admin panel.
+     *
+     * @return array<class-string<Widget>>
+     */
+    public function registerFilamentWidgets(): array
+    {
+        return [
+            ConsentStatsWidget::class,
         ];
     }
 
