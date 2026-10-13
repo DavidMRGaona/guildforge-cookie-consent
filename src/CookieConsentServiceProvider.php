@@ -12,6 +12,7 @@ use App\Application\Modules\DTOs\NavigationItemDTO;
 use App\Application\Modules\DTOs\PermissionDTO;
 use App\Application\Modules\DTOs\SlotRegistrationDTO;
 use App\Modules\ModuleServiceProvider;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Event;
 use Inertia\Inertia;
@@ -75,6 +76,11 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
     public function boot(): void
     {
         parent::boot();
+
+        // The banner writes the consent cookie in the browser: encrypted cookies that
+        // fail to decrypt reach the request as null, so the middleware would never
+        // see the visitor's choices
+        EncryptCookies::except([InjectCookieScripts::CONSENT_COOKIE_NAME]);
 
         // Register middleware globally for script injection
         /** @var Router $router */

@@ -1,0 +1,87 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\CookieConsent\Tests\Feature\Http;
+
+use Illuminate\Support\Facades\Route;
+use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieCategoryModel;
+use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieScriptModel;
+use Tests\Support\Modules\ModuleTestCase;
+
+/**
+ * The banner writes the consent cookie from JavaScript, unencrypted: the web group
+ * must hand it to InjectCookieScripts as it is.
+ */
+final class InjectCookieScriptsTest extends ModuleTestCase
+{
+    protected ?string $moduleName = 'cookie-consent';
+
+    protected bool $autoEnableModule = true;
+
+    private const ANALYTICS_SCRIPT = '<script>window.analyticsTestLoaded = true;</script>';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Route::middleware('web')->get('/cookie-consent-test-page', fn () => response(
+            '<html><head><title>Test</title></head><body><p>Contenido</p></body></html>',
+            200,
+            ['Content-Type' => 'text/html; charset=UTF-8'],
+        ));
+
+        CookieScriptModel::create([
+            'category_id' => CookieCategoryModel::query()->where('slug', 'analytics')->value('id'),
+            'name' => 'Analytics test',
+            'script_head' => self::ANALYTICS_SCRIPT,
+            'sort_order' => 1,
+            'is_active' => true,
+        ]);
+    }
+
+    public function test_scripts_of_the_accepted_categories_are_injected(): void
+    {
+        $response = $this->withUnencryptedCookie('guildforge_cookie_consent', $this->consentCookie([
+            'necessary' => true,
+            'analytics' => true,
+            'marketing' => false,
+        ]))->get('/cookie-consent-test-page');
+
+        $response->assertOk();
+        $this->assertStringContainsString(self::ANALYTICS_SCRIPT, (string) $response->getContent());
+    }
+
+    public function test_scripts_of_rejected_categories_are_not_injected(): void
+    {
+        $response = $this->withUnencryptedCookie('guildforge_cookie_consent', $this->consentCookie([
+            'necessary' => true,
+            'analytics' => false,
+            'marketing' => false,
+        ]))->get('/cookie-consent-test-page');
+
+        $this->assertStringNotContainsString(self::ANALYTICS_SCRIPT, (string) $response->getContent());
+    }
+
+    public function test_no_category_script_is_injected_without_consent(): void
+    {
+        $content = (string) $this->get('/cookie-consent-test-page')->getContent();
+
+        $this->assertStringNotContainsString(self::ANALYTICS_SCRIPT, $content);
+    }
+
+    /**
+     * The value the banner stores (consent-manager.ts).
+     *
+     * @param  array<string, bool>  $preferences
+     */
+    private function consentCookie(array $preferences): string
+    {
+        return (string) json_encode([
+            'visitorId' => '0b5d3c1e-7a1f-4c2b-9d3e-5f6a7b8c9d0e',
+            'version' => 1,
+            'timestamp' => now()->toIso8601String(),
+            'preferences' => $preferences,
+        ]);
+    }
+}

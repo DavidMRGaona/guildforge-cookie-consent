@@ -13,7 +13,10 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 final class InjectCookieScripts
 {
-    private const CONSENT_COOKIE_NAME = 'guildforge_cookie_consent';
+    /**
+     * Written by the banner in the browser, so it is never encrypted.
+     */
+    public const CONSENT_COOKIE_NAME = 'guildforge_cookie_consent';
 
     public function __construct(
         private readonly ScriptInjectorServiceInterface $scriptInjector,
