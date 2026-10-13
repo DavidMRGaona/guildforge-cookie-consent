@@ -30,8 +30,6 @@ final class BannerConfigService implements BannerConfigServiceInterface
             ],
             showRejectAll: (bool) $this->settingsService->get('cookie-consent.show_reject_all', true),
             showSettingsButton: (bool) $this->settingsService->get('cookie-consent.show_settings_button', true),
-            showLogo: (bool) $this->settingsService->get('cookie-consent.show_logo', true),
-            blockPageUntilConsent: (bool) $this->settingsService->get('cookie-consent.block_page_until_consent', false),
             validityDays: (int) $this->settingsService->get('cookie-consent.consent_validity_days', 365),
             reconsentOnChange: (bool) $this->settingsService->get('cookie-consent.reconsent_on_change', true),
             configVersion: $this->consentService->getConfigVersion(),

@@ -31,8 +31,6 @@ export interface BannerConfig {
     };
     showRejectAll: boolean;
     showSettingsButton: boolean;
-    showLogo: boolean;
-    blockPageUntilConsent: boolean;
     validityDays: number;
     reconsentOnChange: boolean;
     configVersion: number;

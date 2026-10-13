@@ -130,6 +130,30 @@ final class CookieConsentPanelTest extends ModuleTestCase
         $this->assertFalse(ConsentStatsWidget::canView());
     }
 
+    public function test_the_banner_settings_page_has_no_logo_or_page_blocking_options(): void
+    {
+        Livewire::test(CookieConsentSettings::class)
+            ->assertOk()
+            ->assertFormFieldDoesNotExist('show_logo')
+            ->assertFormFieldDoesNotExist('block_page_until_consent');
+    }
+
+    public function test_stored_logo_and_page_blocking_settings_from_older_versions_are_ignored(): void
+    {
+        $settings = app(SettingsServiceInterface::class);
+        $settings->set('cookie-consent.show_logo', '1');
+        $settings->set('cookie-consent.block_page_until_consent', '1');
+
+        Livewire::test(CookieConsentSettings::class)
+            ->assertOk()
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $config = app(BannerConfigServiceInterface::class)->getBannerConfig()->toArray();
+        $this->assertArrayNotHasKey('showLogo', $config);
+        $this->assertArrayNotHasKey('blockPageUntilConsent', $config);
+    }
+
     public function test_custom_banner_theme_shows_the_colour_pickers(): void
     {
         Livewire::test(CookieConsentSettings::class)
@@ -201,7 +225,7 @@ final class CookieConsentPanelTest extends ModuleTestCase
     {
         $settings = app(SettingsServiceInterface::class);
         $settings->set('cookie-consent.banner_title', 'Cookies en la guarida');
-        $settings->set('cookie-consent.show_logo', '0');
+        $settings->set('cookie-consent.show_reject_all', '0');
         SettingModel::query()->where('key', 'cookie-consent.primary_color')->delete();
         $settings->clearCache();
 
@@ -209,7 +233,7 @@ final class CookieConsentPanelTest extends ModuleTestCase
             ->assertOk()
             ->assertFormSet([
                 'banner_title' => 'Cookies en la guarida',
-                'show_logo' => false,
+                'show_reject_all' => false,
                 'primary_color' => '#10B981',
             ]);
     }

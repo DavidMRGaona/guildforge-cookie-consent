@@ -45,4 +45,12 @@ final class CookieConsentSettingsSeederTest extends ModuleTestCase
 
         $this->assertSame('bottom', SettingModel::query()->where('key', 'cookie-consent.banner_position')->value('value'));
     }
+
+    public function test_it_does_not_seed_the_removed_logo_and_page_blocking_settings(): void
+    {
+        $this->seed(CookieConsentSettingsSeeder::class);
+
+        $this->assertFalse(SettingModel::query()->where('key', 'cookie-consent.show_logo')->exists());
+        $this->assertFalse(SettingModel::query()->where('key', 'cookie-consent.block_page_until_consent')->exists());
+    }
 }
