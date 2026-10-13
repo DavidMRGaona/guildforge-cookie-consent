@@ -52,6 +52,25 @@ final class InjectCookieScriptsTest extends ModuleTestCase
         $this->assertStringContainsString(self::ANALYTICS_SCRIPT, (string) $response->getContent());
     }
 
+    public function test_the_stored_consent_is_restored_in_consent_mode(): void
+    {
+        $response = $this->withUnencryptedCookie('guildforge_cookie_consent', $this->consentCookie([
+            'necessary' => true,
+            'analytics' => true,
+            'marketing' => false,
+        ]))->get('/cookie-consent-test-page');
+
+        $content = (string) $response->getContent();
+        $this->assertStringContainsString("gtag('consent', 'update'", $content);
+        $this->assertMatchesRegularExpression('/"analytics_storage": "granted"/', $content);
+        $this->assertMatchesRegularExpression('/"ad_storage": "denied"/', $content);
+        // The update follows the defaults
+        $this->assertGreaterThan(
+            strpos($content, "gtag('consent', 'default'"),
+            strpos($content, "gtag('consent', 'update'"),
+        );
+    }
+
     public function test_scripts_of_rejected_categories_are_not_injected(): void
     {
         $response = $this->withUnencryptedCookie('guildforge_cookie_consent', $this->consentCookie([
@@ -63,11 +82,13 @@ final class InjectCookieScriptsTest extends ModuleTestCase
         $this->assertStringNotContainsString(self::ANALYTICS_SCRIPT, (string) $response->getContent());
     }
 
-    public function test_no_category_script_is_injected_without_consent(): void
+    public function test_nothing_but_the_consent_mode_defaults_is_injected_without_consent(): void
     {
         $content = (string) $this->get('/cookie-consent-test-page')->getContent();
 
         $this->assertStringNotContainsString(self::ANALYTICS_SCRIPT, $content);
+        $this->assertStringContainsString("gtag('consent', 'default'", $content);
+        $this->assertStringNotContainsString("gtag('consent', 'update'", $content);
     }
 
     /**
