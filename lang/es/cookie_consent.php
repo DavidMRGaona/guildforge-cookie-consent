@@ -20,6 +20,7 @@ return [
             'consent_mode_keys' => 'Claves de Consent Mode',
             'cookies_count' => 'Cookies',
             'scripts_count' => 'Scripts',
+            'created_at' => 'Creada',
         ],
     ],
 
@@ -71,6 +72,10 @@ return [
             'consent_method' => 'Método',
             'consented_at' => 'Fecha consentimiento',
             'expires_at' => 'Expira',
+        ],
+        'filters' => [
+            'authenticated' => 'Usuario autenticado',
+            'consented_today' => 'Hoy',
         ],
     ],
 

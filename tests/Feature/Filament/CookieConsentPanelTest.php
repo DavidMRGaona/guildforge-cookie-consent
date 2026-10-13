@@ -9,6 +9,8 @@ use App\Filament\Pages\ModuleSettingsPage;
 use App\Filament\Pages\ModulesPage;
 use App\Infrastructure\Persistence\Eloquent\Models\SettingModel;
 use App\Infrastructure\Persistence\Eloquent\Models\UserModel;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Modules\CookieConsent\Application\Services\BannerConfigServiceInterface;
@@ -88,6 +90,21 @@ final class CookieConsentPanelTest extends ModuleTestCase
         Livewire::test(ViewCookieConsent::class, ['record' => $consent->getRouteKey()])
             ->assertOk()
             ->assertSee('visitor-1');
+    }
+
+    public function test_table_labels_come_from_the_module_translations(): void
+    {
+        $translated = fn (string $key): bool => __($key) !== $key;
+        $this->assertTrue($translated('cookie-consent::cookie_consent.consents.filters.authenticated'));
+        $this->assertTrue($translated('cookie-consent::cookie_consent.consents.filters.consented_today'));
+        $this->assertTrue($translated('cookie-consent::cookie_consent.categories.fields.created_at'));
+
+        Livewire::test(ListCookieConsents::class)
+            ->assertTableFilterExists('authenticated', fn (Filter $filter): bool => $filter->getLabel() === __('cookie-consent::cookie_consent.consents.filters.authenticated'))
+            ->assertTableFilterExists('consented_today', fn (Filter $filter): bool => $filter->getLabel() === __('cookie-consent::cookie_consent.consents.filters.consented_today'));
+
+        Livewire::test(ListCookieCategories::class)
+            ->assertTableColumnExists('created_at', fn (TextColumn $column): bool => $column->getLabel() === __('cookie-consent::cookie_consent.categories.fields.created_at'));
     }
 
     public function test_consents_cannot_be_created_edited_or_deleted(): void
