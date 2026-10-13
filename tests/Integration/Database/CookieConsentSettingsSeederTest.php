@@ -28,29 +28,34 @@ final class CookieConsentSettingsSeederTest extends ModuleTestCase
 
     public function test_running_the_seeder_again_keeps_configured_settings(): void
     {
-        $this->seed(CookieConsentSettingsSeeder::class);
+        $this->seedSettings();
         SettingModel::query()->where('key', 'cookie-consent.banner_position')->update(['value' => 'top']);
 
-        $this->seed(CookieConsentSettingsSeeder::class);
+        $this->seedSettings();
 
         $this->assertSame('top', SettingModel::query()->where('key', 'cookie-consent.banner_position')->value('value'));
     }
 
     public function test_it_adds_settings_that_are_missing(): void
     {
-        $this->seed(CookieConsentSettingsSeeder::class);
+        $this->seedSettings();
         SettingModel::query()->where('key', 'cookie-consent.banner_position')->delete();
 
-        $this->seed(CookieConsentSettingsSeeder::class);
+        $this->seedSettings();
 
         $this->assertSame('bottom', SettingModel::query()->where('key', 'cookie-consent.banner_position')->value('value'));
     }
 
     public function test_it_does_not_seed_the_removed_logo_and_page_blocking_settings(): void
     {
-        $this->seed(CookieConsentSettingsSeeder::class);
+        $this->seedSettings();
 
         $this->assertFalse(SettingModel::query()->where('key', 'cookie-consent.show_logo')->exists());
         $this->assertFalse(SettingModel::query()->where('key', 'cookie-consent.block_page_until_consent')->exists());
+    }
+
+    private function seedSettings(): void
+    {
+        $this->seed(CookieConsentSettingsSeeder::class);
     }
 }
