@@ -1,155 +1,113 @@
 # GuildForge - Módulo de consentimiento de cookies
 
-Sistema de gestión de consentimiento de cookies compatible con GDPR para la plataforma GuildForge. Incluye soporte para Google Consent Mode v2, banner configurable, inyección dinámica de scripts y panel de administración.
+Gestión del consentimiento de cookies conforme al RGPD para GuildForge: banner configurable, categorías de cookies, inyección de scripts según el consentimiento del visitante y soporte para Google Consent Mode v2 y Google Tag Manager.
 
 ## Características
 
-- Gestión de consentimiento de cookies conforme a GDPR
-- Soporte para Google Consent Mode v2 y Google Tag Manager
-- Banner de cookies configurable (posición, diseño, tema, colores)
-- Gestión de categorías de cookies con detalle de cada cookie
-- Inyección dinámica de scripts según el consentimiento del visitante
-- Versionado de configuración y re-consentimiento automático ante cambios
-- Seguimiento anónimo de visitantes (UUID) con asociación a usuarios autenticados
-- Hash de IP para privacidad
-- Panel de administración para categorías, cookies, scripts y consulta de consentimientos
-- Widget de estadísticas de consentimiento
-- Componentes Vue (banner y modal de ajustes)
-- API REST para integración
+- Banner de cookies configurable (posición, diseño, tema, colores y textos) con modal de preferencias por categoría
+- Categorías de cookies con el detalle de cada cookie y los scripts que dependen de ella
+- Inyección de scripts en las páginas según las categorías aceptadas
+- Google Consent Mode v2 (valores por defecto y actualización al consentir) y Google Tag Manager
+- Versionado de la configuración: al crear o editar categorías y al crear, editar o eliminar cookies o scripts se vuelve a pedir el consentimiento (si está activado)
+- Registro de consentimientos con identificador anónimo de visitante, usuario autenticado si lo hay e IP con hash
+- Panel de administración para categorías, cookies, scripts, consulta de consentimientos y ajustes del banner
+- Widget de estadísticas de consentimiento en el escritorio del panel
 
 ## Requisitos
 
-- PHP >= 8.2
-- Laravel >= 12.0
-- GuildForge (aplicación principal)
+- GuildForge core `^3.0`
+- PHP >= 8.5, Laravel >= 13, Filament 5
+
+El core rechaza el módulo si no se cumplen (`module.json` → `requires`).
 
 ## Instalación
 
-1. Descubre el módulo:
+1. Descarga `cookie-consent-X.Y.Z.zip` de la última release de `DavidMRGaona/guildforge-cookie-consent` en GitHub.
+2. En el panel, activa el modo mantenimiento (**Configuración del sitio** → pestaña **Mantenimiento**).
+3. En **Módulos**, pulsa **Instalar / actualizar** y sube el ZIP.
+4. Pulsa **Habilitar** en el módulo: la primera vez ejecuta sus migraciones y seeders, que crean las categorías por defecto y los ajustes iniciales del banner.
+5. Desactiva el modo mantenimiento.
+
+Las versiones nuevas se aplican desde **Actualizaciones de módulos** (también con el modo mantenimiento activo) o con `php artisan module:update cookie-consent`. Los ajustes del banner se guardan en la base de datos, así que se conservan al actualizar.
+
+### En desarrollo
+
+Con el repositorio clonado en `src/modules/cookie-consent`:
 
 ```bash
 php artisan module:discover
-```
-
-2. Habilita el módulo:
-
-```bash
 php artisan module:enable cookie-consent
+php artisan module:build cookie-consent   # compila el banner y el modal (--force para recompilar)
 ```
 
-3. Ejecuta las migraciones:
-
-```bash
-php artisan module:migrate cookie-consent
-```
-
-## Estructura
-
-```
-cookie-consent/
-├── config/
-│   ├── module.php              # Configuración del módulo
-│   └── settings.php            # Ajustes por defecto del banner
-├── database/
-│   ├── migrations/             # Migraciones de base de datos
-│   └── seeders/                # Categorías por defecto y ajustes
-├── lang/
-│   └── es/                     # Traducciones en español
-├── resources/js/
-│   ├── components/             # Componentes Vue (CookieBanner, CookieSettingsModal)
-│   ├── types/                  # Tipos TypeScript
-│   └── utils/                  # Utilidades (consent-manager)
-├── routes/
-│   ├── api.php                 # Rutas API
-│   └── web.php                 # Rutas web
-├── src/
-│   ├── Application/
-│   │   ├── DTOs/               # Data Transfer Objects
-│   │   └── Services/           # Interfaces de servicios
-│   ├── Domain/
-│   │   ├── Entities/           # Entidades de dominio
-│   │   ├── Enums/              # Enumeraciones
-│   │   ├── Events/             # Eventos de dominio
-│   │   ├── Exceptions/         # Excepciones de dominio
-│   │   ├── Repositories/       # Interfaces de repositorio
-│   │   └── ValueObjects/       # Objetos de valor
-│   ├── Filament/
-│   │   ├── Resources/          # Recursos de Filament
-│   │   └── Widgets/            # Widget de estadísticas
-│   ├── Http/
-│   │   ├── Controllers/        # Controladores API
-│   │   ├── Middleware/          # Middleware de inyección de scripts
-│   │   └── Requests/           # Form Requests
-│   ├── Infrastructure/
-│   │   ├── Persistence/        # Modelos y repositorios Eloquent
-│   │   └── Services/           # Implementación de servicios
-│   ├── Listeners/              # Event listeners
-│   └── Policies/               # Políticas de autorización
-├── tests/
-│   ├── Feature/                # Tests de integración
-│   └── Unit/                   # Tests unitarios
-└── module.json                 # Manifiesto del módulo
-```
+En las releases los assets los compila el CI y van dentro del ZIP.
 
 ## Uso
 
 ### Panel de administración
 
-Una vez habilitado, aparecerá un nuevo grupo "Cookies" en el menú lateral del panel de administración con acceso a:
+Una vez habilitado, el grupo **Configuración** del panel muestra:
 
-- **Categorías de cookies**: CRUD de categorías con gestión de cookies y scripts asociados (relation managers). Las categorías del sistema no se pueden eliminar.
-- **Consentimientos**: Consulta de consentimientos registrados (solo lectura). Incluye filtros por método de consentimiento, usuarios autenticados y fecha.
+- **Cookies**: categorías de cookies, con las cookies y los scripts de cada una en su ficha. Las categorías del sistema no se pueden eliminar.
+- **Consentimientos**: consulta de los consentimientos registrados (solo lectura), con filtros por método, usuario autenticado y consentimientos de hoy.
+- **Banner de cookies**: ajustes del banner (ver [Configuración](#configuración)).
 
-### Widget del dashboard
+### Widget del escritorio
 
-- **Estadísticas de consentimiento**: Total de consentimientos y desglose por método (banner, página de ajustes, API).
+**Estadísticas de consentimiento** muestra el total de consentimientos y el desglose por método de consentimiento. Solo lo ven los usuarios con el permiso `cookie_consents.view_any`; se activa, desactiva u ordena en **Panel de control**.
 
-### API
+### Banner
+
+El banner se inyecta automáticamente al final de cada página (slot `after-footer`) y abre `CookieSettingsModal` para elegir categorías. Se muestra mientras el visitante no haya consentido, cuando el consentimiento caduca o, si `reconsent_on_change` está activo, cuando cambia la versión de la configuración. Las preferencias se guardan en el navegador (`localStorage` y cookie `guildforge_cookie_consent`) y se registran en el servidor.
+
+### Rutas
+
+Rutas web (middleware `web`, con CSRF):
 
 ```
-GET    /api/cookie-consent/categories    # Listar categorías con sus cookies
-GET    /api/cookie-consent/config        # Obtener configuración del banner
-POST   /api/cookie-consent/consent       # Guardar preferencias de consentimiento
+GET    /consentimiento-cookies/categorias      # Categorías con sus cookies (JSON)
+GET    /consentimiento-cookies/configuracion   # Configuración del banner (JSON)
+POST   /consentimiento-cookies/consentir       # Guardar las preferencias de consentimiento
 ```
 
-El endpoint POST requiere:
-- `visitor_id` (uuid, obligatorio)
-- `preferences` (array, obligatorio)
-- `config_version` (integer, obligatorio)
-- `consent_method` (string, opcional, por defecto: `banner`)
+El POST requiere:
+- `visitor_id` (UUID, obligatorio)
+- `preferences` (objeto `slug de categoría => booleano`, obligatorio)
+- `config_version` (entero, obligatorio)
+- `consent_method` (`banner`, `settings_page` o `api`; opcional, por defecto `banner`)
 
-### Componentes Vue
-
-```vue
-<template>
-  <CookieBanner />
-  <CookieSettingsModal />
-</template>
-```
+El banner siempre envía `banner`.
 
 ### Middleware
 
-El middleware `InjectCookieScripts` inyecta automáticamente los scripts en las respuestas HTML según el consentimiento del visitante. Lee la cookie `guildforge_cookie_consent` y añade scripts en `<head>`, después de `<body>` y antes de `</body>`.
+`InjectCookieScripts` se añade al grupo `web` y actúa en las respuestas HTML. Lee la cookie `guildforge_cookie_consent` y añade:
+
+- en `<head>`: los valores por defecto de Consent Mode (si está activo), el contenedor de GTM (si está activo y tiene ID) y los scripts de cabecera de las categorías aceptadas;
+- al empezar `<body>`: el `noscript` de GTM y los scripts de esa posición de las categorías aceptadas;
+- antes de `</body>`: los scripts de esa posición de las categorías aceptadas.
+
+GTM se carga con independencia del consentimiento; las etiquetas de Google respetan el estado de Consent Mode, que el banner actualiza al consentir.
 
 ## Configuración
 
+Los ajustes se editan en **Configuración → Banner de cookies** (permiso `settings.manage`) y se guardan en la tabla `settings` con el prefijo `cookie-consent.`. El seeder crea los valores iniciales al habilitar el módulo; `config/settings.php` solo da el valor que muestra el formulario para un ajuste que nunca se ha guardado.
+
 ### Apariencia
 
-| Opción | Descripción | Por defecto |
-|--------|-------------|-------------|
+| Opción | Descripción | Valor inicial |
+|--------|-------------|---------------|
 | `banner_position` | Posición del banner | `bottom` |
 | `banner_layout` | Diseño del banner | `bar` |
 | `banner_theme` | Tema del banner | `light` |
-| `primary_color` | Color principal | `#10B981` |
-| `secondary_color` | Color secundario | `#6B7280` |
-| `background_color` | Color de fondo | `#FFFFFF` |
-| `text_color` | Color del texto | `#1F2937` |
-| `show_logo` | Mostrar logotipo | `true` |
+| `primary_color` | Color principal (tema personalizado) | `#D97706` |
+| `secondary_color` | Color secundario (tema personalizado) | `#57534E` |
+| `background_color` | Color de fondo (tema personalizado) | `#FFFFFF` |
+| `text_color` | Color del texto (tema personalizado) | `#1C1917` |
 
 ### Textos
 
-| Opción | Descripción | Por defecto |
-|--------|-------------|-------------|
+| Opción | Descripción | Valor inicial |
+|--------|-------------|---------------|
 | `banner_title` | Título del banner | `Utilizamos cookies` |
 | `banner_description` | Descripción del banner | `Usamos cookies propias y de terceros...` |
 | `accept_all_text` | Texto del botón aceptar | `Aceptar todas` |
@@ -157,26 +115,26 @@ El middleware `InjectCookieScripts` inyecta automáticamente los scripts en las 
 | `settings_text` | Texto del botón configurar | `Configurar` |
 | `save_settings_text` | Texto del botón guardar | `Guardar preferencias` |
 | `privacy_policy_link_text` | Texto del enlace de privacidad | `Política de privacidad` |
-| `privacy_policy_url` | URL de la política de privacidad | `/politica-de-privacidad` |
+| `privacy_policy_url` | Ruta del sitio (`/...`) o dirección `http(s)` de la política de privacidad | `/politica-de-privacidad` |
 
 ### Comportamiento
 
-| Opción | Descripción | Por defecto |
-|--------|-------------|-------------|
-| `show_reject_all` | Mostrar botón de rechazar todas | `true` |
-| `show_settings_button` | Mostrar botón de configurar | `true` |
-| `block_page_until_consent` | Bloquear página hasta consentir | `false` |
-| `consent_validity_days` | Días de validez del consentimiento | `365` |
-| `reconsent_on_change` | Pedir re-consentimiento ante cambios | `true` |
+| Opción | Descripción | Valor inicial |
+|--------|-------------|---------------|
+| `show_reject_all` | Mostrar el botón de rechazar todas | `true` |
+| `show_settings_button` | Mostrar el botón de configurar | `true` |
+| `consent_validity_days` | Días de validez del consentimiento (1-365) | `365` |
+| `reconsent_on_change` | Volver a pedir el consentimiento cuando cambia la configuración | `true` |
 
 ### Integraciones
 
-| Opción | Descripción | Por defecto |
-|--------|-------------|-------------|
+| Opción | Descripción | Valor inicial |
+|--------|-------------|---------------|
 | `gtm_enabled` | Habilitar Google Tag Manager | `false` |
-| `gtm_container_id` | ID del contenedor GTM | `""` |
+| `gtm_container_id` | ID del contenedor GTM | vacío |
 | `consent_mode_enabled` | Habilitar Google Consent Mode v2 | `true` |
-| `config_version` | Versión de configuración (auto-incrementado) | `1` |
+
+`config_version` no se edita: sube sola al crear o editar categorías y al crear, editar o eliminar cookies o scripts.
 
 ## Enums de referencia
 
@@ -235,47 +193,87 @@ El middleware `InjectCookieScripts` inyecta automáticamente los scripts en las 
 
 ## Permisos
 
-| Permiso | Descripción |
-|---------|-------------|
-| `cookie_categories.view_any` | Ver categorías de cookies |
-| `cookie_categories.create` | Crear categorías de cookies |
-| `cookie_categories.update` | Editar categorías de cookies |
-| `cookie_categories.delete` | Eliminar categorías de cookies |
-| `cookie_consents.view_any` | Ver consentimientos |
-| `cookie_consents.export` | Exportar consentimientos |
+| Permiso | Descripción | Roles por defecto |
+|---------|-------------|-------------------|
+| `cookie_categories.view_any` | Ver categorías de cookies | `editor` |
+| `cookie_categories.create` | Crear categorías de cookies | — |
+| `cookie_categories.update` | Editar categorías de cookies | — |
+| `cookie_categories.delete` | Eliminar categorías de cookies | — |
+| `cookie_consents.view_any` | Ver consentimientos y el widget de estadísticas | — |
+| `cookie_consents.export` | Reservado para exportar consentimientos (sin acción en el panel todavía) | — |
+
+Los administradores tienen todos los permisos. La página **Banner de cookies** usa el permiso del core `settings.manage`.
 
 ## Eventos de dominio
 
 | Evento | Cuándo se dispara |
 |--------|-------------------|
-| `ConsentGranted` | Al registrar un nuevo consentimiento |
-| `ConsentUpdated` | Al modificar las preferencias de consentimiento |
-| `ConsentWithdrawn` | Al retirar el consentimiento |
-| `CookieConfigurationChanged` | Al modificar categorías, cookies o scripts (incrementa la versión de configuración) |
+| `ConsentGranted` | Al registrar el primer consentimiento de un visitante |
+| `ConsentUpdated` | Al cambiar un visitante sus preferencias (también al rechazar categorías que había aceptado) |
+| `CookieConfigurationChanged` | Al crear o editar categorías y al crear, editar o eliminar cookies o scripts (sube la versión de configuración) |
 
 ## Categorías por defecto
 
-El seeder crea las siguientes categorías del sistema:
+El seeder crea estas categorías del sistema:
 
-| Categoría | Slug | Obligatoria | Claves Consent Mode |
-|-----------|------|-------------|---------------------|
-| Cookies necesarias | `necessary` | Si | `security_storage`, `functionality_storage` |
+| Categoría | Slug | Obligatoria | Claves de Consent Mode |
+|-----------|------|-------------|------------------------|
+| Cookies necesarias | `necessary` | Sí | `security_storage`, `functionality_storage` |
 | Cookies de preferencias | `preferences` | No | `personalization_storage` |
 | Cookies analíticas | `analytics` | No | `analytics_storage` |
 | Cookies de marketing | `marketing` | No | `ad_storage`, `ad_user_data`, `ad_personalization` |
 
+## Estructura
+
+```
+cookie-consent/
+├── config/
+│   ├── module.php              # Configuración del módulo
+│   └── settings.php            # Valores por defecto del formulario del banner
+├── database/
+│   ├── migrations/             # Migraciones
+│   └── seeders/                # Categorías por defecto y ajustes iniciales
+├── lang/
+│   └── es/                     # Traducciones
+├── resources/
+│   ├── css/                    # Estilos del banner
+│   └── js/
+│       ├── components/         # CookieBanner, CookieSettingsModal
+│       ├── types/              # Tipos TypeScript
+│       └── utils/              # consent-manager
+├── routes/
+│   └── web.php                 # Rutas del banner
+├── src/
+│   ├── Application/            # DTOs e interfaces de servicios
+│   ├── Domain/                 # Entidades, enums, eventos, excepciones, repositorios, objetos de valor
+│   ├── Filament/               # Recursos, página de ajustes y widget
+│   ├── Http/                   # Controlador, middleware y form request
+│   ├── Infrastructure/         # Modelos, repositorios Eloquent y servicios
+│   ├── Listeners/              # Listeners de eventos
+│   └── Policies/               # Políticas de autorización
+├── tests/
+│   ├── Unit/
+│   ├── Integration/
+│   └── Feature/
+└── module.json                 # Manifiesto del módulo
+```
+
 ## Tests
 
+Desde `src/` (o dentro del contenedor `guildforge_app`):
+
 ```bash
-# Ejecutar todos los tests del módulo
-php artisan test modules/cookie-consent/tests
-
-# Solo tests unitarios
-php artisan test modules/cookie-consent/tests/Unit
-
-# Solo tests de integración
-php artisan test modules/cookie-consent/tests/Feature
+vendor/bin/phpunit -c modules/cookie-consent/phpunit.xml
+vendor/bin/phpunit -c modules/cookie-consent/phpunit.xml --testsuite=Unit
 ```
+
+`php artisan test` no ejecuta los tests de los módulos.
+
+## Publicar una versión
+
+1. Sube `version` en `module.json`.
+2. Crea y empuja la etiqueta `vX.Y.Z` (debe coincidir con `version`).
+3. El workflow `release.yml` ejecuta los tests contra el core (`main`, o la variable `GUILDFORGE_HOST_REF`), compila los assets y publica `cookie-consent-X.Y.Z.zip` con su `.sha256` en la release.
 
 ## Licencia
 
