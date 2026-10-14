@@ -39,9 +39,16 @@ final class ScriptInjectorService implements ScriptInjectorServiceInterface
         $config = $this->bannerConfigService->getBannerConfig();
         $scripts = [];
 
-        // Always add consent mode defaults first (if enabled)
+        // Always add consent mode defaults first (if enabled), then the visitor's
+        // stored choices: the banner only updates Consent Mode when they are made
         if ($config->consentModeEnabled) {
             $scripts[] = $this->consentModeService->generateDefaultScript();
+
+            if (count($consentedCategories) > 0) {
+                $scripts[] = $this->consentModeService->generateUpdateScript(
+                    array_fill_keys($consentedCategories, true)
+                );
+            }
         }
 
         // Add GTM script if enabled and analytics/marketing consent exists

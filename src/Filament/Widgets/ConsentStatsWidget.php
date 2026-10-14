@@ -8,10 +8,16 @@ use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Modules\CookieConsent\Domain\Enums\ConsentMethod;
 use Modules\CookieConsent\Domain\Repositories\CookieConsentRepositoryInterface;
+use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieConsentModel;
 
 class ConsentStatsWidget extends StatsOverviewWidget
 {
     protected static ?int $sort = 90;
+
+    public static function canView(): bool
+    {
+        return auth()->user()?->can('viewAny', CookieConsentModel::class) ?? false;
+    }
 
     protected function getStats(): array
     {

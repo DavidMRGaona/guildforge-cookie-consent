@@ -108,12 +108,12 @@ class CookieConsentResource extends BaseResource
                     ->options(ConsentMethod::class),
 
                 Filter::make('authenticated')
-                    ->label('Usuario autenticado')
+                    ->label(__('cookie-consent::cookie_consent.consents.filters.authenticated'))
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('user_id'))
                     ->toggle(),
 
                 Filter::make('consented_today')
-                    ->label('Hoy')
+                    ->label(__('cookie-consent::cookie_consent.consents.filters.consented_today'))
                     ->query(fn (Builder $query): Builder => $query->whereDate('consented_at', today()))
                     ->toggle(),
             ])

@@ -55,7 +55,6 @@ final class CookieConsentSettings extends Page implements HasForms
         'secondary_color',
         'background_color',
         'text_color',
-        'show_logo',
         'banner_title',
         'banner_description',
         'accept_all_text',
@@ -66,7 +65,6 @@ final class CookieConsentSettings extends Page implements HasForms
         'privacy_policy_url',
         'show_reject_all',
         'show_settings_button',
-        'block_page_until_consent',
         'consent_validity_days',
         'reconsent_on_change',
         'gtm_enabled',
@@ -76,10 +74,8 @@ final class CookieConsentSettings extends Page implements HasForms
 
     /** @var list<string> */
     private const BOOLEAN_KEYS = [
-        'show_logo',
         'show_reject_all',
         'show_settings_button',
-        'block_page_until_consent',
         'reconsent_on_change',
         'gtm_enabled',
         'consent_mode_enabled',
@@ -210,10 +206,6 @@ final class CookieConsentSettings extends Page implements HasForms
                                 ->default('#1F2937'),
                         ])
                         ->visible(fn (Get $get): bool => $get('banner_theme') === BannerTheme::Custom),
-
-                    Toggle::make('show_logo')
-                        ->label(__('cookie-consent::cookie_consent.settings.show_logo'))
-                        ->default(true),
                 ])
                 ->columns(2),
 
@@ -287,11 +279,6 @@ final class CookieConsentSettings extends Page implements HasForms
                     Toggle::make('show_settings_button')
                         ->label(__('cookie-consent::cookie_consent.settings.show_settings_button'))
                         ->default(true),
-
-                    Toggle::make('block_page_until_consent')
-                        ->label(__('cookie-consent::cookie_consent.settings.block_page_until_consent'))
-                        ->helperText(__('cookie-consent::cookie_consent.settings.block_page_until_consent_help'))
-                        ->default(false),
 
                     TextInput::make('consent_validity_days')
                         ->label(__('cookie-consent::cookie_consent.settings.consent_validity_days'))

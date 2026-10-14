@@ -7,10 +7,12 @@ namespace Modules\CookieConsent;
 use Throwable;
 use Filament\Pages\Page;
 use Filament\Resources\Resource;
+use Filament\Widgets\Widget;
 use App\Application\Modules\DTOs\NavigationItemDTO;
 use App\Application\Modules\DTOs\PermissionDTO;
 use App\Application\Modules\DTOs\SlotRegistrationDTO;
 use App\Modules\ModuleServiceProvider;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Event;
 use Inertia\Inertia;
@@ -29,6 +31,7 @@ use Modules\CookieConsent\Filament\Resources\CookieCategoryResource;
 use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\RelationManagers\CookiesRelationManager;
 use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\RelationManagers\ScriptsRelationManager;
 use Modules\CookieConsent\Filament\Resources\CookieConsentResource;
+use Modules\CookieConsent\Filament\Widgets\ConsentStatsWidget;
 use Modules\CookieConsent\Http\Middleware\InjectCookieScripts;
 use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieCategoryModel;
 use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieConsentModel;
@@ -73,6 +76,11 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
     public function boot(): void
     {
         parent::boot();
+
+        // The banner writes the consent cookie in the browser: encrypted cookies that
+        // fail to decrypt reach the request as null, so the middleware would never
+        // see the visitor's choices
+        EncryptCookies::except([InjectCookieScripts::CONSENT_COOKIE_NAME]);
 
         // Register middleware globally for script injection
         /** @var Router $router */
@@ -141,6 +149,18 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
     {
         return [
             CookieConsentSettings::class,
+        ];
+    }
+
+    /**
+     * Dashboard widgets, discovered by the admin panel.
+     *
+     * @return array<class-string<Widget>>
+     */
+    public function registerFilamentWidgets(): array
+    {
+        return [
+            ConsentStatsWidget::class,
         ];
     }
 

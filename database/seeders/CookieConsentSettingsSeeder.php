@@ -20,7 +20,6 @@ final class CookieConsentSettingsSeeder extends Seeder
             'secondary_color' => '#57534E',   // Stone-600
             'background_color' => '#FFFFFF',
             'text_color' => '#1C1917',        // Stone-900
-            'show_logo' => '1',
 
             // Texts
             'banner_title' => 'Utilizamos cookies',
@@ -35,7 +34,6 @@ final class CookieConsentSettingsSeeder extends Seeder
             // Behavior
             'show_reject_all' => '1',
             'show_settings_button' => '1',
-            'block_page_until_consent' => '0',
             'consent_validity_days' => '365',
             'reconsent_on_change' => '1',
 

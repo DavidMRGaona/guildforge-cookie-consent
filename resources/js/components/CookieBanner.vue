@@ -26,8 +26,6 @@ const props = withDefaults(defineProps<Props>(), {
             },
             showRejectAll: true,
             showSettingsButton: true,
-            showLogo: true,
-            blockPageUntilConsent: false,
             validityDays: 365,
             reconsentOnChange: true,
             configVersion: 1,

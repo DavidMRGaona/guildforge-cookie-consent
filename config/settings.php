@@ -11,7 +11,6 @@ return [
     'secondary_color' => '#6B7280',
     'background_color' => '#FFFFFF',
     'text_color' => '#1F2937',
-    'show_logo' => true,
 
     // Texts
     'banner_title' => 'Utilizamos cookies',
@@ -26,7 +25,6 @@ return [
     // Behavior
     'show_reject_all' => true,
     'show_settings_button' => true,
-    'block_page_until_consent' => false,
     'consent_validity_days' => 365,
     'reconsent_on_change' => true,
 

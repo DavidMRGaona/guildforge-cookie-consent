@@ -20,6 +20,7 @@ return [
             'consent_mode_keys' => 'Claves de Consent Mode',
             'cookies_count' => 'Cookies',
             'scripts_count' => 'Scripts',
+            'created_at' => 'Creada',
         ],
     ],
 
@@ -71,6 +72,10 @@ return [
             'consent_method' => 'Método',
             'consented_at' => 'Fecha consentimiento',
             'expires_at' => 'Expira',
+        ],
+        'filters' => [
+            'authenticated' => 'Usuario autenticado',
+            'consented_today' => 'Hoy',
         ],
     ],
 
@@ -142,7 +147,6 @@ return [
         'secondary_color' => 'Color secundario',
         'background_color' => 'Color de fondo',
         'text_color' => 'Color de texto',
-        'show_logo' => 'Mostrar logo',
 
         'texts' => 'Textos',
         'texts_description' => 'Personaliza los textos que se muestran en el banner de cookies',
@@ -160,8 +164,6 @@ return [
         'behavior' => 'Comportamiento',
         'show_reject_all' => 'Mostrar botón "Rechazar todas"',
         'show_settings_button' => 'Mostrar botón "Configurar"',
-        'block_page_until_consent' => 'Bloquear página hasta consentimiento',
-        'block_page_until_consent_help' => 'Muestra un overlay que impide interactuar con la página hasta que el usuario dé su consentimiento',
         'consent_validity_days' => 'Días de validez del consentimiento',
         'consent_validity_days_help' => 'Número de días que el consentimiento es válido antes de volver a solicitarlo',
         'reconsent_on_change' => 'Volver a solicitar consentimiento al cambiar configuración',

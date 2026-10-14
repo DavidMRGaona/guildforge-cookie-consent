@@ -162,7 +162,7 @@ class CookieCategoryResource extends BaseResource
                     ->alignCenter(),
 
                 TextColumn::make('created_at')
-                    ->label('Creado')
+                    ->label(__('cookie-consent::cookie_consent.categories.fields.created_at'))
                     ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
