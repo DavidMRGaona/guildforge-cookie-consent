@@ -80,7 +80,7 @@ El banner siempre envía `banner`.
 
 ### Middleware
 
-`InjectCookieScripts` se añade al grupo `web` y actúa en las respuestas HTML. Lee la cookie `guildforge_cookie_consent` y añade:
+`InjectCookieScripts` se añade al grupo `web` y actúa en las respuestas HTML. Lee la cookie `guildforge_cookie_consent` y la ignora, como el banner, si el consentimiento ha caducado (`consent_validity_days`) o, con `reconsent_on_change` activo, si se dio para otra versión de la configuración. Añade:
 
 - en `<head>`: los valores por defecto de Consent Mode y, si el visitante ya eligió, su actualización con las categorías aceptadas (si Consent Mode está activo), el contenedor de GTM (si está activo y tiene ID) y los scripts de cabecera de las categorías aceptadas;
 - al empezar `<body>`: el `noscript` de GTM y los scripts de esa posición de las categorías aceptadas;
