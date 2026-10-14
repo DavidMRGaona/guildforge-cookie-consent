@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Tests\Feature\Http;
 
+use App\Application\Services\SettingsServiceInterface;
 use Illuminate\Support\Facades\Route;
 use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieCategoryModel;
 use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieScriptModel;
@@ -20,6 +21,8 @@ final class InjectCookieScriptsTest extends ModuleTestCase
     protected bool $autoEnableModule = true;
 
     private const ANALYTICS_SCRIPT = '<script>window.analyticsTestLoaded = true;</script>';
+
+    private const ACCEPTS_ANALYTICS = ['necessary' => true, 'analytics' => true, 'marketing' => false];
 
     protected function setUp(): void
     {
@@ -91,17 +94,78 @@ final class InjectCookieScriptsTest extends ModuleTestCase
         $this->assertStringNotContainsString("gtag('consent', 'update'", $content);
     }
 
+    public function test_an_expired_consent_is_ignored(): void
+    {
+        app(SettingsServiceInterface::class)->set('cookie-consent.consent_validity_days', '30');
+
+        $content = $this->pageWith($this->consentCookie(self::ACCEPTS_ANALYTICS, timestamp: now()->subDays(31)->toIso8601String()));
+
+        $this->assertNoConsentApplied($content);
+    }
+
+    public function test_a_consent_still_within_its_validity_is_applied(): void
+    {
+        app(SettingsServiceInterface::class)->set('cookie-consent.consent_validity_days', '30');
+
+        $content = $this->pageWith($this->consentCookie(self::ACCEPTS_ANALYTICS, timestamp: now()->subDays(29)->toIso8601String()));
+
+        $this->assertStringContainsString(self::ANALYTICS_SCRIPT, $content);
+        $this->assertStringContainsString("gtag('consent', 'update'", $content);
+    }
+
+    public function test_a_consent_given_for_an_older_configuration_is_ignored(): void
+    {
+        app(SettingsServiceInterface::class)->set('cookie-consent.config_version', '2');
+
+        $content = $this->pageWith($this->consentCookie(self::ACCEPTS_ANALYTICS, version: 1));
+
+        $this->assertNoConsentApplied($content);
+    }
+
+    public function test_an_older_configuration_is_accepted_when_consent_is_not_asked_again_on_changes(): void
+    {
+        $settings = app(SettingsServiceInterface::class);
+        $settings->set('cookie-consent.config_version', '2');
+        $settings->set('cookie-consent.reconsent_on_change', '0');
+
+        $content = $this->pageWith($this->consentCookie(self::ACCEPTS_ANALYTICS, version: 1));
+
+        $this->assertStringContainsString(self::ANALYTICS_SCRIPT, $content);
+    }
+
+    public function test_a_consent_without_a_valid_timestamp_is_ignored(): void
+    {
+        $content = $this->pageWith($this->consentCookie(self::ACCEPTS_ANALYTICS, timestamp: 'not a date'));
+
+        $this->assertNoConsentApplied($content);
+    }
+
+    private function pageWith(string $cookie): string
+    {
+        return (string) $this->withUnencryptedCookie('guildforge_cookie_consent', $cookie)
+            ->get('/cookie-consent-test-page')
+            ->assertOk()
+            ->getContent();
+    }
+
+    private function assertNoConsentApplied(string $content): void
+    {
+        $this->assertStringNotContainsString(self::ANALYTICS_SCRIPT, $content);
+        $this->assertStringNotContainsString("gtag('consent', 'update'", $content);
+        $this->assertStringContainsString("gtag('consent', 'default'", $content);
+    }
+
     /**
      * The value the banner stores (consent-manager.ts).
      *
      * @param  array<string, bool>  $preferences
      */
-    private function consentCookie(array $preferences): string
+    private function consentCookie(array $preferences, int $version = 1, ?string $timestamp = null): string
     {
         return (string) json_encode([
             'visitorId' => '0b5d3c1e-7a1f-4c2b-9d3e-5f6a7b8c9d0e',
-            'version' => 1,
-            'timestamp' => now()->toIso8601String(),
+            'version' => $version,
+            'timestamp' => $timestamp ?? now()->toIso8601String(),
             'preferences' => $preferences,
         ]);
     }

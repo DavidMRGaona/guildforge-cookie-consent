@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Modules\CookieConsent\Http\Middleware;
 
 use Closure;
+use DateTimeImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Modules\CookieConsent\Application\Services\BannerConfigServiceInterface;
 use Modules\CookieConsent\Application\Services\ScriptInjectorServiceInterface;
 use Modules\CookieConsent\Domain\ValueObjects\ConsentPreferences;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -20,6 +22,7 @@ final class InjectCookieScripts
 
     public function __construct(
         private readonly ScriptInjectorServiceInterface $scriptInjector,
+        private readonly BannerConfigServiceInterface $bannerConfigService,
     ) {}
 
     public function handle(Request $request, Closure $next): SymfonyResponse
@@ -65,7 +68,7 @@ final class InjectCookieScripts
 
         try {
             $data = json_decode($cookieValue, true);
-            if (! is_array($data) || ! isset($data['preferences'])) {
+            if (! is_array($data) || ! isset($data['preferences']) || ! $this->isStillValid($data)) {
                 return [];
             }
 
@@ -75,6 +78,33 @@ final class InjectCookieScripts
         } catch (\Throwable) {
             return [];
         }
+    }
+
+    /**
+     * The banner asks again once the consent expires or, when configured, once the
+     * configuration changes: until then the old choices must not apply either.
+     *
+     * @param  array<mixed>  $data
+     */
+    private function isStillValid(array $data): bool
+    {
+        if (! is_string($data['timestamp'] ?? null) || ! is_int($data['version'] ?? null)) {
+            return false;
+        }
+
+        try {
+            $consentedAt = new DateTimeImmutable($data['timestamp']);
+        } catch (\Exception) {
+            return false;
+        }
+
+        $config = $this->bannerConfigService->getBannerConfig();
+
+        if ($consentedAt->modify("+{$config->validityDays} days") < new DateTimeImmutable) {
+            return false;
+        }
+
+        return ! $config->reconsentOnChange || $data['version'] === $config->configVersion;
     }
 
     /**
