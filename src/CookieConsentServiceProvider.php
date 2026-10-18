@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\CookieConsent;
 
 use Throwable;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Events\NoPendingMigrations;
 use Filament\Pages\Page;
@@ -85,6 +86,18 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
         $this->app->bind(DeclaredCookieSynchronizerInterface::class, DeclaredCookieSynchronizer::class);
     }
 
+    /**
+     * Enabling a module or installing this one does not run the sync in a booted process: catch up hourly.
+     */
+    private function registerSchedule(): void
+    {
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule): void {
+            $schedule->command('cookie-consent:sync-declared-cookies')
+                ->hourly()
+                ->withoutOverlapping(10);
+        });
+    }
+
     public function boot(): void
     {
         parent::boot();
@@ -112,6 +125,8 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([SyncDeclaredCookiesCommand::class]);
         }
+
+        $this->registerSchedule();
 
         // Share cookie consent data with Inertia
         if (class_exists(Inertia::class)) {
