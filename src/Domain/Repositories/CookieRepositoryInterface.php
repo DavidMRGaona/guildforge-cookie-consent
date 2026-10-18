@@ -12,6 +12,8 @@ interface CookieRepositoryInterface
 {
     public function findById(CookieId $id): ?Cookie;
 
+    public function findByName(string $name): ?Cookie;
+
     /**
      * @return array<Cookie>
      */

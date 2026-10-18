@@ -1,0 +1,146 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\CookieConsent\Tests\Integration\Services;
+
+use Illuminate\Database\Events\MigrationsEnded;
+use Illuminate\Database\Events\NoPendingMigrations;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
+use Modules\CookieConsent\Application\DTOs\DeclaredCookieDTO;
+use Modules\CookieConsent\Application\Services\ConsentServiceInterface;
+use Modules\CookieConsent\Application\Services\CookieDeclarationRegistryInterface;
+use Modules\CookieConsent\Application\Services\DeclaredCookieSynchronizerInterface;
+use Modules\CookieConsent\Database\Seeders\DefaultCategoriesSeeder;
+use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieCategoryModel;
+use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieModel;
+use Ramsey\Uuid\Uuid;
+use Tests\Support\Modules\ModuleTestCase;
+
+final class DeclaredCookieSynchronizerTest extends ModuleTestCase
+{
+    protected ?string $moduleName = 'cookie-consent';
+
+    protected bool $autoEnableModule = true;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        require_once dirname(__DIR__, 3).'/database/seeders/DefaultCategoriesSeeder.php';
+        $this->seed(DefaultCategoriesSeeder::class);
+    }
+
+    public function test_creates_a_missing_declared_cookie_in_its_category(): void
+    {
+        $this->declare('gt_guest_registrations', 'preferences', 'Remembers your registrations', '1 year');
+
+        $created = $this->synchronizer()->sync();
+
+        $this->assertSame(1, $created);
+        $this->assertSame(1, CookieModel::query()->where('name', 'gt_guest_registrations')->count());
+
+        $cookie = CookieModel::query()->where('name', 'gt_guest_registrations')->firstOrFail();
+        $this->assertSame(
+            CookieCategoryModel::query()->where('slug', 'preferences')->value('id'),
+            $cookie->category_id,
+        );
+        $this->assertSame('GuildForge', $cookie->provider);
+        $this->assertSame('Remembers your registrations', $cookie->purpose);
+        $this->assertSame('1 year', $cookie->duration);
+        $this->assertTrue($cookie->is_active);
+    }
+
+    public function test_creation_bumps_the_config_version_once(): void
+    {
+        $this->declare('gt_guest_registrations', 'preferences', 'Purpose');
+        $this->declare('gt_other', 'preferences', 'Other purpose');
+        $consent = $this->app->make(ConsentServiceInterface::class);
+        $before = $consent->getConfigVersion();
+
+        $this->synchronizer()->sync();
+        $this->assertSame($before + 1, $consent->getConfigVersion());
+
+        $this->synchronizer()->sync();
+        $this->assertSame($before + 1, $consent->getConfigVersion());
+    }
+
+    public function test_existing_cookie_with_the_same_name_is_left_untouched(): void
+    {
+        CookieModel::query()->create([
+            'id' => Uuid::uuid4()->toString(),
+            'category_id' => CookieCategoryModel::query()->where('slug', 'analytics')->value('id'),
+            'name' => 'gt_guest_registrations',
+            'provider' => 'Someone',
+            'purpose' => 'Edited by an admin',
+            'type' => 'first_party',
+            'is_active' => true,
+        ]);
+        $this->declare('gt_guest_registrations', 'preferences', 'Declared purpose');
+        $consent = $this->app->make(ConsentServiceInterface::class);
+        $before = $consent->getConfigVersion();
+
+        $created = $this->synchronizer()->sync();
+
+        $this->assertSame(0, $created);
+        $this->assertSame(1, CookieModel::query()->where('name', 'gt_guest_registrations')->count());
+        $this->assertSame('Edited by an admin', CookieModel::query()->where('name', 'gt_guest_registrations')->value('purpose'));
+        $this->assertSame($before, $consent->getConfigVersion());
+    }
+
+    public function test_unknown_category_is_skipped_with_a_warning(): void
+    {
+        Log::shouldReceive('warning')->once();
+        Log::shouldReceive('info')->zeroOrMoreTimes();
+        $this->declare('gt_guest_registrations', 'missing', 'Purpose');
+
+        $created = $this->synchronizer()->sync();
+
+        $this->assertSame(0, $created);
+        $this->assertSame(0, CookieModel::query()->where('name', 'gt_guest_registrations')->count());
+    }
+
+    public function test_migrate_runs_the_sync(): void
+    {
+        $this->declare('gt_guest_registrations', 'preferences', 'Purpose');
+
+        Event::dispatch(new NoPendingMigrations('up'));
+
+        $this->assertSame(1, CookieModel::query()->where('name', 'gt_guest_registrations')->count());
+
+        CookieModel::query()->where('name', 'gt_guest_registrations')->delete();
+
+        Event::dispatch(new MigrationsEnded('up'));
+
+        $this->assertSame(1, CookieModel::query()->where('name', 'gt_guest_registrations')->count());
+    }
+
+    public function test_a_failing_sync_never_breaks_the_migration_events(): void
+    {
+        $this->app->bind(DeclaredCookieSynchronizerInterface::class, fn () => new class implements DeclaredCookieSynchronizerInterface
+        {
+            public function sync(): int
+            {
+                throw new \RuntimeException('boom');
+            }
+        });
+        Log::shouldReceive('error')->once();
+
+        Event::dispatch(new MigrationsEnded('up'));
+
+        $this->addToAssertionCount(1);
+    }
+
+    private function declare(string $name, string $slug, string $purpose, ?string $duration = null): void
+    {
+        $this->app->make(CookieDeclarationRegistryInterface::class)->declare(
+            new DeclaredCookieDTO($name, $slug, 'GuildForge', $purpose, $duration)
+        );
+    }
+
+    private function synchronizer(): DeclaredCookieSynchronizerInterface
+    {
+        return $this->app->make(DeclaredCookieSynchronizerInterface::class);
+    }
+}
