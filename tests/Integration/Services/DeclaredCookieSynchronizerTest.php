@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Tests\Integration\Services;
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Events\NoPendingMigrations;
 use Illuminate\Support\Facades\Event;
@@ -130,6 +131,48 @@ final class DeclaredCookieSynchronizerTest extends ModuleTestCase
         Event::dispatch(new MigrationsEnded('up'));
 
         $this->addToAssertionCount(1);
+    }
+
+    public function test_a_throwing_declaration_callback_never_breaks_the_migration_events(): void
+    {
+        $this->app->forgetInstance(CookieDeclarationRegistryInterface::class);
+        $this->app->afterResolving(CookieDeclarationRegistryInterface::class, function (): void {
+            throw new \TypeError('declaration built against another signature');
+        });
+        Log::shouldReceive('error')->once();
+
+        Event::dispatch(new MigrationsEnded('up'));
+        Event::dispatch(new NoPendingMigrations('up'));
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function test_rollbacks_do_not_run_the_sync(): void
+    {
+        $this->declare('gt_guest_registrations', 'preferences', 'Purpose');
+
+        Event::dispatch(new MigrationsEnded('down'));
+        Event::dispatch(new NoPendingMigrations('down'));
+
+        $this->assertSame(0, CookieModel::query()->where('name', 'gt_guest_registrations')->count());
+    }
+
+    public function test_pretend_runs_do_not_run_the_sync(): void
+    {
+        $this->declare('gt_guest_registrations', 'preferences', 'Purpose');
+
+        Event::dispatch(new MigrationsEnded('up', ['pretend' => true]));
+
+        $this->assertSame(0, CookieModel::query()->where('name', 'gt_guest_registrations')->count());
+    }
+
+    public function test_the_sync_is_scheduled_hourly(): void
+    {
+        $events = collect($this->app->make(Schedule::class)->events())
+            ->filter(fn ($event): bool => str_contains((string) $event->command, 'cookie-consent:sync-declared-cookies'));
+
+        $this->assertCount(1, $events);
+        $this->assertSame('0 * * * *', $events->first()->expression);
     }
 
     private function declare(string $name, string $slug, string $purpose, ?string $duration = null): void
