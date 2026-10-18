@@ -69,6 +69,25 @@ export function needsConsent(
 }
 
 /**
+ * Check whether the visitor consented to a category (used by other modules' frontends).
+ * Required categories always count as consented; others need a stored, valid
+ * consent (same expiry and version rules as the banner) with the slug set to true.
+ */
+export function hasConsentFor(
+    slug: string,
+    configVersion: number,
+    validityDays: number,
+    reconsentOnChange: boolean,
+    requiredSlugs: string[]
+): boolean {
+    if (requiredSlugs.includes(slug)) return true;
+
+    if (needsConsent(configVersion, validityDays, reconsentOnChange)) return false;
+
+    return getStoredConsent()?.preferences?.[slug] === true;
+}
+
+/**
  * Save consent to localStorage and sync to server.
  */
 export async function saveConsent(
