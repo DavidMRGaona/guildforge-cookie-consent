@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, watch } from 'vue';
 import type { CookieCategory, BannerConfig } from '../types/cookie-consent';
-import { needsConsent, saveConsent } from '../utils/consent-manager';
+import { hasConsentFor, needsConsent, saveConsent } from '../utils/consent-manager';
 import CookieSettingsModal from './CookieSettingsModal.vue';
 
 interface Props {
@@ -75,6 +75,33 @@ onMounted(() => {
         );
     }
 });
+
+// Publish the browser API other modules use to ask for consent per category
+function publishConsentApi(): void {
+    globalThis.GuildForgeCookieConsent = {
+        hasConsent: (categorySlug: string): boolean => {
+            const current = config.value;
+            if (!current) return false;
+
+            return hasConsentFor(
+                categorySlug,
+                current.configVersion,
+                current.validityDays,
+                current.reconsentOnChange,
+                categories.value
+                    .filter((category) => category.isRequired)
+                    .map((category) => category.slug)
+            );
+        },
+    };
+}
+
+function notifyConsentChanged(): void {
+    window.dispatchEvent(new window.CustomEvent('guildforge:cookie-consent-changed'));
+}
+
+publishConsentApi();
+watch([config, categories], publishConsentApi);
 
 const positionClasses = computed(() => {
     if (!config.value) return '';
@@ -170,6 +197,7 @@ async function acceptAll(): Promise<void> {
 
     await saveConsent(preferences, config.value.configVersion);
     isVisible.value = false;
+    notifyConsentChanged();
 }
 
 async function rejectAll(): Promise<void> {
@@ -183,6 +211,7 @@ async function rejectAll(): Promise<void> {
 
     await saveConsent(preferences, config.value.configVersion);
     isVisible.value = false;
+    notifyConsentChanged();
 }
 
 function openSettings(): void {
@@ -201,6 +230,7 @@ async function handleSaveSettings(
     await saveConsent(preferences, config.value.configVersion);
     showSettingsModal.value = false;
     isVisible.value = false;
+    notifyConsentChanged();
 }
 </script>
 

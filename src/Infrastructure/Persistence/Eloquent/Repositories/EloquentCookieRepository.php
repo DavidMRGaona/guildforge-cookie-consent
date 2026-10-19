@@ -25,6 +25,13 @@ final class EloquentCookieRepository implements CookieRepositoryInterface
         return $this->toEntity($model);
     }
 
+    public function findByName(string $name): ?Cookie
+    {
+        $model = CookieModel::where('name', $name)->first();
+
+        return $model === null ? null : $this->toEntity($model);
+    }
+
     /**
      * @return array<Cookie>
      */

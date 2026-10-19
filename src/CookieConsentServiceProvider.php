@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Modules\CookieConsent;
 
 use Throwable;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Database\Events\MigrationsEnded;
+use Illuminate\Database\Events\NoPendingMigrations;
 use Filament\Pages\Page;
 use Filament\Resources\Resource;
 use Filament\Widgets\Widget;
@@ -20,6 +23,9 @@ use Livewire\Livewire;
 use Modules\CookieConsent\Application\Services\BannerConfigServiceInterface;
 use Modules\CookieConsent\Application\Services\ConsentModeServiceInterface;
 use Modules\CookieConsent\Application\Services\ConsentServiceInterface;
+use Modules\CookieConsent\Application\Services\CookieDeclarationRegistryInterface;
+use Modules\CookieConsent\Application\Services\DeclaredCookieSynchronizerInterface;
+use Modules\CookieConsent\Console\Commands\SyncDeclaredCookiesCommand;
 use Modules\CookieConsent\Application\Services\ScriptInjectorServiceInterface;
 use Modules\CookieConsent\Domain\Events\CookieConfigurationChanged;
 use Modules\CookieConsent\Domain\Repositories\CookieCategoryRepositoryInterface;
@@ -42,8 +48,11 @@ use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Repositories\Eloqu
 use Modules\CookieConsent\Infrastructure\Services\BannerConfigService;
 use Modules\CookieConsent\Infrastructure\Services\ConsentModeService;
 use Modules\CookieConsent\Infrastructure\Services\ConsentService;
+use Modules\CookieConsent\Infrastructure\Services\CookieDeclarationRegistry;
+use Modules\CookieConsent\Infrastructure\Services\DeclaredCookieSynchronizer;
 use Modules\CookieConsent\Infrastructure\Services\ScriptInjectorService;
 use Modules\CookieConsent\Listeners\IncrementConfigVersionOnChange;
+use Modules\CookieConsent\Listeners\SyncDeclaredCookiesAfterMigrations;
 use Modules\CookieConsent\Policies\CookieCategoryPolicy;
 use Modules\CookieConsent\Policies\CookieConsentPolicy;
 
@@ -71,6 +80,22 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
         $this->app->bind(BannerConfigServiceInterface::class, BannerConfigService::class);
         $this->app->bind(ConsentModeServiceInterface::class, ConsentModeService::class);
         $this->app->bind(ScriptInjectorServiceInterface::class, ScriptInjectorService::class);
+
+        // Other modules declare their cookies here during boot: it must outlive each resolution
+        $this->app->singleton(CookieDeclarationRegistryInterface::class, CookieDeclarationRegistry::class);
+        $this->app->bind(DeclaredCookieSynchronizerInterface::class, DeclaredCookieSynchronizer::class);
+    }
+
+    /**
+     * Enabling a module or installing this one does not run the sync in a booted process: catch up hourly.
+     */
+    private function registerSchedule(): void
+    {
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule): void {
+            $schedule->command('cookie-consent:sync-declared-cookies')
+                ->hourly()
+                ->withoutOverlapping(10);
+        });
     }
 
     public function boot(): void
@@ -92,6 +117,16 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
             CookieConfigurationChanged::class,
             IncrementConfigVersionOnChange::class
         );
+
+        // Modules migrate through Artisan::call('migrate'): create the cookies they declare afterwards
+        Event::listen(MigrationsEnded::class, SyncDeclaredCookiesAfterMigrations::class);
+        Event::listen(NoPendingMigrations::class, SyncDeclaredCookiesAfterMigrations::class);
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([SyncDeclaredCookiesCommand::class]);
+        }
+
+        $this->registerSchedule();
 
         // Share cookie consent data with Inertia
         if (class_exists(Inertia::class)) {

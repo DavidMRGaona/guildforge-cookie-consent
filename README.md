@@ -60,6 +60,49 @@ Una vez habilitado, el grupo **Configuración** del panel muestra:
 
 El banner se inyecta automáticamente al final de cada página (slot `after-footer`) y abre `CookieSettingsModal` para elegir categorías. Se muestra mientras el visitante no haya consentido, cuando el consentimiento caduca o, si `reconsent_on_change` está activo, cuando cambia la versión de la configuración. Las preferencias se guardan en el navegador (`localStorage` y cookie `guildforge_cookie_consent`) y se registran en el servidor.
 
+### Cookies declaradas por otros módulos
+
+Un módulo que usa cookies propias las declara para que aparezcan en la categoría que corresponda del banner. El módulo no tiene por qué requerir `cookie-consent`: la declaración solo se hace si la interfaz existe.
+
+```php
+use Modules\CookieConsent\Application\DTOs\DeclaredCookieDTO;
+use Modules\CookieConsent\Application\Services\CookieDeclarationRegistryInterface;
+
+if (interface_exists(CookieDeclarationRegistryInterface::class)) {
+    $this->callAfterResolving(CookieDeclarationRegistryInterface::class, function (CookieDeclarationRegistryInterface $registry): void {
+        $registry->declare(new DeclaredCookieDTO(name: '...', categorySlug: 'preferences', provider: '...', purpose: '...', duration: '90 días'));
+    });
+}
+```
+
+`DeclaredCookieDTO` también acepta `type` (`CookieType`, por defecto `FirstParty`). Declarar dos veces el mismo nombre sustituye la declaración anterior.
+
+- **Cuándo se crean.** `DeclaredCookieSynchronizerInterface::sync()` crea las cookies declaradas que aún no existen. Se ejecuta tras las migraciones (no en rollbacks ni con `--pretend`), cada hora desde el programador de tareas (cubre habilitar un módulo desde el panel o instalar `cookie-consent`) y a mano con `php artisan cookie-consent:sync-declared-cookies`. Un fallo de la sincronización se registra y nunca interrumpe `migrate`.
+- **Nunca actualiza filas existentes.** Si ya hay una cookie con ese nombre no se toca, así que los cambios hechos en el panel se conservan. Una cookie declarada en una categoría que no existe se omite y se registra un aviso.
+- **Versión de la configuración.** Cada sincronización que crea al menos una cookie sube la versión una sola vez (no una por cookie), de modo que se vuelve a pedir el consentimiento si `reconsent_on_change` está activo. Las sincronizaciones posteriores, sin cookies nuevas, no la modifican.
+
+### Consultar el consentimiento desde el navegador
+
+El banner publica `globalThis.GuildForgeCookieConsent` para que los frontends de otros módulos comprueben el consentimiento por categoría:
+
+```ts
+if (globalThis.GuildForgeCookieConsent?.hasConsent('preferences')) {
+    // el visitante aceptó las cookies de preferencias
+}
+```
+
+- `hasConsent(categorySlug)` devuelve `true` para las categorías obligatorias (siempre que el banner tenga cargadas la configuración y las categorías: sin ellas devuelve `false` para cualquier slug). Para las demás, solo si hay un consentimiento guardado, no ha caducado (`validity_days`), coincide con la versión de la configuración (si `reconsent_on_change` está activo) y la categoría está aceptada.
+- Un slug desconocido devuelve `false`.
+- El banner publica el objeto al montarse, después de que se ejecuten los `setup()` de los demás componentes en la primera carga: léelo en `onMounted` (o más tarde) y escucha `guildforge:cookie-consent-changed` para reaccionar a cambios. Durante tu `setup()` puede no existir todavía.
+- Si el objeto global no existe, el módulo no está en la página: trátalo como falta de consentimiento.
+- Tras guardar el consentimiento (aceptar todo, rechazar todo o guardar preferencias) el banner dispara el evento `guildforge:cookie-consent-changed` en `window`, sin recargar la página:
+
+```ts
+window.addEventListener('guildforge:cookie-consent-changed', () => {
+    // vuelve a comprobar hasConsent()
+});
+```
+
 ### Rutas
 
 Rutas web (middleware `web`, con CSRF):
