@@ -176,7 +176,7 @@ const secondaryButtonClasses = computed(() => {
         return 'text-white font-medium py-2 px-4 rounded-md transition-opacity hover:opacity-90';
     }
 
-    return 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-base-primary font-medium py-2 px-4 rounded-md transition-colors';
+    return 'bg-base-secondary/10 hover:bg-base-secondary/20 text-base-primary font-medium py-2 px-4 rounded-md transition-colors';
 });
 
 const secondaryButtonStyles = computed(() => {

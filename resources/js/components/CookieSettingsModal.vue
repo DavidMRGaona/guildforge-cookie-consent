@@ -100,7 +100,7 @@ function close(): void {
                     </h2>
                     <button
                         type="button"
-                        class="p-1 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                        class="p-1 rounded-full hover:bg-base-secondary/10 transition-colors"
                         @click="close"
                     >
                         <svg
@@ -153,7 +153,7 @@ function close(): void {
                         >
                             <!-- Category header -->
                             <div
-                                class="flex items-center justify-between p-4 bg-neutral-100 dark:bg-neutral-800"
+                                class="flex items-center justify-between p-4 bg-base-secondary/10"
                             >
                                 <div class="flex-1">
                                     <div class="flex items-center gap-2">
@@ -162,7 +162,7 @@ function close(): void {
                                         </h3>
                                         <span
                                             v-if="category.isRequired"
-                                            class="text-xs bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded"
+                                            class="text-xs bg-base-secondary/20 px-2 py-0.5 rounded"
                                         >
                                             Obligatoria
                                         </span>
@@ -179,7 +179,7 @@ function close(): void {
                                         'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
                                         preferences[category.slug]
                                             ? 'bg-primary'
-                                            : 'bg-neutral-100 dark:bg-neutral-700',
+                                            : 'bg-base-secondary/50',
                                         category.isRequired
                                             ? 'cursor-not-allowed opacity-70'
                                             : '',
@@ -191,7 +191,7 @@ function close(): void {
                                 >
                                     <span
                                         :class="[
-                                            'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                                            'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-elevated shadow ring-0 transition duration-200 ease-in-out',
                                             preferences[category.slug]
                                                 ? 'translate-x-5'
                                                 : 'translate-x-0',
@@ -207,7 +207,7 @@ function close(): void {
                             >
                                 <button
                                     type="button"
-                                    class="w-full flex items-center justify-between p-3 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                                    class="w-full flex items-center justify-between p-3 text-sm hover:bg-base-secondary/10 transition-colors"
                                     @click="toggleCookieList(category.slug)"
                                 >
                                     <span>
@@ -257,7 +257,7 @@ function close(): void {
                                             class="w-full text-xs border-t border-default"
                                         >
                                             <thead
-                                                class="bg-neutral-100 dark:bg-neutral-800"
+                                                class="bg-base-secondary/10"
                                             >
                                                 <tr>
                                                     <th
@@ -321,7 +321,7 @@ function close(): void {
                     <div class="flex gap-2">
                         <button
                             type="button"
-                            class="px-4 py-2 text-sm font-medium text-base-secondary hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md transition-colors"
+                            class="px-4 py-2 text-sm font-medium text-base-secondary hover:bg-base-secondary/10 rounded-md transition-colors"
                             @click="close"
                         >
                             Cancelar
