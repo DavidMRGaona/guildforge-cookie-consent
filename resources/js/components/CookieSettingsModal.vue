@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ChevronDown, X } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import type { CookieCategory, BannerConfig } from '../types/cookie-consent';
 import { getStoredConsent } from '../utils/consent-manager';
@@ -103,19 +104,7 @@ function close(): void {
                         class="p-1 rounded-full hover:bg-base-secondary/10 transition-colors"
                         @click="close"
                     >
-                        <svg
-                            class="w-6 h-6"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
+                        <X class="w-6 h-6" aria-hidden="true" />
                     </button>
                 </div>
 
@@ -215,26 +204,10 @@ function close(): void {
                                             category.cookies.length
                                         }})
                                     </span>
-                                    <svg
-                                        :class="[
-                                            'w-4 h-4 transition-transform',
-                                            expandedCategories.has(
-                                                category.slug
-                                            )
-                                                ? 'rotate-180'
-                                                : '',
-                                        ]"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M19 9l-7 7-7-7"
-                                        />
-                                    </svg>
+                                    <ChevronDown
+                                        :class="[ 'w-4 h-4 transition-transform', expandedCategories.has( category.slug ) ? 'rotate-180' : '', ]"
+                                        aria-hidden="true"
+                                    />
                                 </button>
 
                                 <Transition
