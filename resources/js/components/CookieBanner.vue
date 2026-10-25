@@ -3,6 +3,7 @@ import { computed, ref, onMounted, watch } from 'vue';
 import type { CookieCategory, BannerConfig } from '../types/cookie-consent';
 import { hasConsentFor, needsConsent, saveConsent } from '../utils/consent-manager';
 import CookieSettingsModal from './CookieSettingsModal.vue';
+import { useRoutes } from '@/composables/useRoutes';
 
 interface Props {
     cookieConsent?: {
@@ -38,7 +39,7 @@ const props = withDefaults(defineProps<Props>(), {
                 settings: 'Configurar',
                 save: 'Guardar preferencias',
                 privacyLink: 'Política de privacidad',
-                privacyUrl: '/politica-de-privacidad',
+                privacyUrl: useRoutes().legal.privacy,
             },
             gtmEnabled: false,
             gtmContainerId: '',
