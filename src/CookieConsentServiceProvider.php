@@ -23,7 +23,6 @@ use Livewire\Livewire;
 use Modules\CookieConsent\Application\Services\BannerConfigServiceInterface;
 use Modules\CookieConsent\Application\Services\ConsentModeServiceInterface;
 use Modules\CookieConsent\Application\Services\ConsentServiceInterface;
-use Modules\CookieConsent\Application\Services\CookieDeclarationRegistryInterface;
 use Modules\CookieConsent\Application\Services\DeclaredCookieSynchronizerInterface;
 use Modules\CookieConsent\Console\Commands\SyncDeclaredCookiesCommand;
 use Modules\CookieConsent\Application\Services\ScriptInjectorServiceInterface;
@@ -48,7 +47,6 @@ use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Repositories\Eloqu
 use Modules\CookieConsent\Infrastructure\Services\BannerConfigService;
 use Modules\CookieConsent\Infrastructure\Services\ConsentModeService;
 use Modules\CookieConsent\Infrastructure\Services\ConsentService;
-use Modules\CookieConsent\Infrastructure\Services\CookieDeclarationRegistry;
 use Modules\CookieConsent\Infrastructure\Services\DeclaredCookieSynchronizer;
 use Modules\CookieConsent\Infrastructure\Services\ScriptInjectorService;
 use Modules\CookieConsent\Listeners\IncrementConfigVersionOnChange;
@@ -82,7 +80,6 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
         $this->app->bind(ScriptInjectorServiceInterface::class, ScriptInjectorService::class);
 
         // Other modules declare their cookies here during boot: it must outlive each resolution
-        $this->app->singleton(CookieDeclarationRegistryInterface::class, CookieDeclarationRegistry::class);
         $this->app->bind(DeclaredCookieSynchronizerInterface::class, DeclaredCookieSynchronizer::class);
     }
 

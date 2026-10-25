@@ -8,7 +8,7 @@
   "description": "Gestión de consentimiento de cookies GDPR",
   "author": "GuildForge",
   "requires": {
-    "core": "^3.0",
+    "core": "^3.18",
     "filament": "^5.0",
     "php": ">=8.5",
     "laravel": ">=13.0"

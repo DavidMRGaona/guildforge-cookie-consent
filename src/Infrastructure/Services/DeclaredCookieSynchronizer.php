@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Infrastructure\Services;
 
+use App\Application\Cookies\Services\CookieDeclarationRegistryInterface;
 use Illuminate\Support\Facades\Log;
-use Modules\CookieConsent\Application\Services\CookieDeclarationRegistryInterface;
 use Modules\CookieConsent\Application\Services\DeclaredCookieSynchronizerInterface;
 use Modules\CookieConsent\Domain\Entities\Cookie;
+use Modules\CookieConsent\Domain\Enums\CookieType;
 use Modules\CookieConsent\Domain\Events\CookieConfigurationChanged;
 use Modules\CookieConsent\Domain\Repositories\CookieCategoryRepositoryInterface;
 use Modules\CookieConsent\Domain\Repositories\CookieRepositoryInterface;
@@ -49,7 +50,8 @@ final readonly class DeclaredCookieSynchronizer implements DeclaredCookieSynchro
                 name: $declared->name,
                 provider: $declared->provider,
                 purpose: $declared->purpose,
-                type: $declared->type,
+                // The core's type and this module's share their values
+                type: CookieType::from($declared->type->value),
                 duration: $declared->duration,
             ));
 
