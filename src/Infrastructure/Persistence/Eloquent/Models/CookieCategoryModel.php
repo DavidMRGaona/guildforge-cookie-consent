@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property string $id
@@ -17,10 +19,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property bool $is_system
  * @property int $sort_order
  * @property array<string>|null $consent_mode_keys
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, CookieModel> $cookies
- * @property-read \Illuminate\Database\Eloquent\Collection<int, CookieScriptModel> $scripts
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection<int, CookieModel> $cookies
+ * @property-read Collection<int, CookieScriptModel> $scripts
  */
 final class CookieCategoryModel extends Model
 {

@@ -12,6 +12,7 @@ use Modules\CookieConsent\Application\DTOs\ConsentDTO;
 use Modules\CookieConsent\Application\DTOs\CookieDTO;
 use Modules\CookieConsent\Application\DTOs\SaveConsentDTO;
 use Modules\CookieConsent\Application\Services\ConsentServiceInterface;
+use Modules\CookieConsent\Domain\Entities\CookieCategory;
 use Modules\CookieConsent\Domain\Entities\CookieConsent;
 use Modules\CookieConsent\Domain\Events\ConsentGranted;
 use Modules\CookieConsent\Domain\Events\ConsentUpdated;
@@ -24,15 +25,15 @@ use Modules\CookieConsent\Domain\ValueObjects\ConsentPreferences;
 use Modules\CookieConsent\Domain\ValueObjects\IpHash;
 use Modules\CookieConsent\Domain\ValueObjects\VisitorId;
 
-final class ConsentService implements ConsentServiceInterface
+final readonly class ConsentService implements ConsentServiceInterface
 {
-    private const SETTINGS_VERSION_KEY = 'cookie-consent.config_version';
+    private const string SETTINGS_VERSION_KEY = 'cookie-consent.config_version';
 
     public function __construct(
-        private readonly CookieCategoryRepositoryInterface $categoryRepository,
-        private readonly CookieRepositoryInterface $cookieRepository,
-        private readonly CookieConsentRepositoryInterface $consentRepository,
-        private readonly SettingsServiceInterface $settingsService,
+        private CookieCategoryRepositoryInterface $categoryRepository,
+        private CookieRepositoryInterface $cookieRepository,
+        private CookieConsentRepositoryInterface $consentRepository,
+        private SettingsServiceInterface $settingsService,
     ) {}
 
     /**
@@ -46,7 +47,7 @@ final class ConsentService implements ConsentServiceInterface
         foreach ($categories as $category) {
             $cookies = $this->cookieRepository->findByCategory($category->id());
             $cookieDTOs = array_map(
-                fn ($cookie) => CookieDTO::fromEntity($cookie),
+                CookieDTO::fromEntity(...),
                 array_filter($cookies, fn ($cookie) => $cookie->isActive())
             );
 
@@ -92,7 +93,7 @@ final class ConsentService implements ConsentServiceInterface
         $this->consentRepository->save($consent);
 
         // Dispatch appropriate event
-        if ($existingConsent !== null) {
+        if ($existingConsent instanceof CookieConsent) {
             event(new ConsentUpdated($consent, $existingConsent));
         } else {
             event(new ConsentGranted($consent));
@@ -105,7 +106,7 @@ final class ConsentService implements ConsentServiceInterface
     {
         $consent = $this->consentRepository->findLatestByVisitor($visitorId);
 
-        if ($consent === null) {
+        if (! $consent instanceof CookieConsent) {
             return null;
         }
 
@@ -118,11 +119,11 @@ final class ConsentService implements ConsentServiceInterface
             VisitorId::fromString($visitorId)
         );
 
-        if ($consent === null || ! $consent->isValid()) {
+        if (! $consent instanceof CookieConsent || ! $consent->isValid()) {
             // Check if it's a required category
             $category = $this->categoryRepository->findBySlug($categorySlug);
 
-            return $category !== null && $category->isRequired();
+            return $category instanceof CookieCategory && $category->isRequired();
         }
 
         return $consent->hasConsentFor($categorySlug);

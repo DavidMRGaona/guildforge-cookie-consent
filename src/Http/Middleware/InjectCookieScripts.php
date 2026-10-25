@@ -13,16 +13,16 @@ use Modules\CookieConsent\Application\Services\ScriptInjectorServiceInterface;
 use Modules\CookieConsent\Domain\ValueObjects\ConsentPreferences;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
-final class InjectCookieScripts
+final readonly class InjectCookieScripts
 {
     /**
      * Written by the banner in the browser, so it is never encrypted.
      */
-    public const CONSENT_COOKIE_NAME = 'guildforge_cookie_consent';
+    public const string CONSENT_COOKIE_NAME = 'guildforge_cookie_consent';
 
     public function __construct(
-        private readonly ScriptInjectorServiceInterface $scriptInjector,
-        private readonly BannerConfigServiceInterface $bannerConfigService,
+        private ScriptInjectorServiceInterface $scriptInjector,
+        private BannerConfigServiceInterface $bannerConfigService,
     ) {}
 
     public function handle(Request $request, Closure $next): SymfonyResponse
@@ -116,7 +116,7 @@ final class InjectCookieScripts
         if ($scripts['head'] !== '') {
             $content = str_replace(
                 '</head>',
-                $scripts['head'] . "\n</head>",
+                $scripts['head']."\n</head>",
                 $content
             );
         }
@@ -125,7 +125,7 @@ final class InjectCookieScripts
         if ($scripts['body_start'] !== '') {
             $content = preg_replace(
                 '/(<body[^>]*>)/i',
-                '$1' . "\n" . $scripts['body_start'],
+                '$1'."\n".$scripts['body_start'],
                 $content,
                 1
             ) ?? $content;
@@ -133,9 +133,9 @@ final class InjectCookieScripts
 
         // Inject body end scripts before </body>
         if ($scripts['body_end'] !== '') {
-            $content = str_replace(
+            return str_replace(
                 '</body>',
-                $scripts['body_end'] . "\n</body>",
+                $scripts['body_end']."\n</body>",
                 $content
             );
         }

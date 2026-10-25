@@ -7,6 +7,7 @@ namespace Modules\CookieConsent\Tests\Feature\Console;
 use App\Application\Cookies\DTOs\DeclaredCookieDTO;
 use App\Application\Cookies\Services\CookieDeclarationRegistryInterface;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Testing\PendingCommand;
 use Modules\CookieConsent\Console\Commands\SyncDeclaredCookiesCommand;
 use Modules\CookieConsent\Database\Seeders\DefaultCategoriesSeeder;
 use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieModel;
@@ -35,9 +36,11 @@ final class SyncDeclaredCookiesCommandTest extends ModuleTestCase
             new DeclaredCookieDTO('gt_guest_registrations', 'preferences', 'GuildForge', 'Purpose')
         );
 
-        $this->artisan('cookie-consent:sync-declared-cookies')
-            ->expectsOutputToContain('1')
-            ->assertExitCode(0);
+        $command = $this->artisan('cookie-consent:sync-declared-cookies');
+        $this->assertInstanceOf(PendingCommand::class, $command);
+        $command->expectsOutputToContain('1')
+            ->assertExitCode(0)
+            ->run();
 
         $this->assertSame(1, CookieModel::query()->where('name', 'gt_guest_registrations')->count());
     }

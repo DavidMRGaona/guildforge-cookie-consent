@@ -9,11 +9,11 @@ use Modules\CookieConsent\Application\DTOs\BannerConfigDTO;
 use Modules\CookieConsent\Application\Services\BannerConfigServiceInterface;
 use Modules\CookieConsent\Application\Services\ConsentServiceInterface;
 
-final class BannerConfigService implements BannerConfigServiceInterface
+final readonly class BannerConfigService implements BannerConfigServiceInterface
 {
     public function __construct(
-        private readonly SettingsServiceInterface $settingsService,
-        private readonly ConsentServiceInterface $consentService,
+        private SettingsServiceInterface $settingsService,
+        private ConsentServiceInterface $consentService,
     ) {}
 
     public function getBannerConfig(): BannerConfigDTO

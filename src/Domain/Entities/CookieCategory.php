@@ -18,7 +18,7 @@ final class CookieCategory
         private string $name,
         private string $slug,
         private string $description,
-        private bool $isRequired,
+        private readonly bool $isRequired,
         private int $sortOrder,
         private array $consentModeKeys = [],
         private readonly ?DateTimeImmutable $createdAt = null,

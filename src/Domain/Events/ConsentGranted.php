@@ -7,11 +7,11 @@ namespace Modules\CookieConsent\Domain\Events;
 use Illuminate\Foundation\Events\Dispatchable;
 use Modules\CookieConsent\Domain\Entities\CookieConsent;
 
-final class ConsentGranted
+final readonly class ConsentGranted
 {
     use Dispatchable;
 
     public function __construct(
-        public readonly CookieConsent $consent,
+        public CookieConsent $consent,
     ) {}
 }

@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent;
 
-use Throwable;
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Database\Events\MigrationsEnded;
-use Illuminate\Database\Events\NoPendingMigrations;
-use Filament\Pages\Page;
-use Filament\Resources\Resource;
-use Filament\Widgets\Widget;
 use App\Application\Modules\DTOs\NavigationItemDTO;
 use App\Application\Modules\DTOs\PermissionDTO;
 use App\Application\Modules\DTOs\SlotRegistrationDTO;
 use App\Modules\ModuleServiceProvider;
+use Filament\Pages\Page;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Component;
+use Filament\Widgets\Widget;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Database\Events\MigrationsEnded;
+use Illuminate\Database\Events\NoPendingMigrations;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Event;
 use Inertia\Inertia;
@@ -24,8 +24,8 @@ use Modules\CookieConsent\Application\Services\BannerConfigServiceInterface;
 use Modules\CookieConsent\Application\Services\ConsentModeServiceInterface;
 use Modules\CookieConsent\Application\Services\ConsentServiceInterface;
 use Modules\CookieConsent\Application\Services\DeclaredCookieSynchronizerInterface;
-use Modules\CookieConsent\Console\Commands\SyncDeclaredCookiesCommand;
 use Modules\CookieConsent\Application\Services\ScriptInjectorServiceInterface;
+use Modules\CookieConsent\Console\Commands\SyncDeclaredCookiesCommand;
 use Modules\CookieConsent\Domain\Events\CookieConfigurationChanged;
 use Modules\CookieConsent\Domain\Repositories\CookieCategoryRepositoryInterface;
 use Modules\CookieConsent\Domain\Repositories\CookieConsentRepositoryInterface;
@@ -53,6 +53,7 @@ use Modules\CookieConsent\Listeners\IncrementConfigVersionOnChange;
 use Modules\CookieConsent\Listeners\SyncDeclaredCookiesAfterMigrations;
 use Modules\CookieConsent\Policies\CookieCategoryPolicy;
 use Modules\CookieConsent\Policies\CookieConsentPolicy;
+use Throwable;
 
 final class CookieConsentServiceProvider extends ModuleServiceProvider
 {
@@ -164,7 +165,7 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
     }
 
     /**
-     * @return array<class-string<Resource>>
+     * @return array<class-string<resource>>
      */
     public function registerFilamentResources(): array
     {
@@ -310,7 +311,7 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
      * them where the banner reads them: the generic module settings page would
      * write them to config/settings.php instead.
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public function getSettingsSchema(): array
     {

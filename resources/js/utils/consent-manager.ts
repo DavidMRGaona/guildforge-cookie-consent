@@ -198,10 +198,6 @@ export function clearConsent(): void {
 // Extend Window interface for gtag
 declare global {
     interface Window {
-        gtag?: (
-            command: string,
-            action: string,
-            params: Record<string, string>
-        ) => void;
+        gtag?: (command: string, action: string, params: Record<string, string>) => void;
     }
 }

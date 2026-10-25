@@ -81,10 +81,12 @@ final class DeclaredCookieSynchronizerTest extends ModuleTestCase
         $before = $consent->getConfigVersion();
 
         $this->synchronizer()->sync();
-        $this->assertSame($before + 1, $consent->getConfigVersion());
-
+        $afterFirstSync = $consent->getConfigVersion();
         $this->synchronizer()->sync();
-        $this->assertSame($before + 1, $consent->getConfigVersion());
+        $afterSecondSync = $consent->getConfigVersion();
+
+        $this->assertSame($before + 1, $afterFirstSync);
+        $this->assertSame($afterFirstSync, $afterSecondSync);
     }
 
     public function test_existing_cookie_with_the_same_name_is_left_untouched(): void
@@ -192,7 +194,9 @@ final class DeclaredCookieSynchronizerTest extends ModuleTestCase
             ->filter(fn ($event): bool => str_contains((string) $event->command, 'cookie-consent:sync-declared-cookies'));
 
         $this->assertCount(1, $events);
-        $this->assertSame('0 * * * *', $events->first()->expression);
+        $event = $events->first();
+        $this->assertNotNull($event);
+        $this->assertSame('0 * * * *', $event->expression);
     }
 
     private function declare(string $name, string $slug, string $purpose, ?string $duration = null): void

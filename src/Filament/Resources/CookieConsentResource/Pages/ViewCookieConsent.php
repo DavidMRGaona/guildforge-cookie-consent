@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Filament\Resources\CookieConsentResource\Pages;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Modules\CookieConsent\Filament\Resources\CookieConsentResource;
 use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieConsentModel;
 

@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Log;
 use Modules\CookieConsent\Application\Services\ConsentServiceInterface;
 use Modules\CookieConsent\Domain\Events\CookieConfigurationChanged;
 
-final class IncrementConfigVersionOnChange
+final readonly class IncrementConfigVersionOnChange
 {
     public function __construct(
-        private readonly ConsentServiceInterface $consentService,
+        private ConsentServiceInterface $consentService,
     ) {}
 
     public function handle(CookieConfigurationChanged $event): void

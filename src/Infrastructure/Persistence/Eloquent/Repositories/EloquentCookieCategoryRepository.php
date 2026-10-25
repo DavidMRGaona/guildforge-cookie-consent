@@ -87,7 +87,7 @@ final class EloquentCookieCategoryRepository implements CookieCategoryRepository
     {
         $query = CookieCategoryModel::where('slug', $slug);
 
-        if ($excludeId !== null) {
+        if ($excludeId instanceof CategoryId) {
             $query->where('id', '!=', $excludeId->value());
         }
 

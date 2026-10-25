@@ -22,7 +22,7 @@ interface ConsentModeServiceInterface
      * Map category preferences to Google Consent Mode values.
      *
      * @param  array<string, bool>  $preferences  Map of category slug to consent value
-     * @return array<string, string>  Map of consent mode key to 'granted' or 'denied'
+     * @return array<string, string> Map of consent mode key to 'granted' or 'denied'
      */
     public function mapToConsentMode(array $preferences): array;
 }

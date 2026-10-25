@@ -13,7 +13,7 @@ use Stringable;
  */
 final readonly class IpHash implements Stringable
 {
-    private const HASH_LENGTH = 64; // SHA256 produces 64 hex characters
+    private const int HASH_LENGTH = 64; // SHA256 produces 64 hex characters
 
     public function __construct(
         public string $value,
@@ -26,7 +26,7 @@ final readonly class IpHash implements Stringable
      */
     public static function fromIp(string $ipAddress, string $salt = ''): self
     {
-        $hash = hash('sha256', $ipAddress . $salt);
+        $hash = hash('sha256', $ipAddress.$salt);
 
         return new self($hash);
     }

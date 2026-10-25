@@ -9,12 +9,12 @@ use Modules\CookieConsent\Application\Services\ConsentModeServiceInterface;
 use Modules\CookieConsent\Application\Services\ScriptInjectorServiceInterface;
 use Modules\CookieConsent\Domain\Repositories\CookieScriptRepositoryInterface;
 
-final class ScriptInjectorService implements ScriptInjectorServiceInterface
+final readonly class ScriptInjectorService implements ScriptInjectorServiceInterface
 {
     public function __construct(
-        private readonly CookieScriptRepositoryInterface $scriptRepository,
-        private readonly ConsentModeServiceInterface $consentModeService,
-        private readonly BannerConfigServiceInterface $bannerConfigService,
+        private CookieScriptRepositoryInterface $scriptRepository,
+        private ConsentModeServiceInterface $consentModeService,
+        private BannerConfigServiceInterface $bannerConfigService,
     ) {}
 
     /**

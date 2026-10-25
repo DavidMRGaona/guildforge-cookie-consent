@@ -10,6 +10,7 @@ use Modules\CookieConsent\Application\DTOs\SaveConsentDTO;
 use Modules\CookieConsent\Application\Services\BannerConfigServiceInterface;
 use Modules\CookieConsent\Application\Services\ConsentServiceInterface;
 use Modules\CookieConsent\Domain\Enums\ConsentMethod;
+use Modules\CookieConsent\Domain\Exceptions\InvalidConsentException;
 use Modules\CookieConsent\Http\Requests\SaveConsentRequest;
 
 final class ConsentApiController extends Controller
@@ -67,7 +68,7 @@ final class ConsentApiController extends Controller
                 'data' => $consent->toArray(),
                 'message' => 'Consent saved successfully',
             ], 201);
-        } catch (\Modules\CookieConsent\Domain\Exceptions\InvalidConsentException $e) {
+        } catch (InvalidConsentException $e) {
             return response()->json([
                 'error' => $e->getMessage(),
             ], 422);

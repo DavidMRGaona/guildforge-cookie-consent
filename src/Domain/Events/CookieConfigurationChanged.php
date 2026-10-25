@@ -10,13 +10,13 @@ use Illuminate\Foundation\Events\Dispatchable;
  * Dispatched when cookie categories, cookies, or scripts are modified.
  * Triggers config version increment for re-consent.
  */
-final class CookieConfigurationChanged
+final readonly class CookieConfigurationChanged
 {
     use Dispatchable;
 
     public function __construct(
-        public readonly string $changeType,
-        public readonly string $entityType,
-        public readonly string $entityId,
+        public string $changeType,
+        public string $entityType,
+        public string $entityId,
     ) {}
 }

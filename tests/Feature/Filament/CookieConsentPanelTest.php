@@ -62,6 +62,17 @@ final class CookieConsentPanelTest extends ModuleTestCase
             ->assertFormSet(['name' => $category->name]);
     }
 
+    public function test_bulk_delete_keeps_system_categories(): void
+    {
+        $system = $this->newCategory('system', isSystem: true);
+        $custom = $this->newCategory('custom', isSystem: false);
+
+        Livewire::test(ListCookieCategories::class)->callTableBulkAction('delete', [$system, $custom]);
+
+        $this->assertModelExists($system);
+        $this->assertModelMissing($custom);
+    }
+
     public function test_category_relation_managers_render(): void
     {
         $category = $this->category();
@@ -276,6 +287,19 @@ final class CookieConsentPanelTest extends ModuleTestCase
         }
 
         $this->assertSame($before, $bannerSettings());
+    }
+
+    private function newCategory(string $slug, bool $isSystem): CookieCategoryModel
+    {
+        return CookieCategoryModel::create([
+            'id' => (string) Str::uuid(),
+            'name' => "Category {$slug}",
+            'slug' => "test-{$slug}",
+            'description' => 'Test category',
+            'is_required' => false,
+            'is_system' => $isSystem,
+            'sort_order' => 100,
+        ]);
     }
 
     private function category(): CookieCategoryModel
