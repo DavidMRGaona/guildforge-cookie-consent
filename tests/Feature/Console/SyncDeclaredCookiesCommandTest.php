@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Tests\Feature\Console;
 
+use App\Application\Cookies\DTOs\DeclaredCookieDTO;
+use App\Application\Cookies\Services\CookieDeclarationRegistryInterface;
 use Illuminate\Contracts\Console\Kernel;
-use Modules\CookieConsent\Application\DTOs\DeclaredCookieDTO;
-use Modules\CookieConsent\Application\Services\CookieDeclarationRegistryInterface;
 use Modules\CookieConsent\Console\Commands\SyncDeclaredCookiesCommand;
 use Modules\CookieConsent\Database\Seeders\DefaultCategoriesSeeder;
 use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieModel;

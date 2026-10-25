@@ -62,20 +62,18 @@ El banner se inyecta automáticamente al final de cada página (slot `after-foot
 
 ### Cookies declaradas por otros módulos
 
-Un módulo que usa cookies propias las declara para que aparezcan en la categoría que corresponda del banner. El módulo no tiene por qué requerir `cookie-consent`: la declaración solo se hace si la interfaz existe.
+Un módulo que usa cookies propias las declara en el registro del core (core ^3.18) y este módulo las lee para que aparezcan en la categoría que corresponda del banner. El módulo que declara no depende de `cookie-consent` ni importa sus clases: sin este módulo instalado, nadie lee la lista.
 
 ```php
-use Modules\CookieConsent\Application\DTOs\DeclaredCookieDTO;
-use Modules\CookieConsent\Application\Services\CookieDeclarationRegistryInterface;
+use App\Application\Cookies\DTOs\DeclaredCookieDTO;
+use App\Application\Cookies\Services\CookieDeclarationRegistryInterface;
 
-if (interface_exists(CookieDeclarationRegistryInterface::class)) {
-    $this->callAfterResolving(CookieDeclarationRegistryInterface::class, function (CookieDeclarationRegistryInterface $registry): void {
-        $registry->declare(new DeclaredCookieDTO(name: '...', categorySlug: 'preferences', provider: '...', purpose: '...', duration: '90 días'));
-    });
-}
+$this->callAfterResolving(CookieDeclarationRegistryInterface::class, function (CookieDeclarationRegistryInterface $registry): void {
+    $registry->declare(new DeclaredCookieDTO(name: '...', categorySlug: 'preferences', provider: '...', purpose: '...', duration: '90 días'));
+});
 ```
 
-`DeclaredCookieDTO` también acepta `type` (`CookieType`, por defecto `FirstParty`). Declarar dos veces el mismo nombre sustituye la declaración anterior.
+`DeclaredCookieDTO` también acepta `type` (`App\Domain\Cookies\Enums\CookieType`, por defecto `FirstParty`), que se guarda como el tipo de cookie de este módulo con el mismo valor. Declarar dos veces el mismo nombre sustituye la declaración anterior.
 
 - **Cuándo se crean.** `DeclaredCookieSynchronizerInterface::sync()` crea las cookies declaradas que aún no existen. Se ejecuta tras las migraciones (no en rollbacks ni con `--pretend`), cada hora desde el programador de tareas (cubre habilitar un módulo desde el panel o instalar `cookie-consent`) y a mano con `php artisan cookie-consent:sync-declared-cookies`. Un fallo de la sincronización se registra y nunca interrumpe `migrate`.
 - **Nunca actualiza filas existentes.** Si ya hay una cookie con ese nombre no se toca, así que los cambios hechos en el panel se conservan. Una cookie declarada en una categoría que no existe se omite y se registra un aviso.

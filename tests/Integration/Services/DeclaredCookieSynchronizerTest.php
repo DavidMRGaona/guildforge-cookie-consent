@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Tests\Integration\Services;
 
+use App\Application\Cookies\DTOs\DeclaredCookieDTO;
+use App\Application\Cookies\Services\CookieDeclarationRegistryInterface;
+use App\Domain\Cookies\Enums\CookieType as DeclaredCookieType;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Events\NoPendingMigrations;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
-use Modules\CookieConsent\Application\DTOs\DeclaredCookieDTO;
 use Modules\CookieConsent\Application\Services\ConsentServiceInterface;
-use Modules\CookieConsent\Application\Services\CookieDeclarationRegistryInterface;
 use Modules\CookieConsent\Application\Services\DeclaredCookieSynchronizerInterface;
 use Modules\CookieConsent\Database\Seeders\DefaultCategoriesSeeder;
+use Modules\CookieConsent\Domain\Enums\CookieType;
 use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieCategoryModel;
 use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieModel;
 use Ramsey\Uuid\Uuid;
@@ -51,6 +53,24 @@ final class DeclaredCookieSynchronizerTest extends ModuleTestCase
         $this->assertSame('Remembers your registrations', $cookie->purpose);
         $this->assertSame('1 year', $cookie->duration);
         $this->assertTrue($cookie->is_active);
+    }
+
+    public function test_a_third_party_cookie_keeps_its_type(): void
+    {
+        $this->app->make(CookieDeclarationRegistryInterface::class)->declare(new DeclaredCookieDTO(
+            name: 'third_party_cookie',
+            categorySlug: 'preferences',
+            provider: 'Example provider',
+            purpose: 'Purpose',
+            type: DeclaredCookieType::ThirdParty,
+        ));
+
+        $this->synchronizer()->sync();
+
+        $this->assertSame(
+            CookieType::ThirdParty,
+            CookieModel::query()->where('name', 'third_party_cookie')->firstOrFail()->type,
+        );
     }
 
     public function test_creation_bumps_the_config_version_once(): void
