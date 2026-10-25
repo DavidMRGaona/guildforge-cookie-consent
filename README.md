@@ -81,25 +81,13 @@ $this->callAfterResolving(CookieDeclarationRegistryInterface::class, function (C
 
 ### Consultar el consentimiento desde el navegador
 
-El banner publica `globalThis.GuildForgeCookieConsent` para que los frontends de otros módulos comprueben el consentimiento por categoría:
+El banner es el proveedor del contrato de consentimiento del core (`@/contracts/cookieConsent`, core ^3.19): se registra con `registerCookieConsentProvider()` y avisa con `notifyCookieConsentChanged()` al guardar una elección (aceptar todo, rechazar todo o guardar preferencias) y cuando cambian su configuración o sus categorías. Los demás módulos no nombran este módulo: preguntan al core con `hasCookieConsent('preferences')`, que es reactiva y, sin este módulo en la página, responde «sin consentimiento». El uso está en la guía de módulos del core, «Cookie consent in the browser».
 
-```ts
-if (globalThis.GuildForgeCookieConsent?.hasConsent('preferences')) {
-    // el visitante aceptó las cookies de preferencias
-}
-```
+La respuesta del banner:
 
-- `hasConsent(categorySlug)` devuelve `true` para las categorías obligatorias (siempre que el banner tenga cargadas la configuración y las categorías: sin ellas devuelve `false` para cualquier slug). Para las demás, solo si hay un consentimiento guardado, no ha caducado (`validity_days`), coincide con la versión de la configuración (si `reconsent_on_change` está activo) y la categoría está aceptada.
+- `true` para las categorías obligatorias, siempre que el banner tenga cargadas la configuración y las categorías (sin ellas, `false` para cualquier slug).
+- Para las demás, `true` solo si hay un consentimiento guardado, no ha caducado (`validity_days`), coincide con la versión de la configuración (si `reconsent_on_change` está activo) y la categoría está aceptada.
 - Un slug desconocido devuelve `false`.
-- El banner publica el objeto al montarse, después de que se ejecuten los `setup()` de los demás componentes en la primera carga: léelo en `onMounted` (o más tarde) y escucha `guildforge:cookie-consent-changed` para reaccionar a cambios. Durante tu `setup()` puede no existir todavía.
-- Si el objeto global no existe, el módulo no está en la página: trátalo como falta de consentimiento.
-- Tras guardar el consentimiento (aceptar todo, rechazar todo o guardar preferencias) el banner dispara el evento `guildforge:cookie-consent-changed` en `window`, sin recargar la página:
-
-```ts
-window.addEventListener('guildforge:cookie-consent-changed', () => {
-    // vuelve a comprobar hasConsent()
-});
-```
 
 ### Rutas
 

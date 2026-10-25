@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, watch } from 'vue';
+import {
+    notifyCookieConsentChanged,
+    registerCookieConsentProvider,
+} from '@/contracts/cookieConsent';
 import type { CookieCategory, BannerConfig } from '../types/cookie-consent';
 import { hasConsentFor, needsConsent, saveConsent } from '../utils/consent-manager';
 import CookieSettingsModal from './CookieSettingsModal.vue';
@@ -77,32 +81,25 @@ onMounted(() => {
     }
 });
 
-// Publish the browser API other modules use to ask for consent per category
-function publishConsentApi(): void {
-    globalThis.GuildForgeCookieConsent = {
-        hasConsent: (categorySlug: string): boolean => {
-            const current = config.value;
-            if (!current) return false;
+// Answer the core's cookie consent contract, which the other modules ask per category
+registerCookieConsentProvider({
+    hasConsent: (categorySlug: string): boolean => {
+        const current = config.value;
+        if (!current) return false;
 
-            return hasConsentFor(
-                categorySlug,
-                current.configVersion,
-                current.validityDays,
-                current.reconsentOnChange,
-                categories.value
-                    .filter((category) => category.isRequired)
-                    .map((category) => category.slug)
-            );
-        },
-    };
-}
-
-function notifyConsentChanged(): void {
-    window.dispatchEvent(new window.CustomEvent('guildforge:cookie-consent-changed'));
-}
-
-publishConsentApi();
-watch([config, categories], publishConsentApi);
+        return hasConsentFor(
+            categorySlug,
+            current.configVersion,
+            current.validityDays,
+            current.reconsentOnChange,
+            categories.value
+                .filter((category) => category.isRequired)
+                .map((category) => category.slug)
+        );
+    },
+});
+// The answer depends on the configuration and the categories too
+watch([config, categories], notifyCookieConsentChanged);
 
 const positionClasses = computed(() => {
     if (!config.value) return '';
@@ -198,7 +195,7 @@ async function acceptAll(): Promise<void> {
 
     await saveConsent(preferences, config.value.configVersion);
     isVisible.value = false;
-    notifyConsentChanged();
+    notifyCookieConsentChanged();
 }
 
 async function rejectAll(): Promise<void> {
@@ -212,7 +209,7 @@ async function rejectAll(): Promise<void> {
 
     await saveConsent(preferences, config.value.configVersion);
     isVisible.value = false;
-    notifyConsentChanged();
+    notifyCookieConsentChanged();
 }
 
 function openSettings(): void {
@@ -223,15 +220,13 @@ function closeSettings(): void {
     showSettingsModal.value = false;
 }
 
-async function handleSaveSettings(
-    preferences: Record<string, boolean>
-): Promise<void> {
+async function handleSaveSettings(preferences: Record<string, boolean>): Promise<void> {
     if (!config.value) return;
 
     await saveConsent(preferences, config.value.configVersion);
     showSettingsModal.value = false;
     isVisible.value = false;
-    notifyConsentChanged();
+    notifyCookieConsentChanged();
 }
 </script>
 
@@ -245,15 +240,8 @@ async function handleSaveSettings(
             leave-from-class="opacity-100 translate-y-0"
             leave-to-class="opacity-0 translate-y-4"
         >
-            <div
-                v-if="isVisible && config"
-                :class="positionClasses"
-            >
-                <div
-                    :class="bannerClasses"
-                    :style="bannerStyles"
-                    class="p-4 md:p-6"
-                >
+            <div v-if="isVisible && config" :class="positionClasses">
+                <div :class="bannerClasses" :style="bannerStyles" class="p-4 md:p-6">
                     <div class="max-w-7xl mx-auto">
                         <div
                             class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
@@ -276,13 +264,9 @@ async function handleSaveSettings(
                             </div>
 
                             <!-- Buttons -->
-                            <div
-                                class="flex flex-wrap items-center gap-2 flex-shrink-0"
-                            >
+                            <div class="flex flex-wrap items-center gap-2 flex-shrink-0">
                                 <button
-                                    v-if="
-                                        config.showSettingsButton
-                                    "
+                                    v-if="config.showSettingsButton"
                                     type="button"
                                     :class="secondaryButtonClasses"
                                     :style="secondaryButtonStyles"
