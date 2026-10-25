@@ -37,7 +37,12 @@ Con el repositorio clonado en `src/modules/cookie-consent`:
 ```bash
 php artisan module:discover
 php artisan module:enable cookie-consent
-php artisan module:build cookie-consent   # compila el banner y el modal (--force para recompilar)
+```
+
+Los componentes Vue se compilan con las herramientas del core, desde `src/`:
+
+```bash
+docker exec guildforge_node npm run build:module -- cookie-consent
 ```
 
 En las releases los assets los compila el CI y van dentro del ZIP.
