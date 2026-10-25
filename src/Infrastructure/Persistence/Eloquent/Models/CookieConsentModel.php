@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models;
 
+use App\Infrastructure\Persistence\Eloquent\Models\UserModel;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 use Modules\CookieConsent\Domain\Enums\ConsentMethod;
 
 /**
@@ -18,11 +20,11 @@ use Modules\CookieConsent\Domain\Enums\ConsentMethod;
  * @property array<string, bool> $preferences
  * @property int $config_version
  * @property ConsentMethod $consent_method
- * @property \Illuminate\Support\Carbon $consented_at
- * @property \Illuminate\Support\Carbon $expires_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Infrastructure\Persistence\Eloquent\Models\UserModel|null $user
+ * @property Carbon $consented_at
+ * @property Carbon $expires_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read UserModel|null $user
  */
 final class CookieConsentModel extends Model
 {
@@ -65,10 +67,10 @@ final class CookieConsentModel extends Model
     }
 
     /**
-     * @return BelongsTo<\App\Infrastructure\Persistence\Eloquent\Models\UserModel, $this>
+     * @return BelongsTo<UserModel, $this>
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(\App\Infrastructure\Persistence\Eloquent\Models\UserModel::class, 'user_id');
+        return $this->belongsTo(UserModel::class, 'user_id');
     }
 }

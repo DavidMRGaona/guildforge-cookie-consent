@@ -88,14 +88,9 @@ function close(): void {
             class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4"
             @click.self="close"
         >
-            <div
-                :class="modalClasses"
-                :style="modalStyles"
-            >
+            <div :class="modalClasses" :style="modalStyles">
                 <!-- Header -->
-                <div
-                    class="flex items-center justify-between p-4 border-b border-default"
-                >
+                <div class="flex items-center justify-between p-4 border-b border-default">
                     <h2 class="text-xl font-semibold">
                         {{ config.texts.settings }}
                     </h2>
@@ -141,9 +136,7 @@ function close(): void {
                             class="border border-default rounded-lg overflow-hidden"
                         >
                             <!-- Category header -->
-                            <div
-                                class="flex items-center justify-between p-4 bg-base-secondary/10"
-                            >
+                            <div class="flex items-center justify-between p-4 bg-base-secondary/10">
                                 <div class="flex-1">
                                     <div class="flex items-center gap-2">
                                         <h3 class="font-medium">
@@ -169,9 +162,7 @@ function close(): void {
                                         preferences[category.slug]
                                             ? 'bg-primary'
                                             : 'bg-base-secondary/50',
-                                        category.isRequired
-                                            ? 'cursor-not-allowed opacity-70'
-                                            : '',
+                                        category.isRequired ? 'cursor-not-allowed opacity-70' : '',
                                     ]"
                                     :disabled="category.isRequired"
                                     role="switch"
@@ -190,22 +181,20 @@ function close(): void {
                             </div>
 
                             <!-- Cookie list (expandable) -->
-                            <div
-                                v-if="category.cookies.length > 0"
-                                class="border-t border-default"
-                            >
+                            <div v-if="category.cookies.length > 0" class="border-t border-default">
                                 <button
                                     type="button"
                                     class="w-full flex items-center justify-between p-3 text-sm hover:bg-base-secondary/10 transition-colors"
                                     @click="toggleCookieList(category.slug)"
                                 >
-                                    <span>
-                                        Ver cookies ({{
-                                            category.cookies.length
-                                        }})
-                                    </span>
+                                    <span> Ver cookies ({{ category.cookies.length }}) </span>
                                     <ChevronDown
-                                        :class="[ 'w-4 h-4 transition-transform', expandedCategories.has( category.slug ) ? 'rotate-180' : '', ]"
+                                        :class="[
+                                            'w-4 h-4 transition-transform',
+                                            expandedCategories.has(category.slug)
+                                                ? 'rotate-180'
+                                                : '',
+                                        ]"
                                         aria-hidden="true"
                                     />
                                 </button>
@@ -219,33 +208,19 @@ function close(): void {
                                     leave-to-class="opacity-0 max-h-0"
                                 >
                                     <div
-                                        v-if="
-                                            expandedCategories.has(
-                                                category.slug
-                                            )
-                                        "
+                                        v-if="expandedCategories.has(category.slug)"
                                         class="overflow-hidden"
                                     >
-                                        <table
-                                            class="w-full text-xs border-t border-default"
-                                        >
-                                            <thead
-                                                class="bg-base-secondary/10"
-                                            >
+                                        <table class="w-full text-xs border-t border-default">
+                                            <thead class="bg-base-secondary/10">
                                                 <tr>
-                                                    <th
-                                                        class="px-3 py-2 text-left font-medium"
-                                                    >
+                                                    <th class="px-3 py-2 text-left font-medium">
                                                         Cookie
                                                     </th>
-                                                    <th
-                                                        class="px-3 py-2 text-left font-medium"
-                                                    >
+                                                    <th class="px-3 py-2 text-left font-medium">
                                                         Proveedor
                                                     </th>
-                                                    <th
-                                                        class="px-3 py-2 text-left font-medium"
-                                                    >
+                                                    <th class="px-3 py-2 text-left font-medium">
                                                         Duración
                                                     </th>
                                                 </tr>
@@ -256,19 +231,14 @@ function close(): void {
                                                     :key="cookie.id"
                                                     class="border-t border-default"
                                                 >
-                                                    <td
-                                                        class="px-3 py-2 font-mono"
-                                                    >
+                                                    <td class="px-3 py-2 font-mono">
                                                         {{ cookie.name }}
                                                     </td>
                                                     <td class="px-3 py-2">
                                                         {{ cookie.provider }}
                                                     </td>
                                                     <td class="px-3 py-2">
-                                                        {{
-                                                            cookie.duration ??
-                                                            '-'
-                                                        }}
+                                                        {{ cookie.duration ?? '-' }}
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -281,9 +251,7 @@ function close(): void {
                 </div>
 
                 <!-- Footer -->
-                <div
-                    class="flex items-center justify-between p-4 border-t border-default"
-                >
+                <div class="flex items-center justify-between p-4 border-t border-default">
                     <a
                         v-if="config.texts.privacyUrl"
                         :href="config.texts.privacyUrl"

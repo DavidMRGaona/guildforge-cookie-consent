@@ -12,21 +12,21 @@ use Modules\CookieConsent\Domain\ValueObjects\ConsentPreferences;
 use Modules\CookieConsent\Domain\ValueObjects\IpHash;
 use Modules\CookieConsent\Domain\ValueObjects\VisitorId;
 
-final class CookieConsent
+final readonly class CookieConsent
 {
     public function __construct(
-        private readonly ConsentId $id,
-        private readonly VisitorId $visitorId,
-        private readonly IpHash $ipHash,
-        private readonly string $userAgent,
-        private readonly ConsentPreferences $preferences,
-        private readonly int $configVersion,
-        private readonly ConsentMethod $consentMethod,
-        private readonly DateTimeImmutable $consentedAt,
-        private readonly DateTimeImmutable $expiresAt,
-        private readonly ?UserId $userId = null,
-        private readonly ?DateTimeImmutable $createdAt = null,
-        private readonly ?DateTimeImmutable $updatedAt = null,
+        private ConsentId $id,
+        private VisitorId $visitorId,
+        private IpHash $ipHash,
+        private string $userAgent,
+        private ConsentPreferences $preferences,
+        private int $configVersion,
+        private ConsentMethod $consentMethod,
+        private DateTimeImmutable $consentedAt,
+        private DateTimeImmutable $expiresAt,
+        private ?UserId $userId = null,
+        private ?DateTimeImmutable $createdAt = null,
+        private ?DateTimeImmutable $updatedAt = null,
     ) {}
 
     public function id(): ConsentId
@@ -94,7 +94,7 @@ final class CookieConsent
      */
     public function isValid(?DateTimeImmutable $now = null): bool
     {
-        $now = $now ?? new DateTimeImmutable;
+        $now ??= new DateTimeImmutable;
 
         return $now < $this->expiresAt;
     }

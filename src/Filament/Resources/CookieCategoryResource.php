@@ -4,38 +4,36 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Utilities\Set;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
+use App\Filament\Resources\BaseResource;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\RelationManagers\CookiesRelationManager;
-use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\RelationManagers\ScriptsRelationManager;
-use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\Pages\ListCookieCategories;
-use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\Pages\CreateCookieCategory;
-use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\Pages\EditCookieCategory;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use App\Filament\Resources\BaseResource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use Modules\CookieConsent\Domain\Enums\ConsentModeKey;
-use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\Pages;
-use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\RelationManagers;
+use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\Pages\CreateCookieCategory;
+use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\Pages\EditCookieCategory;
+use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\Pages\ListCookieCategories;
+use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\RelationManagers\CookiesRelationManager;
+use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\RelationManagers\ScriptsRelationManager;
 use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieCategoryModel;
 
 class CookieCategoryResource extends BaseResource
 {
     protected static ?string $model = CookieCategoryModel::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     protected static ?int $navigationSort = 1;
 
@@ -93,7 +91,7 @@ class CookieCategoryResource extends BaseResource
                         Toggle::make('is_required')
                             ->label(__('cookie-consent::cookie_consent.categories.fields.is_required'))
                             ->helperText('Las categorías requeridas no pueden ser rechazadas por el usuario')
-                            ->disabled(fn (?CookieCategoryModel $record): bool => $record !== null && $record->is_required),
+                            ->disabled(fn (?CookieCategoryModel $record): bool => $record instanceof CookieCategoryModel && $record->is_required),
 
                         TextInput::make('sort_order')
                             ->label(__('cookie-consent::cookie_consent.categories.fields.sort_order'))
@@ -180,8 +178,8 @@ class CookieCategoryResource extends BaseResource
                     DeleteBulkAction::make()
                         ->deselectRecordsAfterCompletion()
                         ->action(function (Collection $records): void {
-                            $records->reject(fn (CookieCategoryModel $record): bool => $record->is_system)
-                                ->each->delete();
+                            // System categories are never deleted, even when selected
+                            $records->where('is_system', false)->each->delete();
                         }),
                 ]),
             ]);

@@ -8,10 +8,10 @@ use Modules\CookieConsent\Application\Services\ConsentModeServiceInterface;
 use Modules\CookieConsent\Domain\Enums\ConsentModeKey;
 use Modules\CookieConsent\Domain\Repositories\CookieCategoryRepositoryInterface;
 
-final class ConsentModeService implements ConsentModeServiceInterface
+final readonly class ConsentModeService implements ConsentModeServiceInterface
 {
     public function __construct(
-        private readonly CookieCategoryRepositoryInterface $categoryRepository,
+        private CookieCategoryRepositoryInterface $categoryRepository,
     ) {}
 
     public function generateDefaultScript(): string

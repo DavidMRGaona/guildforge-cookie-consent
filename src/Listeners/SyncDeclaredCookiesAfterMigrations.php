@@ -12,10 +12,10 @@ use Illuminate\Support\Facades\Log;
 use Modules\CookieConsent\Application\Services\DeclaredCookieSynchronizerInterface;
 use Throwable;
 
-final class SyncDeclaredCookiesAfterMigrations
+final readonly class SyncDeclaredCookiesAfterMigrations
 {
     public function __construct(
-        private readonly Container $container,
+        private Container $container,
     ) {}
 
     /**

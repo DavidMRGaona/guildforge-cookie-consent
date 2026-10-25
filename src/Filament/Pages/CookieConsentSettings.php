@@ -19,6 +19,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
@@ -31,7 +32,7 @@ use Modules\CookieConsent\Domain\Enums\BannerTheme;
  * Banner settings, stored as "cookie-consent.<key>" settings: the same place
  * BannerConfigService reads them from.
  *
- * @property \Filament\Schemas\Schema $form
+ * @property Schema $form
  */
 final class CookieConsentSettings extends Page implements HasForms
 {
@@ -39,7 +40,7 @@ final class CookieConsentSettings extends Page implements HasForms
     use InteractsWithForms;
     use SafeModuleNavigation;
 
-    private const PREFIX = 'cookie-consent.';
+    private const string PREFIX = 'cookie-consent.';
 
     /**
      * Settings edited on this page; any other "cookie-consent.*" setting
@@ -47,7 +48,7 @@ final class CookieConsentSettings extends Page implements HasForms
      *
      * @var list<string>
      */
-    private const KEYS = [
+    private const array KEYS = [
         'banner_position',
         'banner_layout',
         'banner_theme',
@@ -73,7 +74,7 @@ final class CookieConsentSettings extends Page implements HasForms
     ];
 
     /** @var list<string> */
-    private const BOOLEAN_KEYS = [
+    private const array BOOLEAN_KEYS = [
         'show_reject_all',
         'show_settings_button',
         'reconsent_on_change',
@@ -81,7 +82,7 @@ final class CookieConsentSettings extends Page implements HasForms
         'consent_mode_enabled',
     ];
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected static ?int $navigationSort = 99;
 
@@ -161,7 +162,7 @@ final class CookieConsentSettings extends Page implements HasForms
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getFormSchemaComponents(): array
     {

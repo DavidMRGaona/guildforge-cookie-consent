@@ -7,6 +7,7 @@ namespace Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 use Modules\CookieConsent\Domain\Enums\CookieType;
 
 /**
@@ -19,8 +20,8 @@ use Modules\CookieConsent\Domain\Enums\CookieType;
  * @property CookieType $type
  * @property string|null $duration
  * @property bool $is_active
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property-read CookieCategoryModel $category
  */
 final class CookieModel extends Model

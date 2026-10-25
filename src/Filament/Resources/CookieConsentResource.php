@@ -4,24 +4,23 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Filament\Resources;
 
-use Filament\Actions\ViewAction;
-use Modules\CookieConsent\Filament\Resources\CookieConsentResource\Pages\ListCookieConsents;
-use Modules\CookieConsent\Filament\Resources\CookieConsentResource\Pages\ViewCookieConsent;
 use App\Filament\Resources\BaseResource;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Modules\CookieConsent\Domain\Enums\ConsentMethod;
-use Modules\CookieConsent\Filament\Resources\CookieConsentResource\Pages;
+use Modules\CookieConsent\Filament\Resources\CookieConsentResource\Pages\ListCookieConsents;
+use Modules\CookieConsent\Filament\Resources\CookieConsentResource\Pages\ViewCookieConsent;
 use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieConsentModel;
 
 class CookieConsentResource extends BaseResource
 {
     protected static ?string $model = CookieConsentModel::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-shield-check';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shield-check';
 
     protected static ?int $navigationSort = 2;
 
