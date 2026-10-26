@@ -112,6 +112,27 @@ describe('CookieSettingsModal', () => {
         expect(wrapper.find('tbody td').find('p').exists()).toBe(false);
     });
 
+    it('shows a focus ring on every button, only when moving with the keyboard', async () => {
+        const buttons = (await mountExpanded([cookie({})])).findAll('button');
+
+        expect(buttons.length).toBeGreaterThan(0);
+        for (const candidate of buttons) {
+            expect(candidate.classes()).toContain('focus-visible:ring-2');
+            // A plain focus ring would also show after every mouse click
+            expect(candidate.classes()).not.toContain('focus:ring-2');
+        }
+    });
+
+    it('draws «cancel» as a button, like the banner secondary ones', async () => {
+        const cancel = (await mountExpanded([cookie({})]))
+            .findAll('button')
+            .find((candidate) => candidate.text() === texts.cancel);
+
+        expect(cancel?.classes()).toEqual(
+            expect.arrayContaining(['bg-muted', 'border', 'border-base-muted'])
+        );
+    });
+
     it('takes every label from the configured texts', async () => {
         const wrapper = await mountExpanded([cookie({})]);
 

@@ -96,7 +96,7 @@ function close(): void {
                     </h2>
                     <button
                         type="button"
-                        class="p-1 rounded-full hover:bg-base-secondary/10 transition-colors"
+                        class="p-1 rounded-full hover:bg-base-secondary/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 focus-visible:ring-offset-surface"
                         :aria-label="config.texts.close"
                         @click="close"
                     >
@@ -114,7 +114,7 @@ function close(): void {
                     <div class="flex gap-2 mb-4">
                         <button
                             type="button"
-                            class="text-sm text-primary hover:underline"
+                            class="text-sm text-primary hover:underline rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 focus-visible:ring-offset-surface"
                             @click="acceptAll"
                         >
                             {{ config.texts.acceptAll }}
@@ -122,7 +122,7 @@ function close(): void {
                         <span class="text-base-muted">|</span>
                         <button
                             type="button"
-                            class="text-sm text-primary hover:underline"
+                            class="text-sm text-primary hover:underline rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 focus-visible:ring-offset-surface"
                             @click="rejectAll"
                         >
                             {{ config.texts.rejectAll }}
@@ -159,7 +159,7 @@ function close(): void {
                                 <button
                                     type="button"
                                     :class="[
-                                        'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
+                                        'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 focus-visible:ring-offset-surface',
                                         preferences[category.slug]
                                             ? 'bg-primary'
                                             : 'bg-base-secondary/50',
@@ -185,7 +185,7 @@ function close(): void {
                             <div v-if="category.cookies.length > 0" class="border-t border-default">
                                 <button
                                     type="button"
-                                    class="w-full flex items-center justify-between p-3 text-sm hover:bg-base-secondary/10 transition-colors"
+                                    class="w-full flex items-center justify-between p-3 text-sm hover:bg-base-secondary/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500"
                                     @click="toggleCookieList(category.slug)"
                                 >
                                     <span>
@@ -275,14 +275,14 @@ function close(): void {
                     <div class="flex gap-2">
                         <button
                             type="button"
-                            class="px-4 py-2 text-sm font-medium text-base-secondary hover:bg-base-secondary/10 rounded-md transition-colors"
+                            class="px-4 py-2 text-sm font-medium bg-muted text-base-primary border border-base-muted hover:border-base-secondary rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 focus-visible:ring-offset-surface"
                             @click="close"
                         >
                             {{ config.texts.cancel }}
                         </button>
                         <button
                             type="button"
-                            class="px-4 py-2 text-sm font-medium text-white bg-primary hover:opacity-90 rounded-md transition-colors"
+                            class="px-4 py-2 text-sm font-medium text-white bg-primary hover:opacity-90 rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 focus-visible:ring-offset-surface"
                             @click="save"
                         >
                             {{ config.texts.save }}

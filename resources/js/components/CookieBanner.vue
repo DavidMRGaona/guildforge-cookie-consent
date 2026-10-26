@@ -156,14 +156,18 @@ const bannerStyles = computed(() => {
     };
 });
 
+// Every theme, custom included: keyboard users must see which button is selected
+const focusRingClasses =
+    'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 focus-visible:ring-offset-surface';
+
 const primaryButtonClasses = computed(() => {
     if (!config.value) return '';
 
     if (config.value.theme === 'custom') {
-        return 'text-white font-medium py-2 px-4 rounded-md transition-opacity hover:opacity-90';
+        return `text-white font-medium py-2 px-4 rounded-md transition-opacity hover:opacity-90 ${focusRingClasses}`;
     }
 
-    return 'bg-primary text-white font-medium py-2 px-4 rounded-md transition-opacity hover:opacity-90';
+    return `bg-primary text-white font-medium py-2 px-4 rounded-md transition-opacity hover:opacity-90 ${focusRingClasses}`;
 });
 
 const primaryButtonStyles = computed(() => {
@@ -178,10 +182,12 @@ const secondaryButtonClasses = computed(() => {
     if (!config.value) return '';
 
     if (config.value.theme === 'custom') {
-        return 'text-white font-medium py-2 px-4 rounded-md transition-opacity hover:opacity-90';
+        return `text-white font-medium py-2 px-4 rounded-md transition-opacity hover:opacity-90 ${focusRingClasses}`;
     }
 
-    return 'bg-base-secondary/10 hover:bg-base-secondary/20 text-base-primary font-medium py-2 px-4 rounded-md transition-colors';
+    // Hover darkens the border, not the background: the neutral scale does not
+    // follow dark mode, so a neutral hover background would hide the light text
+    return `bg-muted text-base-primary border border-base-muted hover:border-base-secondary font-medium py-2 px-4 rounded-md transition-colors ${focusRingClasses}`;
 });
 
 const secondaryButtonStyles = computed(() => {
