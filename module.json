@@ -7,8 +7,9 @@
   "provider": "CookieConsentServiceProvider",
   "description": "Gestión de consentimiento de cookies GDPR",
   "author": "GuildForge",
+  "storesUtc": true,
   "requires": {
-    "core": "^3.21",
+    "core": "^3.22",
     "filament": "^5.0",
     "php": ">=8.5",
     "laravel": ">=13.0"

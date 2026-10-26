@@ -15,10 +15,12 @@ Gestión del consentimiento de cookies conforme al RGPD para GuildForge: banner 
 
 ## Requisitos
 
-- GuildForge core `^3.0`
+- GuildForge core `^3.22`
 - PHP >= 8.5, Laravel >= 13, Filament 5
 
 El core rechaza el módulo si no se cumplen (`module.json` → `requires`).
+
+Las fechas se guardan en la zona de almacenamiento del sitio (UTC cuando el core lo indica) y se muestran, filtran y cuentan en la zona de visualización (Europe/Madrid): el filtro «Consentimientos de hoy» y la caducidad en días naturales usan el día del sitio. El módulo declara `"storesUtc": true`.
 
 ## Instalación
 

@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Modules\CookieConsent\Infrastructure\Services;
 
 use App\Application\Services\SettingsServiceInterface;
+use App\Application\Services\TimezoneServiceInterface;
 use App\Domain\ValueObjects\UserId;
-use DateTimeImmutable;
+use Carbon\CarbonImmutable;
 use Modules\CookieConsent\Application\DTOs\CategoryDTO;
 use Modules\CookieConsent\Application\DTOs\ConsentDTO;
 use Modules\CookieConsent\Application\DTOs\CookieDTO;
@@ -34,6 +35,7 @@ final readonly class ConsentService implements ConsentServiceInterface
         private CookieRepositoryInterface $cookieRepository,
         private CookieConsentRepositoryInterface $consentRepository,
         private SettingsServiceInterface $settingsService,
+        private TimezoneServiceInterface $timezone,
     ) {}
 
     /**
@@ -73,8 +75,8 @@ final readonly class ConsentService implements ConsentServiceInterface
 
         // Calculate expiry date
         $validityDays = (int) $this->settingsService->get('cookie-consent.consent_validity_days', 365);
-        $consentedAt = new DateTimeImmutable;
-        $expiresAt = $consentedAt->modify("+{$validityDays} days");
+        $consentedAt = CarbonImmutable::now();
+        $expiresAt = $this->timezone->toDisplay($consentedAt)->modify("+{$validityDays} days");
 
         // Create new consent
         $consent = new CookieConsent(

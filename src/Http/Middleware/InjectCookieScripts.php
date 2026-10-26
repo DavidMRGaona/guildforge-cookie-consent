@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Http\Middleware;
 
+use App\Application\Services\TimezoneServiceInterface;
+use Carbon\CarbonImmutable;
 use Closure;
 use DateTimeImmutable;
 use Illuminate\Http\Request;
@@ -23,6 +25,7 @@ final readonly class InjectCookieScripts
     public function __construct(
         private ScriptInjectorServiceInterface $scriptInjector,
         private BannerConfigServiceInterface $bannerConfigService,
+        private TimezoneServiceInterface $timezone,
     ) {}
 
     public function handle(Request $request, Closure $next): SymfonyResponse
@@ -100,7 +103,8 @@ final readonly class InjectCookieScripts
 
         $config = $this->bannerConfigService->getBannerConfig();
 
-        if ($consentedAt->modify("+{$config->validityDays} days") < new DateTimeImmutable) {
+        // Validity counts calendar days of the site, not blocks of 24 hours
+        if ($this->timezone->toDisplay($consentedAt)->modify("+{$config->validityDays} days") < CarbonImmutable::now()) {
             return false;
         }
 

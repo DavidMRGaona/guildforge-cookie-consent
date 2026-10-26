@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Application\DTOs;
 
+use App\Application\Services\TimezoneServiceInterface;
 use Modules\CookieConsent\Domain\Entities\CookieConsent;
 
 final readonly class ConsentDTO
@@ -35,8 +36,8 @@ final readonly class ConsentDTO
             consentedCategories: $consent->getConsentedCategories(),
             configVersion: $consent->configVersion(),
             consentMethod: $consent->consentMethod()->value,
-            consentedAt: $consent->consentedAt()->format('c'),
-            expiresAt: $consent->expiresAt()->format('c'),
+            consentedAt: (string) app(TimezoneServiceInterface::class)->iso($consent->consentedAt()),
+            expiresAt: (string) app(TimezoneServiceInterface::class)->iso($consent->expiresAt()),
             isValid: $consent->isValid(),
         );
     }
