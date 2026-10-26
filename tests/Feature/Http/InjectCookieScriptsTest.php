@@ -20,9 +20,9 @@ final class InjectCookieScriptsTest extends ModuleTestCase
 
     protected bool $autoEnableModule = true;
 
-    private const ANALYTICS_SCRIPT = '<script>window.analyticsTestLoaded = true;</script>';
+    private const string ANALYTICS_SCRIPT = '<script>window.analyticsTestLoaded = true;</script>';
 
-    private const ACCEPTS_ANALYTICS = ['necessary' => true, 'analytics' => true, 'marketing' => false];
+    private const array ACCEPTS_ANALYTICS = ['necessary' => true, 'analytics' => true, 'marketing' => false];
 
     protected function setUp(): void
     {
