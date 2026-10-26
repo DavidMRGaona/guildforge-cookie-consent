@@ -97,6 +97,7 @@ function close(): void {
                     <button
                         type="button"
                         class="p-1 rounded-full hover:bg-base-secondary/10 transition-colors"
+                        :aria-label="config.texts.close"
                         @click="close"
                     >
                         <X class="w-6 h-6" aria-hidden="true" />
@@ -146,7 +147,7 @@ function close(): void {
                                             v-if="category.isRequired"
                                             class="text-xs bg-base-secondary/20 px-2 py-0.5 rounded"
                                         >
-                                            Obligatoria
+                                            {{ config.texts.required }}
                                         </span>
                                     </div>
                                     <p class="text-sm opacity-70 mt-1">
@@ -187,7 +188,11 @@ function close(): void {
                                     class="w-full flex items-center justify-between p-3 text-sm hover:bg-base-secondary/10 transition-colors"
                                     @click="toggleCookieList(category.slug)"
                                 >
-                                    <span> Ver cookies ({{ category.cookies.length }}) </span>
+                                    <span>
+                                        {{ config.texts.showCookies }} ({{
+                                            category.cookies.length
+                                        }})
+                                    </span>
                                     <ChevronDown
                                         :class="[
                                             'w-4 h-4 transition-transform',
@@ -215,13 +220,13 @@ function close(): void {
                                             <thead class="bg-base-secondary/10">
                                                 <tr>
                                                     <th class="px-3 py-2 text-left font-medium">
-                                                        Cookie
+                                                        {{ config.texts.cookieColumn }}
                                                     </th>
                                                     <th class="px-3 py-2 text-left font-medium">
-                                                        Proveedor
+                                                        {{ config.texts.providerColumn }}
                                                     </th>
                                                     <th class="px-3 py-2 text-left font-medium">
-                                                        Duración
+                                                        {{ config.texts.durationColumn }}
                                                     </th>
                                                 </tr>
                                             </thead>
@@ -231,8 +236,16 @@ function close(): void {
                                                     :key="cookie.id"
                                                     class="border-t border-default"
                                                 >
-                                                    <td class="px-3 py-2 font-mono">
-                                                        {{ cookie.name }}
+                                                    <td class="px-3 py-2 align-top">
+                                                        <span class="font-mono break-all">
+                                                            {{ cookie.name }}
+                                                        </span>
+                                                        <p
+                                                            v-if="cookie.purpose.trim()"
+                                                            class="mt-1 text-base-secondary"
+                                                        >
+                                                            {{ cookie.purpose }}
+                                                        </p>
                                                     </td>
                                                     <td class="px-3 py-2">
                                                         {{ cookie.provider }}
@@ -265,7 +278,7 @@ function close(): void {
                             class="px-4 py-2 text-sm font-medium text-base-secondary hover:bg-base-secondary/10 rounded-md transition-colors"
                             @click="close"
                         >
-                            Cancelar
+                            {{ config.texts.cancel }}
                         </button>
                         <button
                             type="button"
