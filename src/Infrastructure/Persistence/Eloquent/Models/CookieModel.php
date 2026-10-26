@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models;
 
+use App\Infrastructure\Persistence\Eloquent\Concerns\StoresInstantsInStorageTimezone;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -27,6 +28,7 @@ use Modules\CookieConsent\Domain\Enums\CookieType;
 final class CookieModel extends Model
 {
     use HasUuids;
+    use StoresInstantsInStorageTimezone;
 
     protected $table = 'cookie_consent_cookies';
 

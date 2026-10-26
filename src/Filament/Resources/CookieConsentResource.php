@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Filament\Resources;
 
+use App\Application\Services\TimezoneServiceInterface;
 use App\Filament\Resources\BaseResource;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -113,7 +114,12 @@ class CookieConsentResource extends BaseResource
 
                 Filter::make('consented_today')
                     ->label(__('cookie-consent::cookie_consent.consents.filters.consented_today'))
-                    ->query(fn (Builder $query): Builder => $query->whereDate('consented_at', today()))
+                    ->query(function (Builder $query): Builder {
+                        $timezone = app(TimezoneServiceInterface::class);
+                        [$start, $end] = $timezone->displayDayRange($timezone->today());
+
+                        return $query->where('consented_at', '>=', $start)->where('consented_at', '<', $end);
+                    })
                     ->toggle(),
             ])
             ->recordActions([
