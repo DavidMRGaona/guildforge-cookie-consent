@@ -34,6 +34,8 @@ use Tests\Support\Modules\ModuleTestCase;
 
 final class CookieConsentPanelTest extends ModuleTestCase
 {
+    private const string VISITOR_ID = '6f1c2a3b-4d5e-4f60-8a71-92b3c4d5e6f7';
+
     use InteractsWithModulePanel;
 
     protected ?string $moduleName = 'cookie-consent';
@@ -87,7 +89,7 @@ final class CookieConsentPanelTest extends ModuleTestCase
     {
         $consent = CookieConsentModel::create([
             'id' => (string) Str::uuid(),
-            'visitor_id' => 'visitor-1',
+            'visitor_id' => self::VISITOR_ID,
             'ip_hash' => hash('sha256', '127.0.0.1'),
             'user_agent' => 'PHPUnit',
             'preferences' => ['analytics' => true],
@@ -100,7 +102,7 @@ final class CookieConsentPanelTest extends ModuleTestCase
         Livewire::test(ListCookieConsents::class)->assertOk()->assertCanSeeTableRecords([$consent]);
         Livewire::test(ViewCookieConsent::class, ['record' => $consent->getRouteKey()])
             ->assertOk()
-            ->assertSee('visitor-1');
+            ->assertSee(self::VISITOR_ID);
     }
 
     public function test_table_labels_come_from_the_module_translations(): void
@@ -122,7 +124,7 @@ final class CookieConsentPanelTest extends ModuleTestCase
     {
         $consent = CookieConsentModel::create([
             'id' => (string) Str::uuid(),
-            'visitor_id' => 'visitor-1',
+            'visitor_id' => self::VISITOR_ID,
             'ip_hash' => hash('sha256', '127.0.0.1'),
             'user_agent' => 'PHPUnit',
             'preferences' => ['analytics' => true],
