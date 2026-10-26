@@ -80,6 +80,8 @@ $this->callAfterResolving(CookieDeclarationRegistryInterface::class, function (C
 });
 ```
 
+La finalidad (`purpose`) se muestra bajo el nombre de cada cookie en la lista desplegable del modal de preferencias, así que conviene que explique para qué sirve esa cookie en concreto y no solo su categoría.
+
 `DeclaredCookieDTO` también acepta `type` (`App\Domain\Cookies\Enums\CookieType`, por defecto `FirstParty`), que se guarda como el tipo de cookie de este módulo con el mismo valor. Declarar dos veces el mismo nombre sustituye la declaración anterior.
 
 - **Cuándo se crean.** `DeclaredCookieSynchronizerInterface::sync()` crea las cookies declaradas que aún no existen. Se ejecuta tras las migraciones (no en rollbacks ni con `--pretend`), cada hora desde el programador de tareas (cubre habilitar un módulo desde el panel o instalar `cookie-consent`) y a mano con `php artisan cookie-consent:sync-declared-cookies`. Un fallo de la sincronización se registra y nunca interrumpe `migrate`.
@@ -152,6 +154,8 @@ Los ajustes se editan en **Configuración → Banner de cookies** (permiso `sett
 | `save_settings_text` | Texto del botón guardar | `Guardar preferencias` |
 | `privacy_policy_link_text` | Texto del enlace de privacidad | `Política de privacidad` |
 | `privacy_policy_url` | Ruta del sitio (`/...`) o dirección `http(s)` de la política de privacidad | `/politica-de-privacidad` |
+
+El resto de etiquetas del modal de preferencias («Obligatoria», «Ver cookies», las cabeceras de la lista de cookies, «Cancelar» y el nombre accesible del botón de cerrar) llegan en los mismos textos del banner desde `lang/es/cookie_consent.php` (`frontend.*`) y no se editan en el panel.
 
 ### Comportamiento
 
@@ -290,7 +294,8 @@ cookie-consent/
 ├── tests/
 │   ├── Unit/
 │   ├── Integration/
-│   └── Feature/
+│   ├── Feature/
+│   └── js/                     # Specs de Vitest de los componentes
 └── module.json                 # Manifiesto del módulo
 ```
 
@@ -301,6 +306,12 @@ Desde `src/` (o dentro del contenedor `guildforge_app`):
 ```bash
 vendor/bin/phpunit -c modules/cookie-consent/phpunit.xml
 vendor/bin/phpunit -c modules/cookie-consent/phpunit.xml --testsuite=Unit
+```
+
+Los componentes Vue se prueban con el Vitest del core (`vitest.config.ts`, specs en `tests/js/`), desde `src/modules/cookie-consent` en el contenedor de Node:
+
+```bash
+../../node_modules/.bin/vitest run
 ```
 
 `php artisan test` no ejecuta los tests de los módulos.

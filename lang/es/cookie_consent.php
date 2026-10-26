@@ -204,9 +204,14 @@ return [
         'settings' => 'Configurar',
         'save_preferences' => 'Guardar preferencias',
         'privacy_policy' => 'Política de privacidad',
-        'required_category' => '(Obligatoria)',
+        'required_category' => 'Obligatoria',
         'show_cookies' => 'Ver cookies',
         'hide_cookies' => 'Ocultar cookies',
+        'cookie_column' => 'Cookie',
+        'provider_column' => 'Proveedor',
+        'duration_column' => 'Duración',
+        'cancel' => 'Cancelar',
+        'close' => 'Cerrar',
     ],
 
     // Validation messages

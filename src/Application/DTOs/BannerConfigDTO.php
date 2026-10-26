@@ -8,7 +8,7 @@ final readonly class BannerConfigDTO
 {
     /**
      * @param  array{primary: string, secondary: string, background: string, text: string}  $colors
-     * @param  array{title: string, description: string, acceptAll: string, rejectAll: string, settings: string, save: string, privacyLink: string, privacyUrl: string}  $texts
+     * @param  array{title: string, description: string, acceptAll: string, rejectAll: string, settings: string, save: string, privacyLink: string, privacyUrl: string, required: string, showCookies: string, cookieColumn: string, providerColumn: string, durationColumn: string, cancel: string, close: string}  $texts
      */
     public function __construct(
         public string $position,

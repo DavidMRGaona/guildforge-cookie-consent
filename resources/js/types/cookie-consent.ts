@@ -43,6 +43,13 @@ export interface BannerConfig {
         save: string;
         privacyLink: string;
         privacyUrl: string;
+        required: string;
+        showCookies: string;
+        cookieColumn: string;
+        providerColumn: string;
+        durationColumn: string;
+        cancel: string;
+        close: string;
     };
     gtmEnabled: boolean;
     gtmContainerId: string;
