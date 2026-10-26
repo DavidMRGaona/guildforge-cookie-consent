@@ -201,8 +201,8 @@ final class UtcStorageTest extends ModuleTestCase
     {
         // 00:30 on 25 October in Madrid: the day began at 22:00Z the day before
         $this->travelTo(CarbonImmutable::parse('2026-10-24T22:30:00Z'));
-        $inside = $this->consent('2026-10-24T22:10:00Z', '2027-10-24T22:10:00Z', 'inside');
-        $outside = $this->consent('2026-10-24T21:50:00Z', '2027-10-24T21:50:00Z', 'outside');
+        $inside = $this->consent('2026-10-24T22:10:00Z', '2027-10-24T22:10:00Z');
+        $outside = $this->consent('2026-10-24T21:50:00Z', '2027-10-24T21:50:00Z');
 
         Livewire::test(ListCookieConsents::class)
             ->filterTable('consented_today')
@@ -210,11 +210,11 @@ final class UtcStorageTest extends ModuleTestCase
             ->assertCanNotSeeTableRecords([$outside]);
     }
 
-    private function consent(string $consentedAt, string $expiresAt, string $visitor = 'visitor-1'): CookieConsentModel
+    private function consent(string $consentedAt, string $expiresAt): CookieConsentModel
     {
         return CookieConsentModel::create([
             'id' => (string) Str::uuid(),
-            'visitor_id' => $visitor,
+            'visitor_id' => (string) Str::uuid(),
             'ip_hash' => hash('sha256', '127.0.0.1'),
             'user_agent' => 'PHPUnit',
             'preferences' => ['necessary' => true],
