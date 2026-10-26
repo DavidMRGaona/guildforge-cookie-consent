@@ -103,7 +103,8 @@ final readonly class InjectCookieScripts
 
         $config = $this->bannerConfigService->getBannerConfig();
 
-        // Validity counts calendar days of the site, not blocks of 24 hours
+        // The expiry counts calendar days in the display zone, like ConsentService and the browser.
+        // It used to be N x 24 h from the UTC timestamp, which differed by one hour across a DST change.
         if ($this->timezone->toDisplay($consentedAt)->modify("+{$config->validityDays} days") < CarbonImmutable::now()) {
             return false;
         }

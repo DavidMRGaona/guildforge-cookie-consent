@@ -70,9 +70,7 @@ final class UtcStorageTest extends ModuleTestCase
 
     public function test_the_today_filter_follows_the_madrid_day_with_madrid_storage(): void
     {
-        if (app(TimezoneServiceInterface::class)->storageTimezone()->getName() !== 'Europe/Madrid') {
-            $this->markTestSkipped('Only meaningful with Madrid storage; the UTC test covers the other.');
-        }
+        $this->skipUnlessMadridStorage();
 
         $this->assertTodayFilterBoundary();
     }
@@ -112,6 +110,40 @@ final class UtcStorageTest extends ModuleTestCase
     public function test_the_validity_counts_calendar_days_in_the_display_zone(): void
     {
         $this->useUtcStorage();
+
+        $this->assertServiceValidityBoundary();
+    }
+
+    public function test_the_validity_counts_calendar_days_in_the_display_zone_with_madrid_storage(): void
+    {
+        $this->skipUnlessMadridStorage();
+
+        $this->assertServiceValidityBoundary();
+    }
+
+    public function test_the_cookie_validity_counts_calendar_days_in_the_display_zone(): void
+    {
+        $this->useUtcStorage();
+
+        $this->assertCookieValidityBoundary();
+    }
+
+    public function test_the_cookie_validity_counts_calendar_days_in_the_display_zone_with_madrid_storage(): void
+    {
+        $this->skipUnlessMadridStorage();
+
+        $this->assertCookieValidityBoundary();
+    }
+
+    private function skipUnlessMadridStorage(): void
+    {
+        if (app(TimezoneServiceInterface::class)->storageTimezone()->getName() !== 'Europe/Madrid') {
+            $this->markTestSkipped('Only meaningful with Madrid storage; the UTC test covers the other.');
+        }
+    }
+
+    private function assertServiceValidityBoundary(): void
+    {
         app(SettingsServiceInterface::class)->set('cookie-consent.consent_validity_days', '2');
         // 12:00 in Madrid on 24 October; the clocks go back on the night of the 25th
         $this->travelTo(CarbonImmutable::parse('2026-10-24T10:00:00Z'));
@@ -127,12 +159,13 @@ final class UtcStorageTest extends ModuleTestCase
         ));
 
         // Two calendar days later is 12:00 on the 26th, which is 11:00Z (49 hours elapsed)
-        $this->assertSame('2026-10-26 11:00:00', substr((string) DB::table('cookie_consent_consents')->value('expires_at'), 0, 19));
+        $expiresAt = CarbonImmutable::parse((string) DB::table('cookie_consent_consents')->value('expires_at'), app(TimezoneServiceInterface::class)->storageTimezone());
+        $this->assertSame('2026-10-26T11:00:00+00:00', $expiresAt->utc()->toIso8601String());
+        $this->assertSame('2026-10-26 12:00:00', app(TimezoneServiceInterface::class)->toDisplayWallTime($expiresAt, 'Y-m-d H:i:s'));
     }
 
-    public function test_the_cookie_validity_counts_calendar_days_in_the_display_zone(): void
+    private function assertCookieValidityBoundary(): void
     {
-        $this->useUtcStorage();
         app(SettingsServiceInterface::class)->set('cookie-consent.consent_validity_days', '2');
         Route::middleware('web')->get('/cookie-consent-test-page', fn () => response(
             '<html><head><title>Test</title></head><body><p>Contenido</p></body></html>',
