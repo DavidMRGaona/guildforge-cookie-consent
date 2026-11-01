@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import CookieSettingsModal from '../../resources/js/components/CookieSettingsModal.vue';
 import type { BannerConfig, Cookie, CookieCategory } from '../../resources/js/types/cookie-consent';
 
@@ -63,7 +63,7 @@ function category(cookies: Cookie[]): CookieCategory {
     };
 }
 
-async function mountExpanded(cookies: Cookie[]) {
+async function mountExpanded(cookies: Cookie[]): Promise<VueWrapper> {
     const wrapper = mount(CookieSettingsModal, {
         props: { categories: [category(cookies)], config },
         global: { stubs: { teleport: true } },
