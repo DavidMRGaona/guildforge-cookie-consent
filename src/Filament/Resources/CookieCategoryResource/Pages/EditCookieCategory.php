@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Filament\Resources\CookieCategoryResource\Pages;
 
+use App\Filament\Concerns\HasKnowledgeGuideAction;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Modules\CookieConsent\Domain\Events\CookieConfigurationChanged;
@@ -15,14 +16,17 @@ use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieCateg
  */
 class EditCookieCategory extends EditRecord
 {
+    use HasKnowledgeGuideAction;
+
     protected static string $resource = CookieCategoryResource::class;
 
     protected function getHeaderActions(): array
     {
-        return [
+        return array_filter([
             DeleteAction::make()
                 ->hidden(fn () => $this->record->is_system),
-        ];
+            $this->knowledgeGuideAction('cookie-consent.panel.categories'),
+        ]);
     }
 
     protected function afterSave(): void
