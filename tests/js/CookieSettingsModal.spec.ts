@@ -1,7 +1,24 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import type { VNode } from 'vue';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import CookieSettingsModal from '../../resources/js/components/CookieSettingsModal.vue';
 import type { BannerConfig, Cookie, CookieCategory } from '../../resources/js/types/cookie-consent';
+
+// The help button asks the server which guides the person may read: a plain anchor naming its guide
+vi.mock('@/components/knowledge/HelpLink.vue', async () => {
+    const { defineComponent, h } = await import('vue');
+
+    return {
+        default: defineComponent({
+            name: 'HelpLink',
+            props: { guide: { type: String, required: true } },
+            setup(props) {
+                return (): VNode =>
+                    h('a', { 'data-testid': 'help-link', 'data-guide': props.guide }, '?');
+            },
+        }),
+    };
+});
 
 const texts: BannerConfig['texts'] = {
     title: 'Cookie notice',
@@ -131,6 +148,21 @@ describe('CookieSettingsModal', () => {
         expect(cancel?.classes()).toEqual(
             expect.arrayContaining(['bg-muted', 'border', 'border-base-muted'])
         );
+    });
+
+    it('links its title to the guide on cookie preferences', async () => {
+        const help = (await mountExpanded([cookie({})])).find('[data-testid="help-link"]');
+
+        expect(help.attributes('data-guide')).toBe('cookie-consent.cookie-preferences');
+    });
+
+    it('closes when the help link opens the guide, so the window does not cover it', async () => {
+        const wrapper = await mountExpanded([cookie({})]);
+
+        await wrapper.find('[data-testid="help-link"]').trigger('click');
+
+        expect(wrapper.emitted('close')).toHaveLength(1);
+        expect(wrapper.emitted('save')).toBeUndefined();
     });
 
     it('takes every label from the configured texts', async () => {

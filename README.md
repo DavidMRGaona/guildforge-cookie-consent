@@ -15,7 +15,7 @@ Gestión del consentimiento de cookies conforme al RGPD para GuildForge: banner 
 
 ## Requisitos
 
-- GuildForge core `^3.22`
+- GuildForge core `^3.35`
 - PHP >= 8.5, Laravel >= 13, Filament 5
 
 El core rechaza el módulo si no se cumplen (`module.json` → `requires`).
@@ -125,6 +125,15 @@ El banner siempre envía `banner`.
 - antes de `</body>`: los scripts de esa posición de las categorías aceptadas.
 
 La cookie se escribe en el navegador y el módulo la excluye del cifrado de cookies de Laravel para poder leerla. GTM se carga con independencia del consentimiento; las etiquetas de Google respetan el estado de Consent Mode, que el banner actualiza al consentir y el middleware restaura en cada página.
+
+### Ayuda
+
+El módulo trae sus guías para el centro de ayuda del core (`resources/knowledge/es/`, core ≥ 3.35), cada una visible solo para quien puede hacer lo que explica.
+
+- **Panel** (categoría «Configuración del sitio»): «Cookies y consentimiento: cómo funcionan» (la de entrada, para quien tenga cualquiera de los permisos del módulo o `settings.manage`), categorías de cookies (`cookie_categories.view_any`), las cookies y los scripts de una categoría (`cookie_categories.update`), los ajustes del banner (`settings.manage`) y los consentimientos (`cookie_consents.view_any`).
+- **Sitio** (categoría «Cuenta»): elegir qué cookies aceptas y cambiar tu elección, para cualquier cuenta. No hacen falta capacidades: el aviso sale a todo el mundo.
+
+El «?» de las páginas del panel abre su guía (`HasKnowledgeGuideAction`): las de categorías, la de consentimientos y la de ajustes del banner. En la web, la ventana de preferencias lleva un `HelpLink` a la guía de elegir cookies; al pulsarlo se cierra la ventana, porque el layout persistente mantiene el banner entre páginas y taparía la guía. `KnowledgeGuidesTest` pasa el lint de la base de conocimiento en el CI.
 
 ## Configuración
 

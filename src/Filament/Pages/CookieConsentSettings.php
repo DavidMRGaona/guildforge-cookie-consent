@@ -6,6 +6,7 @@ namespace Modules\CookieConsent\Filament\Pages;
 
 use App\Application\Services\SettingsServiceInterface;
 use App\Filament\Concerns\ChecksPermissions;
+use App\Filament\Concerns\HasKnowledgeGuideAction;
 use App\Filament\Concerns\SafeModuleNavigation;
 use BackedEnum;
 use Closure;
@@ -37,6 +38,7 @@ use Modules\CookieConsent\Domain\Enums\BannerTheme;
 final class CookieConsentSettings extends Page implements HasForms
 {
     use ChecksPermissions;
+    use HasKnowledgeGuideAction;
     use InteractsWithForms;
     use SafeModuleNavigation;
 
@@ -314,6 +316,13 @@ final class CookieConsentSettings extends Page implements HasForms
                 ])
                 ->columns(2),
         ];
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return array_filter([
+            $this->knowledgeGuideAction('cookie-consent.panel.banner-settings'),
+        ]);
     }
 
     /**

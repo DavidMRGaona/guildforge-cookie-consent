@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Filament\Resources\CookieConsentResource\Pages;
 
+use App\Filament\Concerns\HasKnowledgeGuideAction;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Section;
@@ -13,7 +14,16 @@ use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieConse
 
 class ViewCookieConsent extends ViewRecord
 {
+    use HasKnowledgeGuideAction;
+
     protected static string $resource = CookieConsentResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return array_filter([
+            $this->knowledgeGuideAction('cookie-consent.panel.consents'),
+        ]);
+    }
 
     public function infolist(Schema $schema): Schema
     {

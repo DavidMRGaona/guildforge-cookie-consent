@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ChevronDown, X } from '@lucide/vue';
 import { computed, ref } from 'vue';
+import HelpLink from '@/components/knowledge/HelpLink.vue';
 import type { CookieCategory, BannerConfig } from '../types/cookie-consent';
 import { getStoredConsent } from '../utils/consent-manager';
 
@@ -91,9 +92,15 @@ function close(): void {
             <div :class="modalClasses" :style="modalStyles">
                 <!-- Header -->
                 <div class="flex items-center justify-between p-4 border-b border-default">
-                    <h2 class="text-xl font-semibold">
-                        {{ config.texts.settings }}
-                    </h2>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-xl font-semibold">
+                            {{ config.texts.settings }}
+                        </h2>
+                        <!-- The layout keeps the banner between pages: close this window, or it would cover the guide -->
+                        <span class="inline-flex" @click="close">
+                            <HelpLink guide="cookie-consent.cookie-preferences" />
+                        </span>
+                    </div>
                     <button
                         type="button"
                         class="p-1 rounded-full hover:bg-base-secondary/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 focus-visible:ring-offset-surface"
