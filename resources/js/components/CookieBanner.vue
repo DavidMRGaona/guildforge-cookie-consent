@@ -232,13 +232,16 @@ const focusRingClasses =
     'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 focus-visible:ring-offset-surface';
 
 // It stays on the page over any content, so it follows the site mode (never the fixed colours of
-// «Claro» or «Oscuro») and stands out from the page with an elevated surface and a strong border.
+// «Claro» or «Oscuro») and stands out from the page with an elevated surface and a border that
+// reaches 3:1 on the page in both modes (`border-strong` is a 1.4:1 hairline in light mode).
 // Only «Personalizado» keeps the panel's colours.
 const floatingButtonClasses = computed(() => {
     if (!config.value) return '';
 
     const themeClasses =
-        config.value.theme === 'custom' ? '' : 'bg-elevated text-base-primary border border-strong';
+        config.value.theme === 'custom'
+            ? ''
+            : 'bg-elevated text-base-primary border border-base-muted';
 
     return `fixed bottom-4 left-4 z-40 rounded-full p-3 shadow-lg transition-opacity hover:opacity-90 ${themeClasses} ${focusRingClasses}`;
 });
