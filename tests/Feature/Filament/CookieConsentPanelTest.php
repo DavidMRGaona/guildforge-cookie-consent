@@ -64,6 +64,22 @@ final class CookieConsentPanelTest extends ModuleTestCase
             ->assertFormSet(['name' => $category->name]);
     }
 
+    public function test_renaming_a_category_keeps_its_slug(): void
+    {
+        $custom = $this->newCategory('custom', isSystem: false);
+
+        Livewire::test(EditCookieCategory::class, ['record' => $custom->getRouteKey()])
+            ->fillForm(['name' => 'A completely new name'])
+            ->assertFormSet(['slug' => 'test-custom']);
+    }
+
+    public function test_the_slug_is_proposed_from_the_name_when_creating_a_category(): void
+    {
+        Livewire::test(CreateCookieCategory::class)
+            ->fillForm(['name' => 'Social media'])
+            ->assertFormSet(['slug' => 'social-media']);
+    }
+
     public function test_bulk_delete_keeps_system_categories(): void
     {
         $system = $this->newCategory('system', isSystem: true);
