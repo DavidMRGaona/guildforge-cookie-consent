@@ -64,7 +64,11 @@ export interface BannerConfig {
     /** Without Consent Mode, the container waits until the visitor accepts this category. */
     gtmCategory: string;
     consentModeEnabled: boolean;
+    /** Every Consent Mode key with its value before the visitor chooses. */
+    consentModeDefaults: Record<string, ConsentModeValue>;
 }
+
+export type ConsentModeValue = 'granted' | 'denied';
 
 export interface StoredConsent {
     visitorId: string;

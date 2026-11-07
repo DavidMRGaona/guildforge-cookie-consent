@@ -7,6 +7,7 @@ namespace Modules\CookieConsent\Infrastructure\Services;
 use App\Application\Services\SettingsServiceInterface;
 use Modules\CookieConsent\Application\DTOs\BannerConfigDTO;
 use Modules\CookieConsent\Application\Services\BannerConfigServiceInterface;
+use Modules\CookieConsent\Application\Services\ConsentModeServiceInterface;
 use Modules\CookieConsent\Application\Services\ConsentServiceInterface;
 
 final readonly class BannerConfigService implements BannerConfigServiceInterface
@@ -14,6 +15,7 @@ final readonly class BannerConfigService implements BannerConfigServiceInterface
     public function __construct(
         private SettingsServiceInterface $settingsService,
         private ConsentServiceInterface $consentService,
+        private ConsentModeServiceInterface $consentModeService,
     ) {}
 
     public function getBannerConfig(): BannerConfigDTO
@@ -58,6 +60,7 @@ final readonly class BannerConfigService implements BannerConfigServiceInterface
             gtmCategory: (string) $this->settingsService->get('cookie-consent.gtm_category', 'analytics'),
             showFloatingButton: (bool) $this->settingsService->get('cookie-consent.show_floating_button', true),
             preferencesUrl: route('cookie-consent.preferences', absolute: false),
+            consentModeDefaults: $this->consentModeService->defaults(),
         );
     }
 

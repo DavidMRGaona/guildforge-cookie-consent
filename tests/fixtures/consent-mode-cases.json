@@ -1,0 +1,80 @@
+{
+    "_comment": "One Consent Mode mapping for the browser and the server: ConsentModeServiceTest (PHP) and consentMode.spec.ts (Vitest) both check these cases. Slugs are not the system ones on purpose.",
+    "defaults": {
+        "ad_storage": "denied",
+        "ad_user_data": "denied",
+        "ad_personalization": "denied",
+        "analytics_storage": "denied",
+        "functionality_storage": "denied",
+        "personalization_storage": "denied",
+        "security_storage": "granted"
+    },
+    "categories": [
+        {
+            "slug": "imprescindibles",
+            "isRequired": true,
+            "consentModeKeys": ["security_storage", "functionality_storage"]
+        },
+        { "slug": "estadisticas", "isRequired": false, "consentModeKeys": ["analytics_storage"] },
+        {
+            "slug": "publicidad",
+            "isRequired": false,
+            "consentModeKeys": ["ad_storage", "ad_user_data", "ad_personalization"]
+        },
+        { "slug": "sin-claves", "isRequired": false, "consentModeKeys": [] }
+    ],
+    "cases": [
+        {
+            "name": "only the required categories",
+            "preferences": { "imprescindibles": true, "estadisticas": false, "publicidad": false, "sin-claves": false },
+            "expected": {
+                "ad_storage": "denied",
+                "ad_user_data": "denied",
+                "ad_personalization": "denied",
+                "analytics_storage": "denied",
+                "functionality_storage": "granted",
+                "personalization_storage": "denied",
+                "security_storage": "granted"
+            }
+        },
+        {
+            "name": "statistics accepted",
+            "preferences": { "imprescindibles": true, "estadisticas": true, "publicidad": false, "sin-claves": true },
+            "expected": {
+                "ad_storage": "denied",
+                "ad_user_data": "denied",
+                "ad_personalization": "denied",
+                "analytics_storage": "granted",
+                "functionality_storage": "granted",
+                "personalization_storage": "denied",
+                "security_storage": "granted"
+            }
+        },
+        {
+            "name": "everything accepted",
+            "preferences": { "imprescindibles": true, "estadisticas": true, "publicidad": true, "sin-claves": true },
+            "expected": {
+                "ad_storage": "granted",
+                "ad_user_data": "granted",
+                "ad_personalization": "granted",
+                "analytics_storage": "granted",
+                "functionality_storage": "granted",
+                "personalization_storage": "denied",
+                "security_storage": "granted"
+            }
+        },
+        {
+            "name": "a required category missing from the choice still counts",
+            "preferences": { "publicidad": true },
+            "expected": {
+                "ad_storage": "granted",
+                "ad_user_data": "granted",
+                "ad_personalization": "granted",
+                "analytics_storage": "denied",
+                "functionality_storage": "granted",
+                "personalization_storage": "denied",
+                "security_storage": "granted"
+            }
+        }
+    ]
+}

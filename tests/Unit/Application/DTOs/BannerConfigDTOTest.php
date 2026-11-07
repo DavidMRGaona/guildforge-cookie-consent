@@ -71,6 +71,7 @@ final class BannerConfigDTOTest extends TestCase
             'gtmContainerId',
             'gtmCategory',
             'consentModeEnabled',
+            'consentModeDefaults',
         ], array_keys($array));
     }
 }
