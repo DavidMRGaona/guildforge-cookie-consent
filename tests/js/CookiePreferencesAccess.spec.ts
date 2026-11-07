@@ -107,9 +107,12 @@ describe('reopening the cookie preferences', () => {
                     'bg-elevated',
                     'text-base-primary',
                     'border',
-                    'border-strong',
+                    'border-base-muted',
                 ])
             );
+            // border-strong is a decorative hairline (1.4:1 on the light page, 2.1:1 on the dark
+            // one): the button's outline must reach the 3:1 WCAG 1.4.11 asks for
+            expect(button.classes()).not.toContain('border-strong');
         }
     );
 
