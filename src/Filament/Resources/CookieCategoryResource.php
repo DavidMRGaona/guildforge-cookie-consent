@@ -68,10 +68,13 @@ class CookieCategoryResource extends BaseResource
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(function (Set $set, ?string $state, ?string $old) {
-                                if (blank($state)) {
+                            // The slug is the category's identifier for modules, declared cookies and
+                            // Consent Mode: it is only proposed on creation, never rewritten by a rename
+                            ->afterStateUpdated(function (Set $set, ?string $state, string $operation): void {
+                                if ($operation !== 'create' || blank($state)) {
                                     return;
                                 }
+
                                 $set('slug', Str::slug($state));
                             }),
 
