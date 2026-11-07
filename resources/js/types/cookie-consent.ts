@@ -6,6 +6,8 @@ export interface CookieCategory {
     isRequired: boolean;
     sortOrder: number;
     consentModeKeys: string[];
+    /** Whether accepting or withdrawing it adds or removes scripts on the page. */
+    hasScripts: boolean;
     cookies: Cookie[];
 }
 
@@ -31,9 +33,13 @@ export interface BannerConfig {
     };
     showRejectAll: boolean;
     showSettingsButton: boolean;
+    /** A small button that reopens the preferences once the visitor has chosen. */
+    showFloatingButton: boolean;
     validityDays: number;
     reconsentOnChange: boolean;
     configVersion: number;
+    /** Path of the link that reopens the preferences (for the footer menu). */
+    preferencesUrl: string;
     texts: {
         title: string;
         description: string;
@@ -50,6 +56,7 @@ export interface BannerConfig {
         durationColumn: string;
         cancel: string;
         close: string;
+        preferences: string;
     };
     gtmEnabled: boolean;
     gtmContainerId: string;

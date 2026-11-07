@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent;
 
+use App\Application\Modules\DTOs\ModuleRouteDTO;
 use App\Application\Modules\DTOs\NavigationItemDTO;
 use App\Application\Modules\DTOs\PermissionDTO;
 use App\Application\Modules\DTOs\SlotRegistrationDTO;
@@ -285,6 +286,23 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
                 sort: 1,
                 permissions: ['cookie-consent:cookie_categories.view_any'],
                 module: 'cookie-consent',
+            ),
+        ];
+    }
+
+    /**
+     * The link that reopens the cookie preferences, for the footer menu: withdrawing
+     * consent must be as easy as giving it.
+     *
+     * @return array<ModuleRouteDTO>
+     */
+    public function registerRoutes(): array
+    {
+        return [
+            new ModuleRouteDTO(
+                routeName: 'cookie-consent.preferences',
+                label: __('cookie-consent::cookie_consent.routes.preferences'),
+                module: $this->moduleName(),
             ),
         ];
     }

@@ -168,6 +168,8 @@ return [
         'behavior' => 'Comportamiento',
         'show_reject_all' => 'Mostrar botón "Rechazar todas"',
         'show_settings_button' => 'Mostrar botón "Configurar"',
+        'show_floating_button' => 'Mostrar botón flotante de preferencias',
+        'show_floating_button_help' => 'Un botón pequeño con una galleta, abajo a la izquierda, abre las preferencias de cookies una vez elegidas. Si añades el enlace «Preferencias de cookies» al pie de página desde Navegación, puedes quitarlo.',
         'consent_validity_days' => 'Días de validez del consentimiento',
         'consent_validity_days_help' => 'Número de días que el consentimiento es válido antes de volver a solicitarlo',
         'reconsent_on_change' => 'Volver a solicitar consentimiento al cambiar configuración',
@@ -203,7 +205,13 @@ return [
     ],
 
     // Frontend texts (used in Vue components)
+    // Pages offered for the site menus
+    'routes' => [
+        'preferences' => 'Preferencias de cookies',
+    ],
+
     'frontend' => [
+        'preferences' => 'Preferencias de cookies',
         'default_title' => 'Utilizamos cookies',
         'default_description' => 'Usamos cookies propias y de terceros para mejorar tu experiencia y mostrar contenido personalizado.',
         'accept_all' => 'Aceptar todas',

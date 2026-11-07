@@ -21,6 +21,7 @@ use Modules\CookieConsent\Domain\Exceptions\InvalidConsentException;
 use Modules\CookieConsent\Domain\Repositories\CookieCategoryRepositoryInterface;
 use Modules\CookieConsent\Domain\Repositories\CookieConsentRepositoryInterface;
 use Modules\CookieConsent\Domain\Repositories\CookieRepositoryInterface;
+use Modules\CookieConsent\Domain\Repositories\CookieScriptRepositoryInterface;
 use Modules\CookieConsent\Domain\ValueObjects\ConsentId;
 use Modules\CookieConsent\Domain\ValueObjects\ConsentPreferences;
 use Modules\CookieConsent\Domain\ValueObjects\IpHash;
@@ -34,6 +35,7 @@ final readonly class ConsentService implements ConsentServiceInterface
         private CookieCategoryRepositoryInterface $categoryRepository,
         private CookieRepositoryInterface $cookieRepository,
         private CookieConsentRepositoryInterface $consentRepository,
+        private CookieScriptRepositoryInterface $scriptRepository,
         private SettingsServiceInterface $settingsService,
         private TimezoneServiceInterface $timezone,
     ) {}
@@ -53,7 +55,12 @@ final readonly class ConsentService implements ConsentServiceInterface
                 array_filter($cookies, fn ($cookie) => $cookie->isActive())
             );
 
-            $result[] = CategoryDTO::fromEntity($category, array_values($cookieDTOs));
+            $hasScripts = array_filter(
+                $this->scriptRepository->findByCategory($category->id()),
+                fn ($script): bool => $script->isActive(),
+            ) !== [];
+
+            $result[] = CategoryDTO::fromEntity($category, array_values($cookieDTOs), $hasScripts);
         }
 
         return $result;
