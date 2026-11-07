@@ -46,4 +46,13 @@ final class CookieCategoryPolicy
     {
         return $this->authorize($user, 'cookie-consent:cookie_categories.delete');
     }
+
+    /**
+     * Filament asks for it on the table's drag handle; without the method it lets anyone who can
+     * open the list reorder.
+     */
+    public function reorder(UserModel $user): bool
+    {
+        return $this->authorize($user, 'cookie-consent:cookie_categories.update');
+    }
 }
