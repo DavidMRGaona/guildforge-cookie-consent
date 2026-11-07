@@ -20,8 +20,10 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Modules\CookieConsent\Domain\Enums\ConsentModeKey;
+use Modules\CookieConsent\Domain\Events\CookieConfigurationChanged;
 use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\Pages\CreateCookieCategory;
 use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\Pages\EditCookieCategory;
 use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\Pages\ListCookieCategories;
@@ -173,7 +175,8 @@ class CookieCategoryResource extends BaseResource
             ->recordActions([
                 EditAction::make(),
                 DeleteAction::make()
-                    ->hidden(fn (CookieCategoryModel $record): bool => $record->is_system),
+                    ->hidden(fn (CookieCategoryModel $record): bool => $record->is_system)
+                    ->after(fn (CookieCategoryModel $record) => self::announceDeletion($record)),
             ])
             ->checkIfRecordIsSelectableUsing(fn (CookieCategoryModel $record): bool => ! $record->is_system)
             ->toolbarActions([
@@ -182,10 +185,25 @@ class CookieCategoryResource extends BaseResource
                         ->deselectRecordsAfterCompletion()
                         ->action(function (Collection $records): void {
                             // System categories are never deleted, even when selected
-                            $records->where('is_system', false)->each->delete();
+                            $records->where('is_system', false)->each(function (Model $record): void {
+                                $record->delete();
+                                self::announceDeletion($record);
+                            });
                         }),
                 ]),
             ]);
+    }
+
+    /**
+     * Deleting a category changes what visitors consented to, so they are asked again.
+     */
+    public static function announceDeletion(Model $record): void
+    {
+        event(new CookieConfigurationChanged(
+            changeType: 'deleted',
+            entityType: 'category',
+            entityId: (string) $record->getKey(),
+        ));
     }
 
     public static function getRelations(): array
