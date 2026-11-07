@@ -3,6 +3,7 @@ import { ChevronDown, X } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import HelpLink from '@/components/knowledge/HelpLink.vue';
 import type { CookieCategory, BannerConfig } from '../types/cookie-consent';
+import { bannerThemeVariables } from '../utils/banner-theme';
 import { getStoredConsent } from '../utils/consent-manager';
 
 interface Props {
@@ -38,7 +39,7 @@ const modalClasses = computed(() => {
 });
 
 const modalStyles = computed(() => {
-    if (props.config.theme !== 'custom') return {};
+    if (props.config.theme !== 'custom') return bannerThemeVariables(props.config.theme);
 
     return {
         backgroundColor: props.config.colors.background,

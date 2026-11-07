@@ -108,3 +108,26 @@ describe('CookieBanner', () => {
         );
     });
 });
+
+describe('CookieBanner themes', () => {
+    beforeEach(() => {
+        localStorage.clear();
+    });
+
+    function surface(theme: BannerConfig['theme']): string {
+        const wrapper = mountBanner(config({ theme }));
+
+        return (wrapper.find('div.shadow-lg').element as HTMLElement).style.getPropertyValue(
+            '--color-bg-surface'
+        );
+    }
+
+    it('paints the light and dark themes differently', () => {
+        expect(surface('light')).toBe('#ffffff');
+        expect(surface('dark')).toBe('#302d2a');
+    });
+
+    it('sets no theme colours with the custom theme', () => {
+        expect(surface('custom')).toBe('');
+    });
+});
