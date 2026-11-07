@@ -29,7 +29,7 @@ Al habilitar el módulo se crean cuatro categorías del sistema, que no se puede
 
 1. El aviso sale en todas las páginas de la web mientras el visitante no ha elegido.
 2. El visitante pulsa **Aceptar todas** o **Rechazar todas**, o elige categoría a categoría con **Configurar**. Son los nombres por defecto: se cambian en los ajustes del banner.
-3. Su elección se guarda en su navegador y queda registrada en **Consentimientos**.
+3. Su elección queda registrada en **Consentimientos** y se guarda en su navegador. Si no se puede registrar, no se aplica: el aviso sigue abierto y le pide que lo intente de nuevo.
 4. Si la elección añade o quita scripts, la página se recarga sola para cargarlos o quitarlos.
 5. Puede cambiar o retirar su elección cuando quiera desde **Preferencias de cookies**: el botón redondo con una galleta, abajo a la izquierda, o el enlace del pie de página si lo añades (mira la guía «Ajustes del banner de cookies»).
 

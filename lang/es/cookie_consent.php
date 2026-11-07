@@ -212,6 +212,7 @@ return [
 
     'frontend' => [
         'preferences' => 'Preferencias de cookies',
+        'save_error' => 'No hemos podido guardar tu elección. Vuelve a intentarlo y, si sigue fallando, recarga la página.',
         'default_title' => 'Utilizamos cookies',
         'default_description' => 'Usamos cookies propias y de terceros para mejorar tu experiencia y mostrar contenido personalizado.',
         'accept_all' => 'Aceptar todas',

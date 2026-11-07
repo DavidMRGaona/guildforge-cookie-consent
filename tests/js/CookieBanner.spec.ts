@@ -20,6 +20,7 @@ const texts: BannerConfig['texts'] = {
     cancel: 'Discard',
     close: 'Close the settings',
     preferences: 'Cookie preferences',
+    saveError: 'Your choice was not saved.',
 };
 
 function config(overrides: Partial<BannerConfig> = {}): BannerConfig {

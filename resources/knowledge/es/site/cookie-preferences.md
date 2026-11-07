@@ -46,5 +46,6 @@ En el aviso y en la ventana de preferencias tienes el enlace a la política de p
 
 ## Si algo no sale bien
 
+- **Sale «No hemos podido guardar tu elección»**: no se ha guardado ni aplicado nada, y el aviso sigue ahí. Vuelve a pulsar el botón y, si sigue fallando, recarga la página y elige de nuevo.
 - **El aviso sale cada vez que entro**: tu navegador no guarda los datos de la web. Pasa, por ejemplo, en una ventana privada, que se borra al cerrarla, o si tienes bloqueadas las cookies de este sitio.
 - **Algo de la web no recuerda lo que hice**: algunas funciones solo recuerdan cosas si aceptas las cookies de su categoría, como las de preferencias. Si echas algo en falta, cambia tu elección (mira la guía «Cambiar tu elección de cookies»).

@@ -50,6 +50,7 @@ final readonly class BannerConfigService implements BannerConfigServiceInterface
                 'cancel' => __('cookie-consent::cookie_consent.frontend.cancel'),
                 'close' => __('cookie-consent::cookie_consent.frontend.close'),
                 'preferences' => __('cookie-consent::cookie_consent.frontend.preferences'),
+                'saveError' => __('cookie-consent::cookie_consent.frontend.save_error'),
             ],
             gtmEnabled: (bool) $this->settingsService->get('cookie-consent.gtm_enabled', false),
             gtmContainerId: $this->settingsService->get('cookie-consent.gtm_container_id', ''),

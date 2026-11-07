@@ -17,6 +17,7 @@ export const texts: BannerConfig['texts'] = {
     cancel: 'Discard',
     close: 'Close the settings',
     preferences: 'Cookie preferences',
+    saveError: 'Your choice was not saved.',
 };
 
 export function bannerConfig(overrides: Partial<BannerConfig> = {}): BannerConfig {
