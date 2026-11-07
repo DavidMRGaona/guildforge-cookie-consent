@@ -250,7 +250,7 @@ El resto de etiquetas del modal de preferencias («Obligatoria», «Ver cookies�
 | `cookie_categories.update` | Editar categorías de cookies | — |
 | `cookie_categories.delete` | Eliminar categorías de cookies | — |
 | `cookie_consents.view_any` | Ver consentimientos y el widget de estadísticas | — |
-| `cookie_consents.export` | Reservado para exportar consentimientos (sin acción en el panel todavía) | — |
+| `cookie_consents.export` | Exportar a CSV los consentimientos de la lista (sin hash de IP, user agent ni correo); hace falta también `cookie_consents.view_any` | — |
 
 Los administradores tienen todos los permisos. La página **Banner de cookies** usa el permiso del core `settings.manage`.
 

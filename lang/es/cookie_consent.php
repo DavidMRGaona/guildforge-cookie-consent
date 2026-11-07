@@ -85,6 +85,12 @@ return [
         'label' => 'consentimiento',
         'plural_label' => 'Consentimientos',
         'anonymous' => 'Anónimo',
+        'export' => [
+            'action' => 'Exportar CSV',
+            'filename' => 'consentimientos',
+            'yes' => 'Sí',
+            'no' => 'No',
+        ],
         'sections' => [
             'visitor' => 'Información del visitante',
             'consent' => 'Consentimiento',

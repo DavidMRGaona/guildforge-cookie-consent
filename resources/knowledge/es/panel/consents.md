@@ -39,11 +39,14 @@ Pulsa **Ver** en su fila. Verás:
 
 Los consentimientos no se pueden cambiar ni borrar desde el panel. La dirección IP nunca se guarda: el **Hash IP** es una huella que no permite saber cuál era.
 
+## Exportar a CSV
+
+Con el permiso **Exportar consentimientos** (además de **Ver consentimientos**), arriba de la lista aparece **Exportar CSV**. Descarga un archivo para hojas de cálculo con lo que muestra la lista en ese momento: si has buscado o filtrado, solo salen esas filas, y con el mismo orden.
+
+Cada fila lleva el **ID visitante**, el **Usuario** (su nombre, vacío si era anónimo), el **Método**, la **Versión config**, una columna por categoría con **Sí** o **No** (vacía si el consentimiento es anterior a esa categoría), la **Fecha consentimiento** y cuándo **Expira**. El archivo no incluye el **Hash IP**, el **User Agent** ni el correo de la persona.
+
 ## El resumen del escritorio
 
 En el escritorio, el resumen de consentimientos muestra el **Total consentimientos** y cuántos hay de cada método. Solo lo ve quien puede ver los consentimientos.
-
-> [!IMPORTANT]
-> Todavía no se pueden exportar los consentimientos: el permiso **Exportar consentimientos** no tiene ninguna acción en el panel.
 
 [[action:filament.admin.resources.cookie-consents.index|Ver los consentimientos]]
