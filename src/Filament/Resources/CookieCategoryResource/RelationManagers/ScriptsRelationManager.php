@@ -67,8 +67,8 @@ class ScriptsRelationManager extends RelationManager
                     ])
                     ->columns(2),
 
-                Section::make('Scripts')
-                    ->description('Introduce el código de los scripts. No incluyas las etiquetas <script> a menos que sea necesario.')
+                Section::make(__('cookie-consent::cookie_consent.scripts.sections.scripts'))
+                    ->description(__('cookie-consent::cookie_consent.scripts.sections.scripts_description'))
                     ->schema([
                         Textarea::make('script_head')
                             ->label(__('cookie-consent::cookie_consent.scripts.fields.script_head'))

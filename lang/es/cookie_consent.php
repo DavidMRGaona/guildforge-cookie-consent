@@ -41,6 +41,10 @@ return [
     'scripts' => [
         'label' => 'script',
         'plural_label' => 'Scripts',
+        'sections' => [
+            'scripts' => 'Scripts',
+            'scripts_description' => 'Pega el fragmento completo tal como lo da el proveedor, con sus etiquetas <script>. Se inserta sin modificar.',
+        ],
         'fields' => [
             'name' => 'Nombre',
             'description' => 'Descripción',
