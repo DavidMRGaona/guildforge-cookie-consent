@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { computed } from 'vue';
+import { computed, type VNode } from 'vue';
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
 import { hasCookieConsent } from '@/contracts/cookieConsent';
 import CookieBanner from '../../resources/js/components/CookieBanner.vue';
@@ -9,7 +9,14 @@ import type { BannerConfig, CookieCategory } from '../../resources/js/types/cook
 vi.mock('@/components/knowledge/HelpLink.vue', async () => {
     const { defineComponent, h } = await import('vue');
 
-    return { default: defineComponent({ name: 'HelpLink', setup: () => () => h('a', '?') }) };
+    return {
+        default: defineComponent({
+            name: 'HelpLink',
+            setup() {
+                return (): VNode => h('a', '?');
+            },
+        }),
+    };
 });
 
 const config = {
