@@ -22,6 +22,10 @@ final class InjectCookieScriptsTest extends ModuleTestCase
 
     private const string ANALYTICS_SCRIPT = '<script>window.analyticsTestLoaded = true;</script>';
 
+    private const string ANALYTICS_NOSCRIPT = '<noscript><img src="https://analytics.example/pixel.gif" alt=""></noscript>';
+
+    private const string MARKETING_NOSCRIPT = '<noscript><img src="https://ads.example/pixel.gif" alt=""></noscript>';
+
     private const array ACCEPTS_ANALYTICS = ['necessary' => true, 'analytics' => true, 'marketing' => false];
 
     protected function setUp(): void
@@ -53,6 +57,33 @@ final class InjectCookieScriptsTest extends ModuleTestCase
 
         $response->assertOk();
         $this->assertStringContainsString(self::ANALYTICS_SCRIPT, (string) $response->getContent());
+    }
+
+    public function test_the_noscript_content_of_an_accepted_category_follows_the_body_tag(): void
+    {
+        $this->scriptWithNoscript('analytics', self::ANALYTICS_NOSCRIPT);
+
+        $content = $this->pageWith($this->consentCookie(self::ACCEPTS_ANALYTICS));
+
+        $this->assertStringContainsString('<body>'."\n".self::ANALYTICS_NOSCRIPT, $content);
+    }
+
+    public function test_the_noscript_content_of_a_rejected_category_is_not_injected(): void
+    {
+        $this->scriptWithNoscript('marketing', self::MARKETING_NOSCRIPT);
+
+        $content = $this->pageWith($this->consentCookie(self::ACCEPTS_ANALYTICS));
+
+        $this->assertStringNotContainsString(self::MARKETING_NOSCRIPT, $content);
+    }
+
+    public function test_no_noscript_content_is_injected_without_consent(): void
+    {
+        $this->scriptWithNoscript('analytics', self::ANALYTICS_NOSCRIPT);
+
+        $content = (string) $this->get('/cookie-consent-test-page')->getContent();
+
+        $this->assertStringNotContainsString(self::ANALYTICS_NOSCRIPT, $content);
     }
 
     public function test_the_stored_consent_is_restored_in_consent_mode(): void
@@ -138,6 +169,17 @@ final class InjectCookieScriptsTest extends ModuleTestCase
         $content = $this->pageWith($this->consentCookie(self::ACCEPTS_ANALYTICS, timestamp: 'not a date'));
 
         $this->assertNoConsentApplied($content);
+    }
+
+    private function scriptWithNoscript(string $categorySlug, string $noscript): void
+    {
+        CookieScriptModel::create([
+            'category_id' => CookieCategoryModel::query()->where('slug', $categorySlug)->value('id'),
+            'name' => 'Noscript test',
+            'noscript_content' => $noscript,
+            'sort_order' => 2,
+            'is_active' => true,
+        ]);
     }
 
     private function pageWith(string $cookie): string

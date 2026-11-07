@@ -55,7 +55,7 @@ return [
             'script_head' => 'Scripts que se cargan en la sección <head> del documento',
             'script_body_start' => 'Scripts que se cargan justo después de la etiqueta <body>',
             'script_body_end' => 'Scripts que se cargan antes de cerrar </body>',
-            'noscript_content' => 'Contenido para usuarios sin JavaScript (ej: iframe de GTM)',
+            'noscript_content' => 'Contenido para usuarios sin JavaScript (ej: iframe de GTM). Se inserta justo después de <body>',
         ],
     ],
 
