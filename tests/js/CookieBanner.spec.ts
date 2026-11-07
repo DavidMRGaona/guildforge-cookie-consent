@@ -136,6 +136,10 @@ describe('CookieBanner themes', () => {
     it('sets no theme colours with the custom theme', () => {
         expect(surface('custom')).toBe('');
     });
+
+    it('sets no theme colours with the automatic theme, so it follows the site mode', () => {
+        expect(surface('auto')).toBe('');
+    });
 });
 
 describe('CookieBanner and Google Tag Manager', () => {

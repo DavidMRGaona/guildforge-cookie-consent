@@ -36,6 +36,10 @@ describe('bannerThemeVariables', () => {
         expect(bannerThemeVariables('custom')).toEqual({});
     });
 
+    it('leaves the colours to the site mode with the automatic theme', () => {
+        expect(bannerThemeVariables('auto')).toEqual({});
+    });
+
     it.each(['light', 'dark'] as const)('reaches AA contrast with the %s theme', (theme) => {
         const tokens = bannerThemeVariables(theme);
         const background = ['--color-bg-surface', '--color-bg-muted', '--color-bg-elevated'];

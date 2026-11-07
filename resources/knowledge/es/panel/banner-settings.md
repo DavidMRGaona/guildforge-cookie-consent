@@ -23,7 +23,7 @@ Los cambios se ven en la siguiente página que cargue cada visitante. Guardar lo
 
 - **Posición del banner**: **Inferior**, **Superior**, **Inferior izquierda**, **Inferior derecha** o **Centro**, que lo pone abajo y centrado.
 - **Diseño del banner**: **Barra**, **Caja** (con las esquinas redondeadas) o **Modal**, que lo muestra en el centro y oscurece la página. Con **Modal** no cuenta la posición.
-- **Tema del banner**: **Claro** y **Oscuro** usan los colores de la web y siguen el modo claro u oscuro de cada visitante, así que ahora mismo se ven igual. Con **Personalizado** eliges el **Color primario** (botón de aceptar), el **Color secundario** (los demás botones), el **Color de fondo** y el **Color de texto**.
+- **Tema del banner**: **Automático** (el valor por defecto) sigue el modo claro u oscuro de la web de cada visitante. **Claro** y **Oscuro** se ven siempre así, sea cual sea el modo de la web. Con **Personalizado** eliges el **Color primario** (botón de aceptar), el **Color secundario** (los demás botones), el **Color de fondo** y el **Color de texto**.
 
 > [!TIP]
 > Con el tema **Personalizado**, el texto de los botones siempre es blanco: elige un color primario y uno secundario oscuros para que se lea bien.
@@ -39,7 +39,7 @@ El resto de textos de la ventana de preferencias, como **Obligatoria** o **Ver c
 ## Comportamiento
 
 - **Mostrar botón "Rechazar todas"** y **Mostrar botón "Configurar"**: si los desactivas, desaparecen del aviso.
-- **Mostrar botón flotante de preferencias**: un botón redondo con una galleta, abajo a la izquierda, que sale una vez elegido y abre las preferencias de cookies. Viene activado.
+- **Mostrar botón flotante de preferencias**: un botón redondo con una galleta, abajo a la izquierda, que sale una vez elegido y abre las preferencias de cookies. Sigue el modo claro u oscuro de la web, sea cual sea el tema (salvo con **Personalizado**, que usa tus colores). Viene activado.
 - **Días de validez del consentimiento**: de 1 a 365. Pasado ese plazo, el aviso vuelve a salir.
 - **Volver a solicitar consentimiento al cambiar configuración**: con él activado, el aviso vuelve a salir a todos los visitantes cuando se crean o editan categorías, o se crean, editan o borran cookies y scripts.
 

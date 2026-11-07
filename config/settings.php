@@ -6,7 +6,7 @@ return [
     // Appearance
     'banner_position' => 'bottom',
     'banner_layout' => 'bar',
-    'banner_theme' => 'light',
+    'banner_theme' => 'auto',
     'primary_color' => '#10B981',
     'secondary_color' => '#6B7280',
     'background_color' => '#FFFFFF',

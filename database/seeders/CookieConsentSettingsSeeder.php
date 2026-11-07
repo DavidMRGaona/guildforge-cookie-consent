@@ -15,7 +15,7 @@ final class CookieConsentSettingsSeeder extends Seeder
             // Appearance
             'banner_position' => 'bottom',
             'banner_layout' => 'bar',
-            'banner_theme' => 'light',
+            'banner_theme' => 'auto',
             'primary_color' => '#D97706',     // Amber-600
             'secondary_color' => '#57534E',   // Stone-600
             'background_color' => '#FFFFFF',

@@ -23,7 +23,7 @@ final readonly class BannerConfigService implements BannerConfigServiceInterface
         return new BannerConfigDTO(
             position: $this->settingsService->get('cookie-consent.banner_position', 'bottom'),
             layout: $this->settingsService->get('cookie-consent.banner_layout', 'bar'),
-            theme: $this->settingsService->get('cookie-consent.banner_theme', 'light'),
+            theme: $this->settingsService->get('cookie-consent.banner_theme', 'auto'),
             colors: [
                 'primary' => $this->settingsService->get('cookie-consent.primary_color', '#10B981'),
                 'secondary' => $this->settingsService->get('cookie-consent.secondary_color', '#6B7280'),

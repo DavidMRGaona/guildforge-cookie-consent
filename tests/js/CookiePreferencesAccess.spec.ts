@@ -93,6 +93,34 @@ describe('reopening the cookie preferences', () => {
         ).toBe(false);
     });
 
+    it.each(['auto', 'light', 'dark'] as const)(
+        'paints the floating button with the site colours, not the fixed %s theme ones',
+        (theme) => {
+            storeConsent({ necessary: true, analytics: false, preferences: false });
+            const button = floatingButton(mountBanner(bannerConfig({ theme })));
+
+            expect(
+                (button.element as HTMLElement).style.getPropertyValue('--color-bg-surface')
+            ).toBe('');
+            expect(button.classes()).toEqual(
+                expect.arrayContaining([
+                    'bg-elevated',
+                    'text-base-primary',
+                    'border',
+                    'border-strong',
+                ])
+            );
+        }
+    );
+
+    it('keeps the panel colours on the floating button with the custom theme', () => {
+        storeConsent({ necessary: true, analytics: false, preferences: false });
+        const button = floatingButton(mountBanner(bannerConfig({ theme: 'custom' })));
+
+        expect((button.element as HTMLElement).style.backgroundColor).not.toBe('');
+        expect(button.classes()).not.toContain('bg-elevated');
+    });
+
     it('opens the preferences from a link to them anywhere on the page, without leaving it', async () => {
         storeConsent({ necessary: true, analytics: false, preferences: false });
         const banner = mountBanner();
