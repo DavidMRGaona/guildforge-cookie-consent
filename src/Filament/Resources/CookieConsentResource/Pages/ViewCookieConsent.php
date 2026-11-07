@@ -29,7 +29,7 @@ class ViewCookieConsent extends ViewRecord
     {
         return $schema
             ->components([
-                Section::make('Información del visitante')
+                Section::make(__('cookie-consent::cookie_consent.consents.sections.visitor'))
                     ->schema([
                         TextEntry::make('visitor_id')
                             ->label(__('cookie-consent::cookie_consent.consents.fields.visitor_id'))
@@ -37,7 +37,7 @@ class ViewCookieConsent extends ViewRecord
 
                         TextEntry::make('user.name')
                             ->label(__('cookie-consent::cookie_consent.consents.fields.user'))
-                            ->placeholder('Anónimo'),
+                            ->placeholder(__('cookie-consent::cookie_consent.consents.anonymous')),
 
                         TextEntry::make('ip_hash')
                             ->label(__('cookie-consent::cookie_consent.consents.fields.ip_hash'))
@@ -49,7 +49,7 @@ class ViewCookieConsent extends ViewRecord
                     ])
                     ->columns(2),
 
-                Section::make('Consentimiento')
+                Section::make(__('cookie-consent::cookie_consent.consents.sections.consent'))
                     ->schema([
                         TextEntry::make('consent_method')
                             ->label(__('cookie-consent::cookie_consent.consents.fields.consent_method'))

@@ -46,13 +46,13 @@ class ScriptsRelationManager extends RelationManager
                     ->schema([
                         TextInput::make('name')
                             ->label(__('cookie-consent::cookie_consent.scripts.fields.name'))
-                            ->placeholder('Google Analytics, GTM, Meta Pixel...')
+                            ->placeholder(__('cookie-consent::cookie_consent.scripts.placeholders.name'))
                             ->required()
                             ->maxLength(255),
 
                         Textarea::make('description')
                             ->label(__('cookie-consent::cookie_consent.scripts.fields.description'))
-                            ->placeholder('Notas internas sobre este script...')
+                            ->placeholder(__('cookie-consent::cookie_consent.scripts.placeholders.description'))
                             ->rows(2),
 
                         TextInput::make('sort_order')
