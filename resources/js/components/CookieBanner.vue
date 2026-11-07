@@ -4,6 +4,7 @@ import {
     notifyCookieConsentChanged,
     registerCookieConsentProvider,
 } from '@/contracts/cookieConsent';
+import { bannerThemeVariables } from '../utils/banner-theme';
 import type { CookieCategory, BannerConfig } from '../types/cookie-consent';
 import { hasConsentFor, needsConsent, saveConsent } from '../utils/consent-manager';
 import CookieSettingsModal from './CookieSettingsModal.vue';
@@ -148,7 +149,10 @@ const bannerClasses = computed(() => {
 });
 
 const bannerStyles = computed(() => {
-    if (!config.value || config.value.theme !== 'custom') return {};
+    if (!config.value) return {};
+
+    // «Claro» and «Oscuro» set their own colour tokens, so they look the same in any site mode
+    if (config.value.theme !== 'custom') return bannerThemeVariables(config.value.theme);
 
     return {
         backgroundColor: config.value.colors.background,

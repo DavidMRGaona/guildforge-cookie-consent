@@ -189,3 +189,25 @@ describe('CookieSettingsModal', () => {
         }
     });
 });
+
+describe('CookieSettingsModal themes', () => {
+    function surface(theme: BannerConfig['theme']): string {
+        const wrapper = mount(CookieSettingsModal, {
+            props: { categories: [category([])], config: { ...config, theme } },
+            global: { stubs: { teleport: true } },
+        });
+
+        return (wrapper.find('div.shadow-xl').element as HTMLElement).style.getPropertyValue(
+            '--color-bg-surface'
+        );
+    }
+
+    it('paints the light and dark themes differently', () => {
+        expect(surface('light')).toBe('#ffffff');
+        expect(surface('dark')).toBe('#302d2a');
+    });
+
+    it('sets no theme colours with the custom theme', () => {
+        expect(surface('custom')).toBe('');
+    });
+});
