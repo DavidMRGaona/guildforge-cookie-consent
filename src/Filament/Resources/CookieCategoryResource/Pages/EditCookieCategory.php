@@ -24,7 +24,8 @@ class EditCookieCategory extends EditRecord
     {
         return array_filter([
             DeleteAction::make()
-                ->hidden(fn () => $this->record->is_system),
+                ->hidden(fn () => $this->record->is_system)
+                ->after(fn () => CookieCategoryResource::announceDeletion($this->record)),
             $this->knowledgeGuideAction('cookie-consent.panel.categories'),
         ]);
     }

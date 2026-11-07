@@ -14,6 +14,7 @@ use Filament\Tables\Filters\Filter;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Modules\CookieConsent\Application\Services\BannerConfigServiceInterface;
+use Modules\CookieConsent\Application\Services\ConsentServiceInterface;
 use Modules\CookieConsent\CookieConsentServiceProvider;
 use Modules\CookieConsent\Filament\Pages\CookieConsentSettings;
 use Modules\CookieConsent\Filament\Resources\CookieCategoryResource;
@@ -28,6 +29,8 @@ use Modules\CookieConsent\Filament\Resources\CookieConsentResource\Pages\ViewCoo
 use Modules\CookieConsent\Filament\Widgets\ConsentStatsWidget;
 use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieCategoryModel;
 use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieConsentModel;
+use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieModel;
+use Modules\CookieConsent\Infrastructure\Persistence\Eloquent\Models\CookieScriptModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\Modules\InteractsWithModulePanel;
 use Tests\Support\Modules\ModuleTestCase;
@@ -78,6 +81,93 @@ final class CookieConsentPanelTest extends ModuleTestCase
         Livewire::test(CreateCookieCategory::class)
             ->fillForm(['name' => 'Social media'])
             ->assertFormSet(['slug' => 'social-media']);
+    }
+
+    public function test_deleting_a_category_asks_visitors_again(): void
+    {
+        $custom = $this->newCategory('custom', isSystem: false);
+        $before = $this->configVersion();
+
+        Livewire::test(ListCookieCategories::class)->callTableAction('delete', $custom);
+
+        $this->assertModelMissing($custom);
+        $this->assertGreaterThan($before, $this->configVersion());
+    }
+
+    public function test_deleting_a_category_from_its_edit_page_asks_visitors_again(): void
+    {
+        $custom = $this->newCategory('custom', isSystem: false);
+        $before = $this->configVersion();
+
+        Livewire::test(EditCookieCategory::class, ['record' => $custom->getRouteKey()])
+            ->callAction('delete');
+
+        $this->assertModelMissing($custom);
+        $this->assertGreaterThan($before, $this->configVersion());
+    }
+
+    public function test_bulk_deleting_categories_asks_visitors_again(): void
+    {
+        $custom = $this->newCategory('custom', isSystem: false);
+        $before = $this->configVersion();
+
+        Livewire::test(ListCookieCategories::class)->callTableBulkAction('delete', [$custom]);
+
+        $this->assertModelMissing($custom);
+        $this->assertGreaterThan($before, $this->configVersion());
+    }
+
+    public function test_bulk_deleting_only_system_categories_keeps_the_version(): void
+    {
+        $system = $this->newCategory('system', isSystem: true);
+        $before = $this->configVersion();
+
+        Livewire::test(ListCookieCategories::class)->callTableBulkAction('delete', [$system]);
+
+        $this->assertModelExists($system);
+        $this->assertSame($before, $this->configVersion());
+    }
+
+    public function test_bulk_deleting_cookies_asks_visitors_again(): void
+    {
+        $category = $this->newCategory('custom', isSystem: false);
+        $cookie = CookieModel::query()->create([
+            'id' => (string) Str::uuid(),
+            'category_id' => $category->id,
+            'name' => 'test_cookie',
+            'provider' => 'Provider',
+            'purpose' => 'Purpose',
+            'type' => 'first_party',
+            'duration' => '1 year',
+            'is_active' => true,
+        ]);
+        $before = $this->configVersion();
+
+        Livewire::test(CookiesRelationManager::class, ['ownerRecord' => $category, 'pageClass' => EditCookieCategory::class])
+            ->callTableBulkAction('delete', [$cookie]);
+
+        $this->assertModelMissing($cookie);
+        $this->assertGreaterThan($before, $this->configVersion());
+    }
+
+    public function test_bulk_deleting_scripts_asks_visitors_again(): void
+    {
+        $category = $this->newCategory('custom', isSystem: false);
+        $script = CookieScriptModel::query()->create([
+            'id' => (string) Str::uuid(),
+            'category_id' => $category->id,
+            'name' => 'Test script',
+            'script_head' => '<script>1</script>',
+            'sort_order' => 0,
+            'is_active' => true,
+        ]);
+        $before = $this->configVersion();
+
+        Livewire::test(ScriptsRelationManager::class, ['ownerRecord' => $category, 'pageClass' => EditCookieCategory::class])
+            ->callTableBulkAction('delete', [$script]);
+
+        $this->assertModelMissing($script);
+        $this->assertGreaterThan($before, $this->configVersion());
     }
 
     public function test_bulk_delete_keeps_system_categories(): void
@@ -318,6 +408,11 @@ final class CookieConsentPanelTest extends ModuleTestCase
             'is_system' => $isSystem,
             'sort_order' => 100,
         ]);
+    }
+
+    private function configVersion(): int
+    {
+        return $this->app->make(ConsentServiceInterface::class)->getConfigVersion();
     }
 
     private function category(): CookieCategoryModel

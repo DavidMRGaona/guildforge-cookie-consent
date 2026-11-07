@@ -18,6 +18,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Modules\CookieConsent\Domain\Enums\CookieType;
 use Modules\CookieConsent\Domain\Events\CookieConfigurationChanged;
@@ -146,7 +147,16 @@ class CookiesRelationManager extends RelationManager
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->after(function (Collection $records): void {
+                            foreach ($records as $record) {
+                                event(new CookieConfigurationChanged(
+                                    changeType: 'deleted',
+                                    entityType: 'cookie',
+                                    entityId: (string) $record->getKey(),
+                                ));
+                            }
+                        }),
                 ]),
             ]);
     }
