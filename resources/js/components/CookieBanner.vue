@@ -16,6 +16,7 @@ import {
     updateConsentMode,
 } from '../utils/consent-manager';
 import { consentModeUpdate } from '../utils/consent-mode';
+import { deleteCookiesOfRejected } from '../utils/cookie-cleanup';
 import { loadGoogleTagManager } from '../utils/google-tag-manager';
 import { reloadPage } from '../utils/page';
 import CookieSettingsModal from './CookieSettingsModal.vue';
@@ -299,6 +300,9 @@ async function applyChoice(preferences: Record<string, boolean>): Promise<boolea
 
     saveError.value = null;
     isVisible.value = false;
+
+    // What was stored with a consent that no longer stands goes with it
+    deleteCookiesOfRejected(categories.value, preferences);
 
     // From each category's own keys, the same mapping the server uses on the next page
     if (current.consentModeEnabled) {

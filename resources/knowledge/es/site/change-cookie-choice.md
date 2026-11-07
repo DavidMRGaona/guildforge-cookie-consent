@@ -18,6 +18,8 @@ Puedes cambiar o retirar tu elección de cookies cuando quieras, tan fácilmente
 
 Si lo que cambias añade o quita scripts de la web, la página se recarga sola. Así se cargan los que acabas de aceptar y dejan de funcionar los que has retirado.
 
+Al retirar una categoría se borran sus cookies de {{site_name}}. Las que guardan otros sitios no se pueden borrar desde aquí: bórralas en los ajustes de tu navegador.
+
 > [!IMPORTANT]
 > Si sale el mensaje «No hemos podido guardar tu elección», no se ha cambiado nada: vuelve a intentarlo y, si sigue fallando, recarga la página.
 

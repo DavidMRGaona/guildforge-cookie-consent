@@ -2,6 +2,9 @@ import type { ConsentModeValue, StoredConsent } from '../types/cookie-consent';
 import { csrfHeaders } from '@/utils/csrf';
 
 const STORAGE_KEY = 'guildforge_cookie_consent';
+
+/** The cookie that carries the choice to the server (InjectCookieScripts::CONSENT_COOKIE_NAME). */
+export const CONSENT_COOKIE_NAME = STORAGE_KEY;
 const VISITOR_ID_KEY = 'guildforge_visitor_id';
 
 /**

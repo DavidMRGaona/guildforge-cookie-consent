@@ -46,6 +46,8 @@ class CookiesRelationManager extends RelationManager
                 TextInput::make('name')
                     ->label(__('cookie-consent::cookie_consent.cookies.fields.name'))
                     ->placeholder('_ga, _fbp, session_id...')
+                    // The banner deletes them by name when their category is withdrawn
+                    ->helperText(__('cookie-consent::cookie_consent.cookies.fields.name_help'))
                     ->required()
                     ->maxLength(255),
 

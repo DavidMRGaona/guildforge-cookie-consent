@@ -20,19 +20,23 @@ La lista es informativa: no bloquea ni borra cookies. Lo que se carga o no segú
 1. En el menú lateral, abre **Configuración** → **Cookies** y pulsa la categoría.
 2. Debajo del formulario, en la pestaña **Cookies**, pulsa **Crear cookie**.
 3. Rellena los datos:
-   - **Nombre**: el nombre exacto de la cookie, como `_ga`.
+   - **Nombre**: el nombre exacto de la cookie, como `_ga`. Si cambia el final, termínalo en `*`: `_ga_*` vale para todas las que empiezan por `_ga_`.
    - **Proveedor**: quién la pone, como Google o el propio sitio.
    - **Dominio**: opcional, el dominio que la escribe.
    - **Tipo**: **Primera parte** si la pone esta web, **Tercera parte** si la pone otro servicio.
    - **Propósito**: para qué sirve esta cookie en concreto. Sale debajo de su nombre en el aviso.
    - **Duración**: texto libre, como «Sesión» o «1 año».
-   - **Activa**: solo las cookies activas salen en el aviso.
+   - **Activa**: solo las cookies activas salen en el aviso y se borran cuando el visitante retira su categoría.
 4. Pulsa **Crear**.
 
 Para cambiar una cookie, pulsa **Editar** en su fila. Para quitarla, pulsa **Borrar** y confirma.
 
 > [!IMPORTANT]
 > Crear, editar o borrar una cookie desde su fila cambia la configuración: si está activado **Volver a solicitar consentimiento al cambiar configuración**, el aviso vuelve a salir a todos los visitantes.
+
+## Qué pasa al retirar el consentimiento
+
+Cuando un visitante rechaza o retira una categoría, se borran de su navegador las cookies declaradas en ella que guarda este sitio, también las que pone un script en tu dominio, como `_ga`. Las de las categorías requeridas nunca se borran. Las que guardan otros sitios no se pueden borrar desde la web.
 
 ## Cookies que añaden otros módulos
 

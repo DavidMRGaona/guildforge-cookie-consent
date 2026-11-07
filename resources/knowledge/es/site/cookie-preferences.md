@@ -41,6 +41,7 @@ Si {{site_name}} no ha cambiado las categorías que vienen por defecto, son **Co
 - {{site_name}} guarda también un registro de lo que elegiste: un identificador anónimo de tu navegador, tu cuenta si habías iniciado sesión y una huella de tu dirección IP, que no permite saber cuál es.
 - El aviso vuelve a salir cuando pasa el plazo que fija el sitio (como mucho, un año) y, si el sitio lo tiene así, cuando cambia su lista de cookies.
 - Puedes cambiar tu elección cuando quieras desde **Preferencias de cookies** (mira la guía «Cambiar tu elección de cookies»).
+- Las cookies de {{site_name}} de las categorías que no aceptas se borran de tu navegador.
 
 En el aviso y en la ventana de preferencias tienes el enlace a la política de privacidad.
 
