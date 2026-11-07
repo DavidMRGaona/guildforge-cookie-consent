@@ -1,13 +1,21 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, watch } from 'vue';
+import { Cookie } from '@lucide/vue';
+import { computed, ref, onBeforeUnmount, onMounted, watch } from 'vue';
 import {
     notifyCookieConsentChanged,
     registerCookieConsentProvider,
 } from '@/contracts/cookieConsent';
 import { bannerThemeVariables } from '../utils/banner-theme';
 import type { CookieCategory, BannerConfig } from '../types/cookie-consent';
-import { hasConsentFor, needsConsent, saveConsent } from '../utils/consent-manager';
+import { choiceNeedsReload } from '../utils/choice-effects';
+import {
+    getStoredConsent,
+    hasConsentFor,
+    needsConsent,
+    saveConsent,
+} from '../utils/consent-manager';
 import { loadGoogleTagManager } from '../utils/google-tag-manager';
+import { reloadPage } from '../utils/page';
 import CookieSettingsModal from './CookieSettingsModal.vue';
 import { useRoutes } from '@/composables/useRoutes';
 
@@ -33,9 +41,11 @@ const props = withDefaults(defineProps<Props>(), {
             },
             showRejectAll: true,
             showSettingsButton: true,
+            showFloatingButton: true,
             validityDays: 365,
             reconsentOnChange: true,
             configVersion: 1,
+            preferencesUrl: '/consentimiento-cookies/preferencias',
             texts: {
                 title: 'Utilizamos cookies',
                 description:
@@ -53,6 +63,7 @@ const props = withDefaults(defineProps<Props>(), {
                 durationColumn: 'Duración',
                 cancel: 'Cancelar',
                 close: 'Cerrar',
+                preferences: 'Preferencias de cookies',
             },
             gtmEnabled: false,
             gtmContainerId: '',
@@ -80,6 +91,35 @@ const shouldShow =
 // Initialize visibility based on stored consent
 isVisible.value = shouldShow;
 
+// The choice this page runs with: the server injected the scripts of these categories.
+// It changes only when a new choice is applied without reloading.
+let pagePreferences: Record<string, boolean> =
+    config.value && !shouldShow ? { ...(getStoredConsent()?.preferences ?? {}) } : {};
+
+// The link to the preferences (ConsentApiController::PREFERENCES_ANCHOR) lands on this anchor
+const PREFERENCES_ANCHOR = '#preferencias-cookies';
+
+/**
+ * A link to the preferences (the footer one, or any other) opens them without leaving
+ * the page. Captured before Inertia's links see the click.
+ */
+function openPreferencesFromLink(event: MouseEvent): void {
+    const current = config.value;
+    if (!current || event.button !== 0) return;
+    // A new tab or window follows the link, and the page it opens shows the preferences
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+    const link = event.target instanceof Element ? event.target.closest('a') : null;
+    if (!link || link.href === '') return;
+
+    const url = new URL(link.href, window.location.href);
+    if (url.origin !== window.location.origin || url.pathname !== current.preferencesUrl) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    openSettings();
+}
+
 onMounted(() => {
     // Re-check after mount in case config was not available initially
     if (config.value) {
@@ -89,6 +129,22 @@ onMounted(() => {
             config.value.reconsentOnChange
         );
     }
+
+    document.addEventListener('click', openPreferencesFromLink, true);
+
+    if (window.location.hash === PREFERENCES_ANCHOR) {
+        // Drop the anchor, so reloading or sharing the address does not open them again
+        window.history.replaceState(
+            window.history.state,
+            '',
+            window.location.pathname + window.location.search
+        );
+        openSettings();
+    }
+});
+
+onBeforeUnmount(() => {
+    document.removeEventListener('click', openPreferencesFromLink, true);
 });
 
 // Answer the core's cookie consent contract, which the other modules ask per category
@@ -166,6 +222,16 @@ const bannerStyles = computed(() => {
 const focusRingClasses =
     'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 focus-visible:ring-offset-surface';
 
+// Same colours as the banner, so it looks like part of it
+const floatingButtonClasses = computed(() => {
+    if (!config.value) return '';
+
+    const themeClasses =
+        config.value.theme === 'custom' ? '' : 'bg-surface text-base-primary border border-default';
+
+    return `fixed bottom-4 left-4 z-40 rounded-full p-3 shadow-lg transition-opacity hover:opacity-90 ${themeClasses} ${focusRingClasses}`;
+});
+
 const primaryButtonClasses = computed(() => {
     if (!config.value) return '';
 
@@ -214,6 +280,12 @@ async function applyChoice(preferences: Record<string, boolean>): Promise<void> 
     await saveConsent(preferences, current.configVersion);
     isVisible.value = false;
     notifyCookieConsentChanged();
+
+    if (choiceNeedsReload(categories.value, pagePreferences, preferences, current)) {
+        reloadPage();
+        return;
+    }
+    pagePreferences = { ...preferences };
 
     // Without Consent Mode the server leaves the container out until its category is accepted
     if (
@@ -327,6 +399,19 @@ async function handleSaveSettings(preferences: Record<string, boolean>): Promise
                 </div>
             </div>
         </Transition>
+
+        <!-- Reopens the preferences once the visitor has chosen -->
+        <button
+            v-if="config && config.showFloatingButton && !isVisible && !showSettingsModal"
+            type="button"
+            :class="floatingButtonClasses"
+            :style="bannerStyles"
+            :aria-label="config.texts.preferences"
+            :title="config.texts.preferences"
+            @click="openSettings"
+        >
+            <Cookie class="h-5 w-5" aria-hidden="true" />
+        </button>
 
         <!-- Settings Modal -->
         <CookieSettingsModal

@@ -70,6 +70,7 @@ final class CookieConsentSettings extends Page implements HasForms
         'privacy_policy_url',
         'show_reject_all',
         'show_settings_button',
+        'show_floating_button',
         'consent_validity_days',
         'reconsent_on_change',
         'gtm_enabled',
@@ -82,6 +83,7 @@ final class CookieConsentSettings extends Page implements HasForms
     private const array BOOLEAN_KEYS = [
         'show_reject_all',
         'show_settings_button',
+        'show_floating_button',
         'reconsent_on_change',
         'gtm_enabled',
         'consent_mode_enabled',
@@ -284,6 +286,11 @@ final class CookieConsentSettings extends Page implements HasForms
 
                     Toggle::make('show_settings_button')
                         ->label(__('cookie-consent::cookie_consent.settings.show_settings_button'))
+                        ->default(true),
+
+                    Toggle::make('show_floating_button')
+                        ->label(__('cookie-consent::cookie_consent.settings.show_floating_button'))
+                        ->helperText(__('cookie-consent::cookie_consent.settings.show_floating_button_help'))
                         ->default(true),
 
                     TextInput::make('consent_validity_days')

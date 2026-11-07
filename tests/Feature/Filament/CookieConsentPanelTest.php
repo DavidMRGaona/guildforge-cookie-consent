@@ -338,6 +338,17 @@ final class CookieConsentPanelTest extends ModuleTestCase
         ];
     }
 
+    public function test_the_floating_button_can_be_turned_off(): void
+    {
+        Livewire::test(CookieConsentSettings::class)
+            ->assertFormSet(['show_floating_button' => true])
+            ->fillForm(['show_floating_button' => false])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertFalse(app(BannerConfigServiceInterface::class)->getBannerConfig()->showFloatingButton);
+    }
+
     public function test_the_container_category_offers_only_optional_categories(): void
     {
         $component = Livewire::test(CookieConsentSettings::class)

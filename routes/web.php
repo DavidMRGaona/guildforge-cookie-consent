@@ -19,4 +19,6 @@ Route::prefix('consentimiento-cookies')->group(function () {
     Route::get('/categorias', [ConsentApiController::class, 'categories'])->name('cookie-consent.categories');
     Route::get('/configuracion', [ConsentApiController::class, 'config'])->name('cookie-consent.config');
     Route::post('/consentir', [ConsentApiController::class, 'store'])->name('cookie-consent.store');
+    // The banner opens the preferences without leaving the page; a direct visit lands here
+    Route::get('/preferencias', [ConsentApiController::class, 'preferences'])->name('cookie-consent.preferences');
 });

@@ -21,12 +21,14 @@ final readonly class CategoryDTO
         public int $sortOrder,
         public array $consentModeKeys = [],
         public array $cookies = [],
+        // Whether accepting or withdrawing it adds or removes scripts on the page
+        public bool $hasScripts = false,
     ) {}
 
     /**
      * @param  array<CookieDTO>  $cookies
      */
-    public static function fromEntity(CookieCategory $category, array $cookies = []): self
+    public static function fromEntity(CookieCategory $category, array $cookies = [], bool $hasScripts = false): self
     {
         return new self(
             id: $category->id()->value(),
@@ -37,6 +39,7 @@ final readonly class CategoryDTO
             sortOrder: $category->sortOrder(),
             consentModeKeys: $category->consentModeKeysAsStrings(),
             cookies: $cookies,
+            hasScripts: $hasScripts,
         );
     }
 
@@ -53,6 +56,7 @@ final readonly class CategoryDTO
             'isRequired' => $this->isRequired,
             'sortOrder' => $this->sortOrder,
             'consentModeKeys' => $this->consentModeKeys,
+            'hasScripts' => $this->hasScripts,
             'cookies' => array_map(fn (CookieDTO $cookie) => $cookie->toArray(), $this->cookies),
         ];
     }

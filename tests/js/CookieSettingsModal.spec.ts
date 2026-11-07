@@ -36,6 +36,7 @@ const texts: BannerConfig['texts'] = {
     durationColumn: 'Lifetime',
     cancel: 'Discard',
     close: 'Close the settings',
+    preferences: 'Cookie preferences',
 };
 
 const config: BannerConfig = {
@@ -45,9 +46,11 @@ const config: BannerConfig = {
     colors: { primary: '#10B981', secondary: '#6B7280', background: '#FFFFFF', text: '#1F2937' },
     showRejectAll: true,
     showSettingsButton: true,
+    showFloatingButton: true,
     validityDays: 365,
     reconsentOnChange: true,
     configVersion: 1,
+    preferencesUrl: '/cookie-preferences',
     texts,
     gtmEnabled: false,
     gtmContainerId: '',
@@ -77,6 +80,7 @@ function category(cookies: Cookie[]): CookieCategory {
         isRequired: true,
         sortOrder: 0,
         consentModeKeys: [],
+        hasScripts: false,
         cookies,
     };
 }

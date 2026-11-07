@@ -25,6 +25,8 @@ return [
     // Behavior
     'show_reject_all' => true,
     'show_settings_button' => true,
+    // Reopens the preferences once the visitor has chosen
+    'show_floating_button' => true,
     'consent_validity_days' => 365,
     'reconsent_on_change' => true,
 

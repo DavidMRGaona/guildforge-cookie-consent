@@ -49,11 +49,14 @@ final readonly class BannerConfigService implements BannerConfigServiceInterface
                 'durationColumn' => __('cookie-consent::cookie_consent.frontend.duration_column'),
                 'cancel' => __('cookie-consent::cookie_consent.frontend.cancel'),
                 'close' => __('cookie-consent::cookie_consent.frontend.close'),
+                'preferences' => __('cookie-consent::cookie_consent.frontend.preferences'),
             ],
             gtmEnabled: (bool) $this->settingsService->get('cookie-consent.gtm_enabled', false),
             gtmContainerId: $this->settingsService->get('cookie-consent.gtm_container_id', ''),
             consentModeEnabled: (bool) $this->settingsService->get('cookie-consent.consent_mode_enabled', true),
             gtmCategory: (string) $this->settingsService->get('cookie-consent.gtm_category', 'analytics'),
+            showFloatingButton: (bool) $this->settingsService->get('cookie-consent.show_floating_button', true),
+            preferencesUrl: route('cookie-consent.preferences', absolute: false),
         );
     }
 

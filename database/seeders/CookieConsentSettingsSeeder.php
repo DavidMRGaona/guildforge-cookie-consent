@@ -34,6 +34,7 @@ final class CookieConsentSettingsSeeder extends Seeder
             // Behavior
             'show_reject_all' => '1',
             'show_settings_button' => '1',
+            'show_floating_button' => '1',
             'consent_validity_days' => '365',
             'reconsent_on_change' => '1',
 

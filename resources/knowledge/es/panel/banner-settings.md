@@ -5,7 +5,7 @@ summary: Elige dónde y cómo sale el aviso de cookies, sus textos, cuánto dura
 category: site-settings
 audience: panel
 order: 64
-keywords: [banner de cookies, aviso de cookies, ajustes, configuración, posición, diseño, tema, colores, textos, botones, aceptar todas, rechazar todas, configurar, política de privacidad, validez, caducidad, días, volver a preguntar, google tag manager, gtm, consent mode, google analytics]
+keywords: [banner de cookies, aviso de cookies, preferencias de cookies, botón flotante, enlace del pie, retirar consentimiento, ajustes, configuración, posición, diseño, tema, colores, textos, botones, aceptar todas, rechazar todas, configurar, política de privacidad, validez, caducidad, días, volver a preguntar, google tag manager, gtm, consent mode, google analytics]
 related: [cookie-consent.panel.overview, cookie-consent.panel.categories, cookie-consent.panel.scripts, core.panel.legal-pages]
 conditions:
   permissions:
@@ -39,11 +39,25 @@ El resto de textos de la ventana de preferencias, como **Obligatoria** o **Ver c
 ## Comportamiento
 
 - **Mostrar botón "Rechazar todas"** y **Mostrar botón "Configurar"**: si los desactivas, desaparecen del aviso.
+- **Mostrar botón flotante de preferencias**: un botón redondo con una galleta, abajo a la izquierda, que sale una vez elegido y abre las preferencias de cookies. Viene activado.
 - **Días de validez del consentimiento**: de 1 a 365. Pasado ese plazo, el aviso vuelve a salir.
 - **Volver a solicitar consentimiento al cambiar configuración**: con él activado, el aviso vuelve a salir a todos los visitantes cuando se crean o editan categorías, o se crean, editan o borran cookies y scripts.
 
 > [!WARNING]
 > Si desactivas los dos botones, el visitante solo puede pulsar **Aceptar todas**.
+
+## Cambiar la elección desde la web
+
+Cada visitante tiene que poder cambiar o retirar su consentimiento tan fácilmente como lo dio. Para eso están el botón flotante y el enlace **Preferencias de cookies**, que abre la ventana de preferencias sin salir de la página.
+
+Para poner el enlace en el pie de página:
+
+1. En el menú lateral, abre **Navegación**.
+2. Crea un elemento con **Ubicación** **Pie de página** y, en **Página**, elige **Preferencias de cookies**.
+3. Guarda. Si es el primer enlace del pie, sustituye a los que salen por defecto: añade también los que quieras conservar.
+
+> [!WARNING]
+> Si desactivas el botón flotante, deja el enlace en el pie de página: sin ninguno de los dos, quien ya eligió no puede cambiar su elección hasta que caduque.
 
 ## Integraciones
 

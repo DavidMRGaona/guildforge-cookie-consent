@@ -8,7 +8,7 @@ final readonly class BannerConfigDTO
 {
     /**
      * @param  array{primary: string, secondary: string, background: string, text: string}  $colors
-     * @param  array{title: string, description: string, acceptAll: string, rejectAll: string, settings: string, save: string, privacyLink: string, privacyUrl: string, required: string, showCookies: string, cookieColumn: string, providerColumn: string, durationColumn: string, cancel: string, close: string}  $texts
+     * @param  array{title: string, description: string, acceptAll: string, rejectAll: string, settings: string, save: string, privacyLink: string, privacyUrl: string, required: string, showCookies: string, cookieColumn: string, providerColumn: string, durationColumn: string, cancel: string, close: string, preferences: string}  $texts
      */
     public function __construct(
         public string $position,
@@ -26,6 +26,10 @@ final readonly class BannerConfigDTO
         public bool $consentModeEnabled,
         // Without Consent Mode, the container waits until the visitor accepts this category
         public string $gtmCategory = 'analytics',
+        // A small button that reopens the preferences once the visitor has chosen
+        public bool $showFloatingButton = true,
+        // The link that reopens them, for the footer menu
+        public string $preferencesUrl = '/consentimiento-cookies/preferencias',
     ) {}
 
     /**
@@ -40,9 +44,11 @@ final readonly class BannerConfigDTO
             'colors' => $this->colors,
             'showRejectAll' => $this->showRejectAll,
             'showSettingsButton' => $this->showSettingsButton,
+            'showFloatingButton' => $this->showFloatingButton,
             'validityDays' => $this->validityDays,
             'reconsentOnChange' => $this->reconsentOnChange,
             'configVersion' => $this->configVersion,
+            'preferencesUrl' => $this->preferencesUrl,
             'texts' => $this->texts,
             'gtmEnabled' => $this->gtmEnabled,
             'gtmContainerId' => $this->gtmContainerId,

@@ -19,6 +19,7 @@ const texts: BannerConfig['texts'] = {
     durationColumn: 'Lifetime',
     cancel: 'Discard',
     close: 'Close the settings',
+    preferences: 'Cookie preferences',
 };
 
 function config(overrides: Partial<BannerConfig> = {}): BannerConfig {
@@ -34,9 +35,11 @@ function config(overrides: Partial<BannerConfig> = {}): BannerConfig {
         },
         showRejectAll: true,
         showSettingsButton: true,
+        showFloatingButton: true,
         validityDays: 365,
         reconsentOnChange: true,
         configVersion: 1,
+        preferencesUrl: '/cookie-preferences',
         texts,
         gtmEnabled: false,
         gtmContainerId: '',
@@ -149,6 +152,7 @@ describe('CookieBanner and Google Tag Manager', () => {
             isRequired,
             sortOrder: 0,
             consentModeKeys: [],
+            hasScripts: false,
             cookies: [],
         };
     }

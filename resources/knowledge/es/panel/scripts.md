@@ -34,7 +34,7 @@ El código se añade a la página tal cual lo pegas. Pega el fragmento completo 
 
 - Solo a quien ha aceptado la categoría del script, y solo si está **Activo**.
 - Nunca antes de que el visitante elija en el aviso, ni siquiera en una categoría requerida.
-- Desde la siguiente vez que su navegador carga una página entera: al recargar o al volver a entrar, no al pasar de una página a otra sin recargar.
+- En cuanto el visitante acepta su categoría: la página se recarga sola para cargarlo. Si después la retira, se recarga otra vez y el script deja de estar.
 
 Crear, editar o borrar un script desde su fila cambia la configuración: si está activado **Volver a solicitar consentimiento al cambiar configuración**, el aviso vuelve a salir a todos los visitantes.
 
@@ -43,7 +43,7 @@ Crear, editar o borrar un script desde su fila cambia la configuración: si est�
 
 ## Si algo no sale bien
 
-- **El script no se carga**: comprueba que está **Activo**, que estás en una categoría que has aceptado y recarga la página.
+- **El script no se carga**: comprueba que está **Activo**, que estás en una categoría que has aceptado y recarga la página. Un script que acabas de crear o activar solo sale en las páginas que se carguen después.
 - **Sale código como texto en la web**: le faltan las etiquetas `<script>`. Edítalo y pega el fragmento completo.
 
 [[action:filament.admin.resources.cookie-categories.index|Ver las categorías de cookies]]
