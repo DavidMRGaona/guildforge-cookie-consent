@@ -39,4 +39,14 @@ final class BannerConfigServiceTest extends ModuleTestCase
             'close',
         ])));
     }
+
+    public function test_texts_carry_the_message_for_a_choice_that_was_not_saved(): void
+    {
+        $texts = $this->app->make(BannerConfigServiceInterface::class)->getBannerConfig()->texts;
+
+        $this->assertSame(
+            'No hemos podido guardar tu elección. Vuelve a intentarlo y, si sigue fallando, recarga la página.',
+            $texts['saveError'],
+        );
+    }
 }

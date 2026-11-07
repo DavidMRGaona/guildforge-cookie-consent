@@ -4,25 +4,38 @@ import { computed, ref } from 'vue';
 import HelpLink from '@/components/knowledge/HelpLink.vue';
 import type { CookieCategory, BannerConfig } from '../types/cookie-consent';
 import { bannerThemeVariables } from '../utils/banner-theme';
-import { getStoredConsent } from '../utils/consent-manager';
+import { getStoredConsent, needsConsent } from '../utils/consent-manager';
 
 interface Props {
     categories: CookieCategory[];
     config: BannerConfig;
+    /** Shown when the last choice could not be saved. */
+    error?: string | null;
+    /** While a choice is being saved. */
+    saving?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), { error: null, saving: false });
 
 const emit = defineEmits<{
     close: [];
     save: [preferences: Record<string, boolean>];
 }>();
 
-// Initialize preferences from stored consent or default to required only
-const storedConsent = getStoredConsent();
+// One entry per current category: required ones always on, the others as last chosen while
+// that choice still counts (asked again, nothing may be ticked beforehand) and off otherwise.
+// Categories created or removed since then must not break or bloat what is sent.
+const storedPreferences = needsConsent(
+    props.config.configVersion,
+    props.config.validityDays,
+    props.config.reconsentOnChange
+)
+    ? {}
+    : (getStoredConsent()?.preferences ?? {});
 const preferences = ref<Record<string, boolean>>(
-    storedConsent?.preferences ??
-        Object.fromEntries(props.categories.map((c) => [c.slug, c.isRequired]))
+    Object.fromEntries(
+        props.categories.map((c) => [c.slug, c.isRequired || storedPreferences[c.slug] === true])
+    )
 );
 
 // Track which categories have expanded cookie lists
@@ -76,7 +89,17 @@ function rejectAll(): void {
 }
 
 function save(): void {
-    emit('save', { ...preferences.value });
+    if (props.saving) return;
+
+    emit(
+        'save',
+        Object.fromEntries(
+            props.categories.map((c) => [
+                c.slug,
+                c.isRequired || preferences.value[c.slug] === true,
+            ])
+        )
+    );
 }
 
 function close(): void {
@@ -272,6 +295,13 @@ function close(): void {
                 </div>
 
                 <!-- Footer -->
+                <p
+                    v-if="error"
+                    role="alert"
+                    class="mx-4 mt-4 rounded-md border border-error bg-error-light px-3 py-2 text-sm text-error"
+                >
+                    {{ error }}
+                </p>
                 <div class="flex items-center justify-between p-4 border-t border-default">
                     <a
                         v-if="config.texts.privacyUrl"
@@ -290,7 +320,8 @@ function close(): void {
                         </button>
                         <button
                             type="button"
-                            class="px-4 py-2 text-sm font-medium text-white bg-primary hover:opacity-90 rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 focus-visible:ring-offset-surface"
+                            class="px-4 py-2 text-sm font-medium text-white bg-primary hover:opacity-90 rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 focus-visible:ring-offset-surface disabled:opacity-60"
+                            :disabled="saving"
                             @click="save"
                         >
                             {{ config.texts.save }}

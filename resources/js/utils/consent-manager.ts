@@ -88,33 +88,31 @@ export function hasConsentFor(
 }
 
 /**
- * Save consent to localStorage and sync to server.
+ * The server did not record the choice, so it was not applied either.
+ */
+export class ConsentNotSavedError extends Error {
+    constructor(message: string, options?: ErrorOptions) {
+        super(message, options);
+        this.name = 'ConsentNotSavedError';
+    }
+}
+
+/**
+ * Record the choice on the server and then apply it in this browser. A choice the server
+ * did not record is not applied: every applied consent can be shown later, and until the
+ * visitor tries again nothing that needs consent runs.
+ *
+ * @throws ConsentNotSavedError when the server cannot be reached or refuses the choice
  */
 export async function saveConsent(
     preferences: Record<string, boolean>,
     configVersion: number
 ): Promise<void> {
     const visitorId = getOrCreateVisitorId();
-    const consent: StoredConsent = {
-        visitorId,
-        version: configVersion,
-        timestamp: new Date().toISOString(),
-        preferences,
-    };
 
-    // Save to localStorage first (for immediate effect)
+    let response: Response;
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(consent));
-    } catch {
-        // Continue even if localStorage fails
-    }
-
-    // Also set as a cookie for server-side middleware
-    setCookieConsent(consent);
-
-    // Sync to server (fire and forget)
-    try {
-        await fetch('/consentimiento-cookies/consentir', {
+        response = await fetch('/consentimiento-cookies/consentir', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -128,9 +126,29 @@ export async function saveConsent(
                 consent_method: 'banner',
             }),
         });
-    } catch {
-        // Ignore server sync errors - localStorage consent is still valid
+    } catch (error) {
+        throw new ConsentNotSavedError('The server could not be reached', { cause: error });
     }
+
+    if (!response.ok) {
+        throw new ConsentNotSavedError(`The server answered ${response.status}`);
+    }
+
+    const consent: StoredConsent = {
+        visitorId,
+        version: configVersion,
+        timestamp: new Date().toISOString(),
+        preferences,
+    };
+
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(consent));
+    } catch {
+        // The cookie below still carries the choice
+    }
+
+    // Also set as a cookie for server-side middleware
+    setCookieConsent(consent);
 
     // Update Google Consent Mode if available
     updateConsentMode(preferences);

@@ -57,6 +57,7 @@ export interface BannerConfig {
         cancel: string;
         close: string;
         preferences: string;
+        saveError: string;
     };
     gtmEnabled: boolean;
     gtmContainerId: string;

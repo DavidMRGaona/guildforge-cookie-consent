@@ -43,6 +43,7 @@ final class BannerConfigDTOTest extends TestCase
                 'cancel' => 'Cancelar',
                 'close' => 'Cerrar',
                 'preferences' => 'Preferencias de cookies',
+                'saveError' => 'No hemos podido guardar tu elección.',
             ],
             gtmEnabled: false,
             gtmContainerId: '',

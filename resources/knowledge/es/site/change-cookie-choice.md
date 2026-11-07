@@ -18,6 +18,9 @@ Puedes cambiar o retirar tu elección de cookies cuando quieras, tan fácilmente
 
 Si lo que cambias añade o quita scripts de la web, la página se recarga sola. Así se cargan los que acabas de aceptar y dejan de funcionar los que has retirado.
 
+> [!IMPORTANT]
+> Si sale el mensaje «No hemos podido guardar tu elección», no se ha cambiado nada: vuelve a intentarlo y, si sigue fallando, recarga la página.
+
 ## Cuándo vuelve a salir el aviso
 
 Aunque no hagas nada, el aviso de cookies vuelve a salir solo:

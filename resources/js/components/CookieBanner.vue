@@ -64,6 +64,8 @@ const props = withDefaults(defineProps<Props>(), {
                 cancel: 'Cancelar',
                 close: 'Cerrar',
                 preferences: 'Preferencias de cookies',
+                saveError:
+                    'No hemos podido guardar tu elección. Vuelve a intentarlo y, si sigue fallando, recarga la página.',
             },
             gtmEnabled: false,
             gtmContainerId: '',
@@ -75,6 +77,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const isVisible = ref(false);
 const showSettingsModal = ref(false);
+// Set when the server did not record the last choice, which was then not applied either
+const saveError = ref<string | null>(null);
+const saving = ref(false);
 
 const categories = computed(() => props.cookieConsent?.categories ?? []);
 const config = computed(() => props.cookieConsent?.config);
@@ -271,19 +276,32 @@ const secondaryButtonStyles = computed(() => {
 });
 
 /**
- * Store the visitor's choice and apply it to this page.
+ * Store the visitor's choice and apply it to this page. Returns whether it was saved: when
+ * it was not, nothing changes and the visitor is told so.
  */
-async function applyChoice(preferences: Record<string, boolean>): Promise<void> {
+async function applyChoice(preferences: Record<string, boolean>): Promise<boolean> {
     const current = config.value;
-    if (!current) return;
+    if (!current || saving.value) return false;
 
-    await saveConsent(preferences, current.configVersion);
+    saving.value = true;
+    try {
+        await saveConsent(preferences, current.configVersion);
+    } catch {
+        saveError.value = current.texts.saveError;
+
+        return false;
+    } finally {
+        saving.value = false;
+    }
+
+    saveError.value = null;
     isVisible.value = false;
     notifyCookieConsentChanged();
 
     if (choiceNeedsReload(categories.value, pagePreferences, preferences, current)) {
         reloadPage();
-        return;
+
+        return true;
     }
     pagePreferences = { ...preferences };
 
@@ -295,6 +313,8 @@ async function applyChoice(preferences: Record<string, boolean>): Promise<void> 
     ) {
         loadGoogleTagManager(current.gtmContainerId);
     }
+
+    return true;
 }
 
 async function acceptAll(): Promise<void> {
@@ -317,16 +337,20 @@ async function rejectAll(): Promise<void> {
 }
 
 function openSettings(): void {
+    saveError.value = null;
     showSettingsModal.value = true;
 }
 
 function closeSettings(): void {
+    saveError.value = null;
     showSettingsModal.value = false;
 }
 
 async function handleSaveSettings(preferences: Record<string, boolean>): Promise<void> {
-    await applyChoice(preferences);
-    showSettingsModal.value = false;
+    // Not saved: the window stays open with the message, so the visitor can try again
+    if (await applyChoice(preferences)) {
+        showSettingsModal.value = false;
+    }
 }
 </script>
 
@@ -361,6 +385,14 @@ async function handleSaveSettings(preferences: Record<string, boolean>): Promise
                                         {{ config.texts.privacyLink }}
                                     </a>
                                 </p>
+                                <!-- With the preferences open, the message is shown there -->
+                                <p
+                                    v-if="saveError && !showSettingsModal"
+                                    role="alert"
+                                    class="mt-2 rounded-md border border-error bg-error-light px-3 py-2 text-sm text-error"
+                                >
+                                    {{ saveError }}
+                                </p>
                             </div>
 
                             <!-- Buttons -->
@@ -380,6 +412,7 @@ async function handleSaveSettings(preferences: Record<string, boolean>): Promise
                                     type="button"
                                     :class="secondaryButtonClasses"
                                     :style="secondaryButtonStyles"
+                                    :disabled="saving"
                                     @click="rejectAll"
                                 >
                                     {{ config.texts.rejectAll }}
@@ -389,6 +422,7 @@ async function handleSaveSettings(preferences: Record<string, boolean>): Promise
                                     type="button"
                                     :class="primaryButtonClasses"
                                     :style="primaryButtonStyles"
+                                    :disabled="saving"
                                     @click="acceptAll"
                                 >
                                     {{ config.texts.acceptAll }}
@@ -418,6 +452,8 @@ async function handleSaveSettings(preferences: Record<string, boolean>): Promise
             v-if="showSettingsModal && config"
             :categories="categories"
             :config="config"
+            :error="saveError"
+            :saving="saving"
             @close="closeSettings"
             @save="handleSaveSettings"
         />
