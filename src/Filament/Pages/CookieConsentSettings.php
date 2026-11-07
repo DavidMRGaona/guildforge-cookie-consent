@@ -192,7 +192,7 @@ final class CookieConsentSettings extends Page implements HasForms
                         ->label(__('cookie-consent::cookie_consent.settings.banner_theme'))
                         ->options(BannerTheme::class)
                         ->native(false)
-                        ->default('light')
+                        ->default('auto')
                         ->live(),
 
                     Grid::make(2)

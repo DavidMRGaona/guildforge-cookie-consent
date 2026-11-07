@@ -108,6 +108,7 @@ return [
 
     // Banner themes
     'banner_theme' => [
+        'auto' => 'Automático',
         'light' => 'Claro',
         'dark' => 'Oscuro',
         'custom' => 'Personalizado',

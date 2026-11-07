@@ -145,7 +145,7 @@ Los ajustes se editan en **Configuración → Banner de cookies** (permiso `sett
 |--------|-------------|---------------|
 | `banner_position` | Posición del banner | `bottom` |
 | `banner_layout` | Diseño del banner | `bar` |
-| `banner_theme` | Tema del banner | `light` |
+| `banner_theme` | Tema del banner | `auto` |
 | `primary_color` | Color principal (tema personalizado) | `#D97706` |
 | `secondary_color` | Color secundario (tema personalizado) | `#57534E` |
 | `background_color` | Color de fondo (tema personalizado) | `#FFFFFF` |
@@ -209,8 +209,9 @@ El resto de etiquetas del modal de preferencias («Obligatoria», «Ver cookies�
 
 | Valor | Descripción |
 |-------|-------------|
-| `light` | Claro |
-| `dark` | Oscuro |
+| `auto` | Automático: sigue el modo claro u oscuro de la web |
+| `light` | Claro, también con la web en modo oscuro |
+| `dark` | Oscuro, también con la web en modo claro |
 | `custom` | Personalizado |
 
 ### CookieType

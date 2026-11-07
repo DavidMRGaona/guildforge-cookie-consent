@@ -40,6 +40,11 @@ final class BannerConfigServiceTest extends ModuleTestCase
         ])));
     }
 
+    public function test_the_theme_follows_the_site_mode_when_none_was_chosen(): void
+    {
+        $this->assertSame('auto', $this->app->make(BannerConfigServiceInterface::class)->getBannerConfig()->theme);
+    }
+
     public function test_texts_carry_the_message_for_a_choice_that_was_not_saved(): void
     {
         $texts = $this->app->make(BannerConfigServiceInterface::class)->getBannerConfig()->texts;

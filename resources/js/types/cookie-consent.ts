@@ -24,7 +24,7 @@ export interface Cookie {
 export interface BannerConfig {
     position: 'bottom' | 'top' | 'bottom_left' | 'bottom_right' | 'center';
     layout: 'bar' | 'box' | 'modal';
-    theme: 'light' | 'dark' | 'custom';
+    theme: 'auto' | 'light' | 'dark' | 'custom';
     colors: {
         primary: string;
         secondary: string;

@@ -5,7 +5,7 @@ import type { BannerConfig } from '../types/cookie-consent';
  * light and dark modes (the semantic tokens of the core's stylesheet).
  *
  * They are set on the banner and the settings window themselves, so each theme looks the same
- * whatever mode the visitor's site is in. The utilities the components use (`bg-surface`,
+ * whatever mode the visitor's site is in. «Automático» sets none and follows the site mode. The utilities the components use (`bg-surface`,
  * `text-base-primary`, `border-default`, `text-primary`...) read these variables.
  */
 const LIGHT: Record<string, string> = {
@@ -36,7 +36,10 @@ const DARK: Record<string, string> = {
     '--color-secondary': '#a8a29e',
 };
 
-/** The variables a theme sets; none for «Personalizado», which paints with the panel's colours. */
+/**
+ * The variables a theme sets; none for «Automático», which keeps the site's own (light or dark)
+ * tokens, nor for «Personalizado», which paints with the panel's colours.
+ */
 export function bannerThemeVariables(theme: BannerConfig['theme']): Record<string, string> {
     if (theme === 'light') return { ...LIGHT };
     if (theme === 'dark') return { ...DARK };
