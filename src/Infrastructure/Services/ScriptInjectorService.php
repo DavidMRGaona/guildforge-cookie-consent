@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Infrastructure\Services;
 
+use Modules\CookieConsent\Application\DTOs\BannerConfigDTO;
 use Modules\CookieConsent\Application\Services\BannerConfigServiceInterface;
 use Modules\CookieConsent\Application\Services\ConsentModeServiceInterface;
 use Modules\CookieConsent\Application\Services\ScriptInjectorServiceInterface;
 use Modules\CookieConsent\Domain\Repositories\CookieScriptRepositoryInterface;
+use Modules\CookieConsent\Domain\ValueObjects\GtmContainerId;
 
 final readonly class ScriptInjectorService implements ScriptInjectorServiceInterface
 {
@@ -51,9 +53,12 @@ final readonly class ScriptInjectorService implements ScriptInjectorServiceInter
             }
         }
 
-        // Add GTM script if enabled and analytics/marketing consent exists
-        if ($config->gtmEnabled && $config->gtmContainerId !== '') {
-            $scripts[] = $this->getGtmHeadScript($config->gtmContainerId);
+        // With Consent Mode the container loads on every page and follows the consent
+        // signals above; without it, only once the visitor accepts its category
+        $containerId = $this->containerId($config);
+        if ($containerId instanceof GtmContainerId
+            && ($config->consentModeEnabled || in_array($config->gtmCategory, $consentedCategories, true))) {
+            $scripts[] = $this->getGtmHeadScript($containerId);
         }
 
         // Add category-specific head scripts
@@ -78,9 +83,11 @@ final readonly class ScriptInjectorService implements ScriptInjectorServiceInter
         $config = $this->bannerConfigService->getBannerConfig();
         $scripts = [];
 
-        // Add GTM noscript fallback
-        if ($config->gtmEnabled && $config->gtmContainerId !== '') {
-            $scripts[] = $this->getGtmBodyStartScript($config->gtmContainerId);
+        // The noscript container gets no consent signals, so even with Consent Mode it
+        // waits for its category
+        $containerId = $this->containerId($config);
+        if ($containerId instanceof GtmContainerId && in_array($config->gtmCategory, $consentedCategories, true)) {
+            $scripts[] = $this->getGtmBodyStartScript($containerId);
         }
 
         // Add category-specific body start scripts
@@ -137,7 +144,15 @@ final readonly class ScriptInjectorService implements ScriptInjectorServiceInter
         return implode("\n", $scripts);
     }
 
-    private function getGtmHeadScript(string $containerId): string
+    /**
+     * Null when the container is off or its ID is malformed: it goes into the page as it is.
+     */
+    private function containerId(BannerConfigDTO $config): ?GtmContainerId
+    {
+        return $config->gtmEnabled ? GtmContainerId::tryFrom(trim($config->gtmContainerId)) : null;
+    }
+
+    private function getGtmHeadScript(GtmContainerId $containerId): string
     {
         return <<<SCRIPT
 <!-- Google Tag Manager -->
@@ -145,16 +160,16 @@ final readonly class ScriptInjectorService implements ScriptInjectorServiceInter
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','{$containerId}');</script>
+})(window,document,'script','dataLayer','{$containerId->value}');</script>
 <!-- End Google Tag Manager -->
 SCRIPT;
     }
 
-    private function getGtmBodyStartScript(string $containerId): string
+    private function getGtmBodyStartScript(GtmContainerId $containerId): string
     {
         return <<<SCRIPT
 <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id={$containerId}"
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id={$containerId->value}"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 SCRIPT;

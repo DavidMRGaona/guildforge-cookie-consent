@@ -24,6 +24,8 @@ final readonly class BannerConfigDTO
         public bool $gtmEnabled,
         public string $gtmContainerId,
         public bool $consentModeEnabled,
+        // Without Consent Mode, the container waits until the visitor accepts this category
+        public string $gtmCategory = 'analytics',
     ) {}
 
     /**
@@ -44,6 +46,7 @@ final readonly class BannerConfigDTO
             'texts' => $this->texts,
             'gtmEnabled' => $this->gtmEnabled,
             'gtmContainerId' => $this->gtmContainerId,
+            'gtmCategory' => $this->gtmCategory,
             'consentModeEnabled' => $this->consentModeEnabled,
         ];
     }

@@ -31,6 +31,8 @@ return [
     // Integrations
     'gtm_enabled' => false,
     'gtm_container_id' => '',
+    // Without Consent Mode, Google Tag Manager waits until this category is accepted
+    'gtm_category' => 'analytics',
     'consent_mode_enabled' => true,
 
     // Config version (auto-incremented on category/cookie/script changes)

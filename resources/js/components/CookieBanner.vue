@@ -7,6 +7,7 @@ import {
 import { bannerThemeVariables } from '../utils/banner-theme';
 import type { CookieCategory, BannerConfig } from '../types/cookie-consent';
 import { hasConsentFor, needsConsent, saveConsent } from '../utils/consent-manager';
+import { loadGoogleTagManager } from '../utils/google-tag-manager';
 import CookieSettingsModal from './CookieSettingsModal.vue';
 import { useRoutes } from '@/composables/useRoutes';
 
@@ -55,6 +56,7 @@ const props = withDefaults(defineProps<Props>(), {
             },
             gtmEnabled: false,
             gtmContainerId: '',
+            gtmCategory: 'analytics',
             consentModeEnabled: true,
         },
     }),
@@ -202,31 +204,44 @@ const secondaryButtonStyles = computed(() => {
     };
 });
 
-async function acceptAll(): Promise<void> {
-    if (!config.value) return;
+/**
+ * Store the visitor's choice and apply it to this page.
+ */
+async function applyChoice(preferences: Record<string, boolean>): Promise<void> {
+    const current = config.value;
+    if (!current) return;
 
+    await saveConsent(preferences, current.configVersion);
+    isVisible.value = false;
+    notifyCookieConsentChanged();
+
+    // Without Consent Mode the server leaves the container out until its category is accepted
+    if (
+        current.gtmEnabled &&
+        !current.consentModeEnabled &&
+        preferences[current.gtmCategory] === true
+    ) {
+        loadGoogleTagManager(current.gtmContainerId);
+    }
+}
+
+async function acceptAll(): Promise<void> {
     const preferences: Record<string, boolean> = {};
     for (const category of categories.value) {
         preferences[category.slug] = true;
     }
 
-    await saveConsent(preferences, config.value.configVersion);
-    isVisible.value = false;
-    notifyCookieConsentChanged();
+    await applyChoice(preferences);
 }
 
 async function rejectAll(): Promise<void> {
-    if (!config.value) return;
-
     const preferences: Record<string, boolean> = {};
     for (const category of categories.value) {
         // Only accept required categories
         preferences[category.slug] = category.isRequired;
     }
 
-    await saveConsent(preferences, config.value.configVersion);
-    isVisible.value = false;
-    notifyCookieConsentChanged();
+    await applyChoice(preferences);
 }
 
 function openSettings(): void {
@@ -238,12 +253,8 @@ function closeSettings(): void {
 }
 
 async function handleSaveSettings(preferences: Record<string, boolean>): Promise<void> {
-    if (!config.value) return;
-
-    await saveConsent(preferences, config.value.configVersion);
+    await applyChoice(preferences);
     showSettingsModal.value = false;
-    isVisible.value = false;
-    notifyCookieConsentChanged();
 }
 </script>
 

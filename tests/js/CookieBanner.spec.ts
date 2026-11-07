@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, it } from 'vitest';
-import { mount, type DOMWrapper, type VueWrapper } from '@vue/test-utils';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { flushPromises, mount, type DOMWrapper, type VueWrapper } from '@vue/test-utils';
 import CookieBanner from '../../resources/js/components/CookieBanner.vue';
-import type { BannerConfig } from '../../resources/js/types/cookie-consent';
+import type { BannerConfig, CookieCategory } from '../../resources/js/types/cookie-consent';
 
 const texts: BannerConfig['texts'] = {
     title: 'Cookie notice',
@@ -40,6 +40,7 @@ function config(overrides: Partial<BannerConfig> = {}): BannerConfig {
         texts,
         gtmEnabled: false,
         gtmContainerId: '',
+        gtmCategory: 'analytics',
         consentModeEnabled: true,
         ...overrides,
     };
@@ -129,5 +130,83 @@ describe('CookieBanner themes', () => {
 
     it('sets no theme colours with the custom theme', () => {
         expect(surface('custom')).toBe('');
+    });
+});
+
+describe('CookieBanner and Google Tag Manager', () => {
+    const categories: CookieCategory[] = [
+        category('necessary', true),
+        category('analytics', false),
+        category('marketing', false),
+    ];
+
+    function category(slug: string, isRequired: boolean): CookieCategory {
+        return {
+            id: `category-${slug}`,
+            name: slug,
+            slug,
+            description: '',
+            isRequired,
+            sortOrder: 0,
+            consentModeKeys: [],
+            cookies: [],
+        };
+    }
+
+    function containerScripts(): Element[] {
+        return Array.from(document.querySelectorAll('script[src*="googletagmanager.com/gtm.js"]'));
+    }
+
+    async function choose(bannerConfig: BannerConfig, label: string): Promise<void> {
+        const wrapper = mount(CookieBanner, {
+            props: { cookieConsent: { categories, config: bannerConfig } },
+            global: { stubs: { teleport: true } },
+        });
+        await button(wrapper, label).trigger('click');
+        await flushPromises();
+    }
+
+    const withoutConsentMode = (overrides: Partial<BannerConfig> = {}): BannerConfig =>
+        config({
+            gtmEnabled: true,
+            gtmContainerId: 'GTM-ABC123',
+            gtmCategory: 'analytics',
+            consentModeEnabled: false,
+            ...overrides,
+        });
+
+    beforeEach(() => {
+        localStorage.clear();
+        document.head.innerHTML = '';
+        delete window.dataLayer;
+        vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{}', { status: 201 })));
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
+    });
+
+    it('loads the container as soon as its category is accepted, without reloading', async () => {
+        await choose(withoutConsentMode(), texts.acceptAll);
+
+        expect(containerScripts()).toHaveLength(1);
+    });
+
+    it('does not load the container when its category is rejected', async () => {
+        await choose(withoutConsentMode(), texts.rejectAll);
+
+        expect(containerScripts()).toHaveLength(0);
+    });
+
+    it('waits for the category chosen for the container', async () => {
+        await choose(withoutConsentMode({ gtmCategory: 'missing' }), texts.acceptAll);
+
+        expect(containerScripts()).toHaveLength(0);
+    });
+
+    it('leaves the container to the server with Consent Mode', async () => {
+        await choose(withoutConsentMode({ consentModeEnabled: true }), texts.acceptAll);
+
+        expect(containerScripts()).toHaveLength(0);
     });
 });

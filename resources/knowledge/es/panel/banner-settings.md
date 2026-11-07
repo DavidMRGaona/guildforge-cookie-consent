@@ -47,10 +47,16 @@ El resto de textos de la ventana de preferencias, como **Obligatoria** o **Ver c
 
 ## Integraciones
 
-- **Habilitar Google Tag Manager** y **ID del contenedor GTM** (como `GTM-XXXXXX`): carga tu contenedor de Google Tag Manager en todas las páginas.
+- **Habilitar Google Tag Manager** y **ID del contenedor GTM** (como `GTM-XXXXXX`): añade tu contenedor de Google Tag Manager a las páginas.
+- **Categoría de Google Tag Manager**: la categoría que tiene que aceptar el visitante para que se cargue el contenedor cuando no usas Consent Mode. Solo se ofrecen las que no son requeridas.
 - **Habilitar Google Consent Mode v2**: dice a Google qué ha aceptado cada visitante. Hasta que elige, todo queda denegado salvo lo de seguridad. Después, se conceden las **Claves de Consent Mode** de las categorías que aceptó.
 
+Cuándo se carga el contenedor:
+
+- **Con Consent Mode**: en todas las páginas, desde el principio. Tus etiquetas reciben lo que ha aceptado cada visitante y deben respetarlo; configúralas para que tengan en cuenta Consent Mode.
+- **Sin Consent Mode**: solo cuando el visitante acepta la **Categoría de Google Tag Manager**. Se carga en ese momento, sin recargar la página.
+
 > [!IMPORTANT]
-> Google Tag Manager se carga siempre, haya aceptado el visitante o no. Si lo usas, deja activado **Habilitar Google Consent Mode v2** y configura tus etiquetas para que respeten Consent Mode.
+> La versión del contenedor para navegadores sin JavaScript no recibe lo que ha aceptado el visitante, así que solo se añade si aceptó la **Categoría de Google Tag Manager**, uses o no Consent Mode.
 
 [[action:filament.admin.pages.cookie-consent-settings|Abrir los ajustes del banner]]

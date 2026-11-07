@@ -51,6 +51,7 @@ const config: BannerConfig = {
     texts,
     gtmEnabled: false,
     gtmContainerId: '',
+    gtmCategory: 'analytics',
     consentModeEnabled: true,
 };
 

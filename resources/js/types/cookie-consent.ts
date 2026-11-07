@@ -53,6 +53,8 @@ export interface BannerConfig {
     };
     gtmEnabled: boolean;
     gtmContainerId: string;
+    /** Without Consent Mode, the container waits until the visitor accepts this category. */
+    gtmCategory: string;
     consentModeEnabled: boolean;
 }
 
