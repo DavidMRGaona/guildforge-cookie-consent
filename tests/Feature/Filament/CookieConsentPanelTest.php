@@ -170,6 +170,15 @@ final class CookieConsentPanelTest extends ModuleTestCase
         $this->assertGreaterThan($before, $this->configVersion());
     }
 
+    public function test_the_scripts_help_says_the_code_is_inserted_as_given(): void
+    {
+        // The middleware injects the stored code untouched, so the help must ask for the script tags
+        $this->assertSame(
+            'Pega el fragmento completo tal como lo da el proveedor, con sus etiquetas <script>. Se inserta sin modificar.',
+            __('cookie-consent::cookie_consent.scripts.sections.scripts_description'),
+        );
+    }
+
     public function test_bulk_delete_keeps_system_categories(): void
     {
         $system = $this->newCategory('system', isSystem: true);
