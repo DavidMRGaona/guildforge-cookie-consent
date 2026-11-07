@@ -180,6 +180,15 @@ final class CookieConsentPanelTest extends ModuleTestCase
         );
     }
 
+    public function test_the_cookie_name_help_explains_the_wildcard(): void
+    {
+        // The banner deletes the cookies of a withdrawn category by these names
+        $this->assertSame(
+            'El nombre exacto de la cookie. Si cambia el final, termínalo en * (_ga_* vale para todas las que empiezan por _ga_).',
+            __('cookie-consent::cookie_consent.cookies.fields.name_help'),
+        );
+    }
+
     public function test_bulk_delete_keeps_system_categories(): void
     {
         $system = $this->newCategory('system', isSystem: true);

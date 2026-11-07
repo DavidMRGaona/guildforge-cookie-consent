@@ -29,6 +29,7 @@ return [
         'plural_label' => 'Cookies',
         'fields' => [
             'name' => 'Nombre',
+            'name_help' => 'El nombre exacto de la cookie. Si cambia el final, termínalo en * (_ga_* vale para todas las que empiezan por _ga_).',
             'provider' => 'Proveedor',
             'domain' => 'Dominio',
             'purpose' => 'Propósito',
