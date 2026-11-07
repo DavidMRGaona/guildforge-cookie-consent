@@ -126,11 +126,13 @@ final readonly class InjectCookieScripts
             );
         }
 
-        // Inject body start scripts after <body...>
-        if ($scripts['body_start'] !== '') {
-            $content = preg_replace(
+        // Inject body start scripts after <body...>, followed by the <noscript> content of the
+        // consented scripts: like Google Tag Manager's, it belongs right after the opening tag
+        $bodyStart = implode("\n", array_filter([$scripts['body_start'], $scripts['noscript']], static fn (string $part): bool => $part !== ''));
+        if ($bodyStart !== '') {
+            $content = preg_replace_callback(
                 '/(<body[^>]*>)/i',
-                '$1'."\n".$scripts['body_start'],
+                static fn (array $matches): string => $matches[1]."\n".$bodyStart,
                 $content,
                 1
             ) ?? $content;
