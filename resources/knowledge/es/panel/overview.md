@@ -54,7 +54,7 @@ Cambiar los ajustes del banner, reordenar las categorías o borrar una categorí
 | **Ver consentimientos** | Ver los consentimientos y su resumen en el escritorio |
 | **Gestionar configuración del sitio** | Cambiar los ajustes del banner |
 
-Ningún permiso del módulo se concede solo: se dan a cada rol en **Roles**. El permiso **Exportar consentimientos** todavía no tiene ninguna acción en el panel.
+Ningún permiso del módulo se concede solo: se dan a cada rol en **Roles**. El permiso **Exportar consentimientos** añade el botón **Exportar CSV** a la lista de consentimientos, que también hay que poder ver.
 
 ## Dónde está cada cosa
 
