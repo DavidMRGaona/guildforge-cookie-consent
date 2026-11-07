@@ -53,6 +53,7 @@ final readonly class BannerConfigService implements BannerConfigServiceInterface
             gtmEnabled: (bool) $this->settingsService->get('cookie-consent.gtm_enabled', false),
             gtmContainerId: $this->settingsService->get('cookie-consent.gtm_container_id', ''),
             consentModeEnabled: (bool) $this->settingsService->get('cookie-consent.consent_mode_enabled', true),
+            gtmCategory: (string) $this->settingsService->get('cookie-consent.gtm_category', 'analytics'),
         );
     }
 

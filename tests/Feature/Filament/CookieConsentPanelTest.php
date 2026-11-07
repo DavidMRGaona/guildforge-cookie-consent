@@ -9,6 +9,7 @@ use App\Filament\Pages\ModuleSettingsPage;
 use App\Filament\Pages\ModulesPage;
 use App\Infrastructure\Persistence\Eloquent\Models\SettingModel;
 use App\Infrastructure\Persistence\Eloquent\Models\UserModel;
+use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Illuminate\Support\Str;
@@ -334,6 +335,62 @@ final class CookieConsentPanelTest extends ModuleTestCase
             'script' => ['javascript:alert(1)'],
             // Browsers read "/\host" as "//host": another site
             'backslash after the slash' => ['/\\evil.example'],
+        ];
+    }
+
+    public function test_the_container_category_offers_only_optional_categories(): void
+    {
+        $component = Livewire::test(CookieConsentSettings::class)
+            ->fillForm(['gtm_enabled' => true])
+            ->assertFormFieldIsVisible('gtm_category');
+
+        $component->assertFormFieldExists('gtm_category', function (Select $field): bool {
+            $options = array_keys($field->getOptions());
+
+            return in_array('analytics', $options, true)
+                && in_array('marketing', $options, true)
+                && ! in_array('necessary', $options, true);
+        });
+    }
+
+    public function test_the_container_category_is_saved(): void
+    {
+        Livewire::test(CookieConsentSettings::class)
+            ->fillForm(['gtm_enabled' => true, 'gtm_container_id' => 'GTM-ABC123', 'gtm_category' => 'marketing'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $config = app(BannerConfigServiceInterface::class)->getBannerConfig();
+        $this->assertSame('marketing', $config->gtmCategory);
+        $this->assertSame('GTM-ABC123', $config->gtmContainerId);
+    }
+
+    public function test_a_required_category_cannot_hold_the_container(): void
+    {
+        Livewire::test(CookieConsentSettings::class)
+            ->fillForm(['gtm_enabled' => true, 'gtm_container_id' => 'GTM-ABC123', 'gtm_category' => 'necessary'])
+            ->call('save')
+            ->assertHasFormErrors(['gtm_category']);
+    }
+
+    #[DataProvider('notAContainerId')]
+    public function test_the_container_id_must_look_like_one(string $containerId): void
+    {
+        Livewire::test(CookieConsentSettings::class)
+            ->fillForm(['gtm_enabled' => true, 'gtm_container_id' => $containerId, 'gtm_category' => 'analytics'])
+            ->call('save')
+            ->assertHasFormErrors(['gtm_container_id']);
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function notAContainerId(): array
+    {
+        return [
+            'script injection' => ["GTM-ABC');alert(1);//"],
+            'another tag id' => ['G-ABC123'],
+            'lower case' => ['gtm-abc123'],
         ];
     }
 

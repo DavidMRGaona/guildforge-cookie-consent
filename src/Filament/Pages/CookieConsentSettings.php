@@ -28,6 +28,8 @@ use Filament\Schemas\Schema;
 use Modules\CookieConsent\Domain\Enums\BannerLayout;
 use Modules\CookieConsent\Domain\Enums\BannerPosition;
 use Modules\CookieConsent\Domain\Enums\BannerTheme;
+use Modules\CookieConsent\Domain\Repositories\CookieCategoryRepositoryInterface;
+use Modules\CookieConsent\Domain\ValueObjects\GtmContainerId;
 
 /**
  * Banner settings, stored as "cookie-consent.<key>" settings: the same place
@@ -72,6 +74,7 @@ final class CookieConsentSettings extends Page implements HasForms
         'reconsent_on_change',
         'gtm_enabled',
         'gtm_container_id',
+        'gtm_category',
         'consent_mode_enabled',
     ];
 
@@ -307,6 +310,20 @@ final class CookieConsentSettings extends Page implements HasForms
                     TextInput::make('gtm_container_id')
                         ->label(__('cookie-consent::cookie_consent.settings.gtm_container_id'))
                         ->placeholder('GTM-XXXXXX')
+                        // Written into the page's JavaScript as it is
+                        ->regex(GtmContainerId::PATTERN)
+                        ->validationMessages(['regex' => __('cookie-consent::cookie_consent.settings.gtm_container_id_invalid')])
+                        ->required(fn (Get $get): bool => (bool) $get('gtm_enabled'))
+                        ->visible(fn (Get $get): bool => (bool) $get('gtm_enabled')),
+
+                    Select::make('gtm_category')
+                        ->label(__('cookie-consent::cookie_consent.settings.gtm_category'))
+                        ->helperText(__('cookie-consent::cookie_consent.settings.gtm_category_help'))
+                        // A required category counts as accepted, so it would not hold the container back
+                        ->options(fn (): array => self::optionalCategoryOptions())
+                        ->native(false)
+                        ->default('analytics')
+                        ->required(fn (Get $get): bool => (bool) $get('gtm_enabled'))
                         ->visible(fn (Get $get): bool => (bool) $get('gtm_enabled')),
 
                     Toggle::make('consent_mode_enabled')
@@ -316,6 +333,22 @@ final class CookieConsentSettings extends Page implements HasForms
                 ])
                 ->columns(2),
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function optionalCategoryOptions(): array
+    {
+        $options = [];
+
+        foreach (app(CookieCategoryRepositoryInterface::class)->findAll() as $category) {
+            if (! $category->isRequired()) {
+                $options[$category->slug()] = $category->name();
+            }
+        }
+
+        return $options;
     }
 
     protected function getHeaderActions(): array
