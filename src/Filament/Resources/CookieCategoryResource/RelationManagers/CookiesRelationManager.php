@@ -45,7 +45,7 @@ class CookiesRelationManager extends RelationManager
             ->components([
                 TextInput::make('name')
                     ->label(__('cookie-consent::cookie_consent.cookies.fields.name'))
-                    ->placeholder('_ga, _fbp, session_id...')
+                    ->placeholder(__('cookie-consent::cookie_consent.cookies.placeholders.name'))
                     // The banner deletes them by name when their category is withdrawn
                     ->helperText(__('cookie-consent::cookie_consent.cookies.fields.name_help'))
                     ->required()
@@ -53,13 +53,13 @@ class CookiesRelationManager extends RelationManager
 
                 TextInput::make('provider')
                     ->label(__('cookie-consent::cookie_consent.cookies.fields.provider'))
-                    ->placeholder('Google, Meta, Propio...')
+                    ->placeholder(__('cookie-consent::cookie_consent.cookies.placeholders.provider'))
                     ->required()
                     ->maxLength(255),
 
                 TextInput::make('domain')
                     ->label(__('cookie-consent::cookie_consent.cookies.fields.domain'))
-                    ->placeholder('.google.com, .facebook.com...')
+                    ->placeholder(__('cookie-consent::cookie_consent.cookies.placeholders.domain'))
                     ->maxLength(255),
 
                 Select::make('type')
@@ -76,7 +76,7 @@ class CookiesRelationManager extends RelationManager
 
                 TextInput::make('duration')
                     ->label(__('cookie-consent::cookie_consent.cookies.fields.duration'))
-                    ->placeholder('Sesión, 1 año, 2 años...')
+                    ->placeholder(__('cookie-consent::cookie_consent.cookies.placeholders.duration'))
                     ->maxLength(100),
 
                 Toggle::make('is_active')

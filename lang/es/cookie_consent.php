@@ -22,6 +22,13 @@ return [
             'scripts_count' => 'Scripts',
             'created_at' => 'Creada',
         ],
+        'hints' => [
+            'is_required' => 'Las categorías requeridas no pueden ser rechazadas por el usuario',
+        ],
+        'sections' => [
+            'consent_mode' => 'Google Consent Mode',
+            'consent_mode_description' => 'Selecciona las claves de Google Consent Mode v2 asociadas a esta categoría',
+        ],
     ],
 
     'cookies' => [
@@ -36,6 +43,12 @@ return [
             'type' => 'Tipo',
             'duration' => 'Duración',
             'is_active' => 'Activa',
+        ],
+        'placeholders' => [
+            'name' => '_ga, _fbp, session_id...',
+            'provider' => 'Google, Meta, Propio...',
+            'domain' => '.google.com, .facebook.com...',
+            'duration' => 'Sesión, 1 año, 2 años...',
         ],
     ],
 
@@ -56,6 +69,10 @@ return [
             'sort_order' => 'Orden',
             'is_active' => 'Activo',
         ],
+        'placeholders' => [
+            'name' => 'Google Analytics, GTM, Meta Pixel...',
+            'description' => 'Notas internas sobre este script...',
+        ],
         'hints' => [
             'script_head' => 'Scripts que se cargan en la sección <head> del documento',
             'script_body_start' => 'Scripts que se cargan justo después de la etiqueta <body>',
@@ -67,6 +84,11 @@ return [
     'consents' => [
         'label' => 'consentimiento',
         'plural_label' => 'Consentimientos',
+        'anonymous' => 'Anónimo',
+        'sections' => [
+            'visitor' => 'Información del visitante',
+            'consent' => 'Consentimiento',
+        ],
         'fields' => [
             'visitor_id' => 'ID visitante',
             'user' => 'Usuario',

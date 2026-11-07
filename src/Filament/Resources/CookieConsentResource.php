@@ -57,7 +57,7 @@ class CookieConsentResource extends BaseResource
 
                 TextColumn::make('user.name')
                     ->label(__('cookie-consent::cookie_consent.consents.fields.user'))
-                    ->placeholder('Anónimo')
+                    ->placeholder(__('cookie-consent::cookie_consent.consents.anonymous'))
                     ->searchable(),
 
                 TextColumn::make('consent_method')

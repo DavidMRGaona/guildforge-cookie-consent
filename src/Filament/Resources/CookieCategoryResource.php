@@ -95,7 +95,7 @@ class CookieCategoryResource extends BaseResource
 
                         Toggle::make('is_required')
                             ->label(__('cookie-consent::cookie_consent.categories.fields.is_required'))
-                            ->helperText('Las categorías requeridas no pueden ser rechazadas por el usuario')
+                            ->helperText(__('cookie-consent::cookie_consent.categories.hints.is_required'))
                             ->disabled(fn (?CookieCategoryModel $record): bool => $record instanceof CookieCategoryModel && $record->is_required),
 
                         TextInput::make('sort_order')
@@ -106,8 +106,8 @@ class CookieCategoryResource extends BaseResource
                     ])
                     ->columns(2),
 
-                Section::make('Google Consent Mode')
-                    ->description('Selecciona las claves de Google Consent Mode v2 asociadas a esta categoría')
+                Section::make(__('cookie-consent::cookie_consent.categories.sections.consent_mode'))
+                    ->description(__('cookie-consent::cookie_consent.categories.sections.consent_mode_description'))
                     ->schema([
                         CheckboxList::make('consent_mode_keys')
                             ->label(__('cookie-consent::cookie_consent.categories.fields.consent_mode_keys'))
