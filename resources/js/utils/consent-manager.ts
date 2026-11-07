@@ -1,4 +1,4 @@
-import type { StoredConsent } from '../types/cookie-consent';
+import type { ConsentModeValue, StoredConsent } from '../types/cookie-consent';
 import { csrfHeaders } from '@/utils/csrf';
 
 const STORAGE_KEY = 'guildforge_cookie_consent';
@@ -149,9 +149,6 @@ export async function saveConsent(
 
     // Also set as a cookie for server-side middleware
     setCookieConsent(consent);
-
-    // Update Google Consent Mode if available
-    updateConsentMode(preferences);
 }
 
 /**
@@ -165,38 +162,13 @@ function setCookieConsent(consent: StoredConsent): void {
 }
 
 /**
- * Update Google Consent Mode with new preferences.
+ * Tell Google Consent Mode the visitor's choice (see consentModeUpdate()). Every key is
+ * sent, so withdrawn ones are denied again.
  */
-export function updateConsentMode(preferences: Record<string, boolean>): void {
-    // Check if gtag function exists
+export function updateConsentMode(update: Record<string, ConsentModeValue>): void {
     if (typeof window.gtag !== 'function') return;
 
-    // Map category slugs to consent mode keys
-    // This is a simplified mapping - the real mapping comes from server-side category config
-    const consentUpdate: Record<string, 'granted' | 'denied'> = {};
-
-    // Basic mapping based on common category slugs
-    if (preferences['necessary']) {
-        consentUpdate['security_storage'] = 'granted';
-        consentUpdate['functionality_storage'] = 'granted';
-    }
-
-    if (preferences['preferences']) {
-        consentUpdate['personalization_storage'] = 'granted';
-    }
-
-    if (preferences['analytics']) {
-        consentUpdate['analytics_storage'] = 'granted';
-    }
-
-    if (preferences['marketing']) {
-        consentUpdate['ad_storage'] = 'granted';
-        consentUpdate['ad_user_data'] = 'granted';
-        consentUpdate['ad_personalization'] = 'granted';
-    }
-
-    // Update consent mode
-    window.gtag('consent', 'update', consentUpdate);
+    window.gtag('consent', 'update', update);
 }
 
 /**

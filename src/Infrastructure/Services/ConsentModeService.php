@@ -14,14 +14,19 @@ final readonly class ConsentModeService implements ConsentModeServiceInterface
         private CookieCategoryRepositoryInterface $categoryRepository,
     ) {}
 
-    public function generateDefaultScript(): string
+    public function defaults(): array
     {
         $defaults = [];
         foreach (ConsentModeKey::cases() as $key) {
             $defaults[$key->value] = $key->defaultValue();
         }
 
-        $defaultsJson = json_encode($defaults, JSON_PRETTY_PRINT);
+        return $defaults;
+    }
+
+    public function generateDefaultScript(): string
+    {
+        $defaultsJson = json_encode($this->defaults(), JSON_PRETTY_PRINT);
 
         return <<<SCRIPT
 <script>
@@ -55,12 +60,8 @@ SCRIPT;
      */
     public function mapToConsentMode(array $preferences): array
     {
-        $result = [];
-
-        // Initialize all keys as denied
-        foreach (ConsentModeKey::cases() as $key) {
-            $result[$key->value] = $key->defaultValue();
-        }
+        // The same mapping as consentModeUpdate() in the banner (consent-mode.ts)
+        $result = $this->defaults();
 
         // Get all categories to map their consent mode keys
         $categories = $this->categoryRepository->findAll();

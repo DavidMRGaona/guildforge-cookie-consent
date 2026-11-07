@@ -46,6 +46,7 @@ function config(overrides: Partial<BannerConfig> = {}): BannerConfig {
         gtmContainerId: '',
         gtmCategory: 'analytics',
         consentModeEnabled: true,
+        consentModeDefaults: {},
         ...overrides,
     };
 }

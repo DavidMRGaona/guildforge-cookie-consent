@@ -7,6 +7,14 @@ namespace Modules\CookieConsent\Application\Services;
 interface ConsentModeServiceInterface
 {
     /**
+     * Every Consent Mode key with its value before the visitor chooses (all denied except
+     * security_storage). The banner gets this list too, so both sides map from it.
+     *
+     * @return array<string, string>
+     */
+    public function defaults(): array;
+
+    /**
      * Generate the default consent mode script (all denied except security_storage).
      */
     public function generateDefaultScript(): string;

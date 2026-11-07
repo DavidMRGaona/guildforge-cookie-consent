@@ -9,6 +9,7 @@ final readonly class BannerConfigDTO
     /**
      * @param  array{primary: string, secondary: string, background: string, text: string}  $colors
      * @param  array{title: string, description: string, acceptAll: string, rejectAll: string, settings: string, save: string, privacyLink: string, privacyUrl: string, required: string, showCookies: string, cookieColumn: string, providerColumn: string, durationColumn: string, cancel: string, close: string, preferences: string, saveError: string}  $texts
+     * @param  array<string, string>  $consentModeDefaults
      */
     public function __construct(
         public string $position,
@@ -30,6 +31,8 @@ final readonly class BannerConfigDTO
         public bool $showFloatingButton = true,
         // The link that reopens them, for the footer menu
         public string $preferencesUrl = '/consentimiento-cookies/preferencias',
+        // Every Consent Mode key with its value before the visitor chooses
+        public array $consentModeDefaults = [],
     ) {}
 
     /**
@@ -54,6 +57,7 @@ final readonly class BannerConfigDTO
             'gtmContainerId' => $this->gtmContainerId,
             'gtmCategory' => $this->gtmCategory,
             'consentModeEnabled' => $this->consentModeEnabled,
+            'consentModeDefaults' => $this->consentModeDefaults,
         ];
     }
 }

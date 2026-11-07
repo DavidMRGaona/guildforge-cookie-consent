@@ -57,6 +57,7 @@ const config: BannerConfig = {
     gtmContainerId: '',
     gtmCategory: 'analytics',
     consentModeEnabled: true,
+    consentModeDefaults: {},
 };
 
 function cookie(overrides: Partial<Cookie>): Cookie {

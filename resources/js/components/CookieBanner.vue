@@ -13,7 +13,9 @@ import {
     hasConsentFor,
     needsConsent,
     saveConsent,
+    updateConsentMode,
 } from '../utils/consent-manager';
+import { consentModeUpdate } from '../utils/consent-mode';
 import { loadGoogleTagManager } from '../utils/google-tag-manager';
 import { reloadPage } from '../utils/page';
 import CookieSettingsModal from './CookieSettingsModal.vue';
@@ -71,6 +73,7 @@ const props = withDefaults(defineProps<Props>(), {
             gtmContainerId: '',
             gtmCategory: 'analytics',
             consentModeEnabled: true,
+            consentModeDefaults: {},
         },
     }),
 });
@@ -296,6 +299,13 @@ async function applyChoice(preferences: Record<string, boolean>): Promise<boolea
 
     saveError.value = null;
     isVisible.value = false;
+
+    // From each category's own keys, the same mapping the server uses on the next page
+    if (current.consentModeEnabled) {
+        updateConsentMode(
+            consentModeUpdate(categories.value, preferences, current.consentModeDefaults)
+        );
+    }
     notifyCookieConsentChanged();
 
     if (choiceNeedsReload(categories.value, pagePreferences, preferences, current)) {

@@ -38,8 +38,10 @@ Necesitas el permiso **Editar categorías de cookies**.
 2. Cambia lo que necesites.
 3. Pulsa **Guardar cambios**.
 
+Cambiar el **Nombre** no cambia el **Identificador**.
+
 > [!WARNING]
-> Si cambias el **Nombre**, el **Identificador** se vuelve a rellenar a partir del nombre nuevo. Antes de guardar, vuelve a escribir el que tenía. Los módulos y Google Consent Mode reconocen las categorías por su identificador (`necessary`, `preferences`, `analytics` y `marketing` en las del sistema), y con otro dejan de encontrarla.
+> No cambies a mano el **Identificador** de una categoría en uso. Los módulos, las cookies que declaran y lo que ya eligieron los visitantes reconocen la categoría por él (`necessary`, `preferences`, `analytics` y `marketing` en las del sistema), y con otro dejan de encontrarla. Google Consent Mode no depende del identificador: usa las **Claves de Consent Mode** de cada categoría.
 
 ## Cambiar el orden
 

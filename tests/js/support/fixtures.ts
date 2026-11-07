@@ -43,6 +43,15 @@ export function bannerConfig(overrides: Partial<BannerConfig> = {}): BannerConfi
         gtmContainerId: '',
         gtmCategory: 'analytics',
         consentModeEnabled: true,
+        consentModeDefaults: {
+            ad_storage: 'denied',
+            ad_user_data: 'denied',
+            ad_personalization: 'denied',
+            analytics_storage: 'denied',
+            functionality_storage: 'denied',
+            personalization_storage: 'denied',
+            security_storage: 'granted',
+        },
         ...overrides,
     };
 }
