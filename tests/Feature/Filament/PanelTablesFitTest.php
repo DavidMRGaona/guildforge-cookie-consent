@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Tests\Feature\Filament;
 
+use App\Filament\Actions\RowDetailsAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
+use Filament\Support\Enums\Alignment;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
@@ -67,12 +69,38 @@ final class PanelTablesFitTest extends ModuleTestCase
         $this->assertInstanceOf(ActionGroup::class, $actions[0]);
     }
 
-    public function test_the_consents_keep_their_single_view_action(): void
+    public function test_the_consents_keep_their_view_action_next_to_the_details(): void
     {
         $actions = $this->table(ListCookieConsents::class)->getRecordActions();
 
         $this->assertCount(1, $actions);
-        $this->assertInstanceOf(ViewAction::class, $actions[0]);
+        $this->assertInstanceOf(ActionGroup::class, $actions[0]);
+        $this->assertSame([RowDetailsAction::NAME, 'view'], array_keys($actions[0]->getFlatActions()));
+        $this->assertInstanceOf(ViewAction::class, $actions[0]->getFlatActions()['view']);
+    }
+
+    /**
+     * @param  class-string<HasTable>  $component
+     */
+    #[DataProvider('tablesWithTwoRowActions')]
+    public function test_row_details_come_first_in_the_menu(string $component): void
+    {
+        $table = $this->table($component);
+        $group = $table->getRecordActions()[0];
+
+        $this->assertInstanceOf(ActionGroup::class, $group);
+        $this->assertSame(RowDetailsAction::NAME, array_key_first($group->getFlatActions()));
+        $this->assertNotNull($table->getAction(RowDetailsAction::NAME));
+    }
+
+    public function test_the_counters_are_centred(): void
+    {
+        $categories = $this->table(ListCookieCategories::class);
+        foreach (['sort_order', 'cookies_count', 'scripts_count'] as $name) {
+            $this->assertSame(Alignment::Center, $categories->getColumn($name)?->getAlignment(), $name);
+        }
+        $this->assertSame(Alignment::Center, $this->table(ScriptsRelationManager::class)->getColumn('sort_order')?->getAlignment());
+        $this->assertSame(Alignment::Center, $this->table(ListCookieConsents::class)->getColumn('config_version')?->getAlignment());
     }
 
     /**

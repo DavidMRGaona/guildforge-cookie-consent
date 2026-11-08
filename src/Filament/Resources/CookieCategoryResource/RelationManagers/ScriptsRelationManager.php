@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Filament\Resources\CookieCategoryResource\RelationManagers;
 
+use App\Filament\Actions\RowDetailsAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -138,6 +139,7 @@ class ScriptsRelationManager extends RelationManager
             // One menu: two labelled actions made the table overflow its container
             ->recordActions([
                 ActionGroup::make([
+                    RowDetailsAction::make(),
                     EditAction::make()
                         ->after(function ($record) {
                             event(new CookieConfigurationChanged(
