@@ -137,7 +137,7 @@ El «?» de las páginas del panel abre su guía (`HasKnowledgeGuideAction`): la
 
 ## Configuración
 
-Los ajustes se editan en **Configuración → Banner de cookies** (permiso `settings.manage`) y se guardan en la tabla `settings` con el prefijo `cookie-consent.`. El seeder crea los valores iniciales al habilitar el módulo; `config/settings.php` solo da el valor que muestra el formulario para un ajuste que nunca se ha guardado.
+Los ajustes se editan en **Configuración → Banner de cookies** (permiso `settings.manage`) y se guardan en la tabla `settings` con el prefijo `cookie-consent.`. El seeder crea los valores iniciales al habilitar el módulo; `config/settings.php` solo da el valor que muestra el formulario para un ajuste que nunca se ha guardado. Los textos del banner (título, descripción y botones) no están en ese archivo: salen de las traducciones del módulo en el idioma del sitio (`BannerTextDefaults`), y un texto ya guardado nunca se toca.
 
 ### Apariencia
 
