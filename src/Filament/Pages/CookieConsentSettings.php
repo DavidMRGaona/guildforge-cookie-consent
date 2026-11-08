@@ -25,9 +25,12 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Modules\CookieConsent\Application\DTOs\CategoryDTO;
+use Modules\CookieConsent\Application\Services\VisibleCategoriesServiceInterface;
 use Modules\CookieConsent\Domain\Enums\BannerLayout;
 use Modules\CookieConsent\Domain\Enums\BannerPosition;
 use Modules\CookieConsent\Domain\Enums\BannerTheme;
+use Modules\CookieConsent\Domain\Events\CookieConfigurationChanged;
 use Modules\CookieConsent\Domain\Repositories\CookieCategoryRepositoryInterface;
 use Modules\CookieConsent\Domain\ValueObjects\GtmContainerId;
 use Modules\CookieConsent\Infrastructure\Services\BannerTextDefaults;
@@ -147,8 +150,11 @@ final class CookieConsentSettings extends Page implements HasForms
             ->statePath('data');
     }
 
-    public function save(SettingsServiceInterface $settings): void
+    public function save(SettingsServiceInterface $settings, VisibleCategoriesServiceInterface $visibleCategories): void
     {
+        // The container and Consent Mode decide which categories the banner offers
+        $categoriesShownBefore = $this->categoriesShown($visibleCategories);
+
         // Hidden fields (custom colours, GTM container) are not in the state: their
         // stored values stay
         foreach ($this->form->getState() as $key => $value) {
@@ -164,10 +170,30 @@ final class CookieConsentSettings extends Page implements HasForms
             });
         }
 
+        // The banner now offers other categories: visitors are asked again
+        if ($this->categoriesShown($visibleCategories) !== $categoriesShownBefore) {
+            event(new CookieConfigurationChanged(
+                changeType: 'updated',
+                entityType: 'settings',
+                entityId: 'categories_shown',
+            ));
+        }
+
         Notification::make()
             ->title(__('cookie-consent::cookie_consent.settings.saved'))
             ->success()
             ->send();
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function categoriesShown(VisibleCategoriesServiceInterface $visibleCategories): array
+    {
+        return array_map(
+            fn (CategoryDTO $category): string => $category->slug,
+            $visibleCategories->getVisibleCategories(),
+        );
     }
 
     /**

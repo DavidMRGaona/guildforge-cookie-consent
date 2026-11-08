@@ -23,6 +23,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Modules\CookieConsent\Application\DTOs\CategoryDTO;
+use Modules\CookieConsent\Application\Services\VisibleCategoriesServiceInterface;
 use Modules\CookieConsent\Domain\Enums\ConsentModeKey;
 use Modules\CookieConsent\Domain\Events\CookieConfigurationChanged;
 use Modules\CookieConsent\Filament\Resources\CookieCategoryResource\Pages\CreateCookieCategory;
@@ -134,10 +136,25 @@ class CookieCategoryResource extends BaseResource
 
     public static function table(Table $table): Table
     {
+        // Read once per render: the categories the banner offers
+        $shownIds = null;
+        $isUnused = function (CookieCategoryModel $record) use (&$shownIds): bool {
+            $shownIds ??= array_map(
+                fn (CategoryDTO $category): string => $category->id,
+                app(VisibleCategoriesServiceInterface::class)->getVisibleCategories(),
+            );
+
+            return ! in_array((string) $record->getKey(), $shownIds, true);
+        };
+
         return $table
             ->columns([
                 TextColumn::make('name')
                     ->label(__('cookie-consent::cookie_consent.categories.fields.name'))
+                    // A category with nothing behind it is left out of the banner
+                    ->description(fn (CookieCategoryModel $record): ?string => $isUnused($record)
+                        ? (string) __('cookie-consent::cookie_consent.categories.unused')
+                        : null)
                     ->searchable()
                     ->sortable()
                     ->wrap(),

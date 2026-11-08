@@ -162,6 +162,9 @@ registerCookieConsentProvider({
         const current = config.value;
         if (!current) return false;
 
+        // A category the banner does not offer was never asked about: an older choice no longer counts
+        if (!categories.value.some((category) => category.slug === categorySlug)) return false;
+
         return hasConsentFor(
             categorySlug,
             current.configVersion,

@@ -61,6 +61,24 @@ describe('the banner as the cookie consent provider', () => {
         expect(hasCookieConsent('analytics')).toBe(false);
     });
 
+    // An unused category is not offered, so an older choice about it no longer counts
+    it('does not count a category the banner no longer offers as consented', () => {
+        localStorage.setItem(
+            'guildforge_cookie_consent',
+            JSON.stringify({
+                visitorId: 'visitor',
+                version: config.configVersion,
+                timestamp: new Date().toISOString(),
+                preferences: { necessary: true, analytics: true, marketing: true },
+            })
+        );
+
+        mountBanner();
+
+        expect(hasCookieConsent('analytics')).toBe(true);
+        expect(hasCookieConsent('marketing')).toBe(false);
+    });
+
     // Modules read consent inside computed values: each choice must reach them
     it('lets readers follow the choice made with "Accept all"', async () => {
         const analytics = computed(() => hasCookieConsent('analytics'));

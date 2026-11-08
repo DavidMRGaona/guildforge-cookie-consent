@@ -11,6 +11,7 @@ return [
     'categories' => [
         'label' => 'categoría de cookies',
         'plural_label' => 'Categorías de cookies',
+        'unused' => 'Sin uso: no se muestra a los visitantes',
         'fields' => [
             'name' => 'Nombre',
             'slug' => 'Identificador',
