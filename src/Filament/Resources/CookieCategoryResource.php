@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\CookieConsent\Filament\Resources;
 
 use App\Filament\Resources\BaseResource;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -138,12 +139,14 @@ class CookieCategoryResource extends BaseResource
                 TextColumn::make('name')
                     ->label(__('cookie-consent::cookie_consent.categories.fields.name'))
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->wrap(),
 
                 TextColumn::make('slug')
                     ->label(__('cookie-consent::cookie_consent.categories.fields.slug'))
                     ->badge()
-                    ->color('gray'),
+                    ->color('gray')
+                    ->visibleFrom('xl'),
 
                 IconColumn::make('is_required')
                     ->label(__('cookie-consent::cookie_consent.categories.fields.is_required'))
@@ -152,17 +155,20 @@ class CookieCategoryResource extends BaseResource
                 TextColumn::make('sort_order')
                     ->label(__('cookie-consent::cookie_consent.categories.fields.sort_order'))
                     ->sortable()
-                    ->alignCenter(),
+                    ->alignCenter()
+                    ->visibleFrom('md'),
 
                 TextColumn::make('cookies_count')
                     ->label(__('cookie-consent::cookie_consent.categories.fields.cookies_count'))
                     ->counts('cookies')
-                    ->alignCenter(),
+                    ->alignCenter()
+                    ->visibleFrom('sm'),
 
                 TextColumn::make('scripts_count')
                     ->label(__('cookie-consent::cookie_consent.categories.fields.scripts_count'))
                     ->counts('scripts')
-                    ->alignCenter(),
+                    ->alignCenter()
+                    ->visibleFrom('md'),
 
                 TextColumn::make('created_at')
                     ->label(__('cookie-consent::cookie_consent.categories.fields.created_at'))
@@ -172,11 +178,14 @@ class CookieCategoryResource extends BaseResource
             ])
             ->reorderable('sort_order')
             ->defaultSort('sort_order')
+            // One menu: two labelled actions made the table overflow its container
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make()
-                    ->hidden(fn (CookieCategoryModel $record): bool => $record->is_system)
-                    ->after(fn (CookieCategoryModel $record) => self::announceDeletion($record)),
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make()
+                        ->hidden(fn (CookieCategoryModel $record): bool => $record->is_system)
+                        ->after(fn (CookieCategoryModel $record) => self::announceDeletion($record)),
+                ]),
             ])
             ->checkIfRecordIsSelectableUsing(fn (CookieCategoryModel $record): bool => ! $record->is_system)
             ->toolbarActions([

@@ -34,7 +34,7 @@ Se abre la ficha de la categoría, donde añades sus cookies y sus scripts.
 
 Necesitas el permiso **Editar categorías de cookies**.
 
-1. Pulsa la categoría en la lista.
+1. Pulsa la categoría en la lista, o abre el menú **⋯** de su fila y pulsa **Editar**.
 2. Cambia lo que necesites.
 3. Pulsa **Guardar cambios**.
 
@@ -55,7 +55,7 @@ El aviso muestra las categorías en el orden de la lista.
 
 Necesitas el permiso **Eliminar categorías de cookies**. Las cuatro categorías del sistema y las requeridas no se pueden borrar.
 
-1. Pulsa **Borrar** en la fila de la categoría.
+1. Abre el menú **⋯** de la fila de la categoría y pulsa **Borrar**.
 2. Confirma.
 
 > [!WARNING]

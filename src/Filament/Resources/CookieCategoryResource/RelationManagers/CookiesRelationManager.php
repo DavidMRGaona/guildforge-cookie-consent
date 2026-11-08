@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Filament\Resources\CookieCategoryResource\RelationManagers;
 
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -96,11 +97,13 @@ class CookiesRelationManager extends RelationManager
 
                 TextColumn::make('provider')
                     ->label(__('cookie-consent::cookie_consent.cookies.fields.provider'))
-                    ->searchable(),
+                    ->searchable()
+                    ->visibleFrom('md'),
 
                 TextColumn::make('domain')
                     ->label(__('cookie-consent::cookie_consent.cookies.fields.domain'))
-                    ->placeholder('-'),
+                    ->placeholder('-')
+                    ->visibleFrom('xl'),
 
                 TextColumn::make('type')
                     ->label(__('cookie-consent::cookie_consent.cookies.fields.type'))
@@ -109,11 +112,13 @@ class CookiesRelationManager extends RelationManager
                     ->color(fn (CookieType $state): string => match ($state) {
                         CookieType::FirstParty => 'success',
                         CookieType::ThirdParty => 'warning',
-                    }),
+                    })
+                    ->visibleFrom('sm'),
 
                 TextColumn::make('duration')
                     ->label(__('cookie-consent::cookie_consent.cookies.fields.duration'))
-                    ->placeholder('-'),
+                    ->placeholder('-')
+                    ->visibleFrom('xl'),
 
                 IconColumn::make('is_active')
                     ->label(__('cookie-consent::cookie_consent.cookies.fields.is_active'))
@@ -129,23 +134,26 @@ class CookiesRelationManager extends RelationManager
                         ));
                     }),
             ])
+            // One menu: two labelled actions made the table overflow its container
             ->recordActions([
-                EditAction::make()
-                    ->after(function ($record) {
-                        event(new CookieConfigurationChanged(
-                            changeType: 'updated',
-                            entityType: 'cookie',
-                            entityId: $record->id,
-                        ));
-                    }),
-                DeleteAction::make()
-                    ->after(function ($record) {
-                        event(new CookieConfigurationChanged(
-                            changeType: 'deleted',
-                            entityType: 'cookie',
-                            entityId: $record->id,
-                        ));
-                    }),
+                ActionGroup::make([
+                    EditAction::make()
+                        ->after(function ($record) {
+                            event(new CookieConfigurationChanged(
+                                changeType: 'updated',
+                                entityType: 'cookie',
+                                entityId: $record->id,
+                            ));
+                        }),
+                    DeleteAction::make()
+                        ->after(function ($record) {
+                            event(new CookieConfigurationChanged(
+                                changeType: 'deleted',
+                                entityType: 'cookie',
+                                entityId: $record->id,
+                            ));
+                        }),
+                ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

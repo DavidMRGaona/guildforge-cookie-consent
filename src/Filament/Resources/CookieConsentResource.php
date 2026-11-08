@@ -53,12 +53,16 @@ class CookieConsentResource extends BaseResource
                     ->label(__('cookie-consent::cookie_consent.consents.fields.visitor_id'))
                     ->limit(8)
                     ->tooltip(fn (CookieConsentModel $record): string => $record->visitor_id)
-                    ->searchable(),
+                    ->searchable()
+                    ->wrapHeader(),
 
                 TextColumn::make('user.name')
                     ->label(__('cookie-consent::cookie_consent.consents.fields.user'))
                     ->placeholder(__('cookie-consent::cookie_consent.consents.anonymous'))
-                    ->searchable(),
+                    ->searchable()
+                    ->wrap()
+                    ->wrapHeader()
+                    ->visibleFrom('sm'),
 
                 TextColumn::make('consent_method')
                     ->label(__('cookie-consent::cookie_consent.consents.fields.consent_method'))
@@ -68,11 +72,14 @@ class CookieConsentResource extends BaseResource
                         ConsentMethod::Banner => 'success',
                         ConsentMethod::SettingsPage => 'info',
                         ConsentMethod::Api => 'warning',
-                    }),
+                    })
+                    ->wrapHeader()
+                    ->visibleFrom('sm'),
 
                 TextColumn::make('config_version')
                     ->label(__('cookie-consent::cookie_consent.consents.fields.config_version'))
-                    ->alignCenter(),
+                    ->alignCenter()
+                    ->visibleFrom('xl'),
 
                 TextColumn::make('preferences')
                     ->label(__('cookie-consent::cookie_consent.consents.fields.preferences'))
@@ -84,12 +91,15 @@ class CookieConsentResource extends BaseResource
                         return implode(', ', $accepted);
                     })
                     ->wrap()
-                    ->limit(50),
+                    ->limit(50)
+                    ->visibleFrom('md'),
 
                 TextColumn::make('consented_at')
                     ->label(__('cookie-consent::cookie_consent.consents.fields.consented_at'))
                     ->dateTime('d/m/Y H:i')
-                    ->sortable(),
+                    ->sortable()
+                    ->wrap()
+                    ->wrapHeader(),
 
                 TextColumn::make('expires_at')
                     ->label(__('cookie-consent::cookie_consent.consents.fields.expires_at'))

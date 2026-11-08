@@ -29,7 +29,7 @@ La lista es informativa: no bloquea ni borra cookies. Lo que se carga o no segú
    - **Activa**: solo las cookies activas salen en el aviso y se borran cuando el visitante retira su categoría.
 4. Pulsa **Crear**.
 
-Para cambiar una cookie, pulsa **Editar** en su fila. Para quitarla, pulsa **Borrar** y confirma.
+Para cambiar una cookie, abre el menú **⋯** de su fila y pulsa **Editar**. Para quitarla, pulsa **Borrar** en ese mismo menú y confirma. En una ventana estrecha la tabla oculta **Tipo**, **Proveedor**, **Dominio** y **Duración** para que quepa la fila; se ven al agrandarla.
 
 > [!IMPORTANT]
 > Crear, editar o borrar una cookie desde su fila cambia la configuración: si está activado **Volver a solicitar consentimiento al cambiar configuración**, el aviso vuelve a salir a todos los visitantes.
