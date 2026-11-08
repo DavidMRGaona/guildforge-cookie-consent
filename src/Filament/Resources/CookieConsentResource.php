@@ -7,6 +7,7 @@ namespace Modules\CookieConsent\Filament\Resources;
 use App\Application\Services\TimezoneServiceInterface;
 use App\Filament\Actions\RowDetailsAction;
 use App\Filament\Resources\BaseResource;
+use App\Filament\Support\PanelNavigationGroup;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -25,11 +26,16 @@ class CookieConsentResource extends BaseResource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 1;
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string
     {
-        return __('cookie-consent::cookie_consent.navigation_group');
+        return PanelNavigationGroup::Site->getLabel();
+    }
+
+    public static function getNavigationParentItem(): string
+    {
+        return CookieCategoryResource::getNavigationLabel();
     }
 
     public static function getNavigationLabel(): string

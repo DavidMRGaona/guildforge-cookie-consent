@@ -15,7 +15,7 @@ Un script es el código que te da un servicio externo para ponerlo en la web: un
 
 ## Añadir un script
 
-1. En el menú lateral, abre **Configuración** → **Cookies** y pulsa la categoría que necesita el script: **Cookies analíticas** para unas estadísticas, **Cookies de marketing** para la publicidad.
+1. En el menú lateral, abre **Sitio web** → **Cookies** y pulsa la categoría que necesita el script: **Cookies analíticas** para unas estadísticas, **Cookies de marketing** para la publicidad.
 2. Debajo del formulario, abre la pestaña **Scripts** y pulsa **Crear script**.
 3. Escribe el **Nombre**. La **Descripción** son notas internas: el visitante no la ve.
 4. En **Orden**, pon su posición entre los scripts de la categoría, y deja activado **Activo**.

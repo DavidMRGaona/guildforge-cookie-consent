@@ -8,6 +8,7 @@ use App\Application\Modules\DTOs\ModuleRouteDTO;
 use App\Application\Modules\DTOs\NavigationItemDTO;
 use App\Application\Modules\DTOs\PermissionDTO;
 use App\Application\Modules\DTOs\SlotRegistrationDTO;
+use App\Filament\Support\PanelNavigationGroup;
 use App\Modules\ModuleServiceProvider;
 use Filament\Pages\Page;
 use Filament\Resources\Resource;
@@ -215,15 +216,13 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
     }
 
     /**
+     * The sidebar groups belong to the core (PanelNavigationGroup): the module declares none.
+     *
      * @return array<string, array{icon?: string, sort?: int}>
      */
     public function registerNavigationGroups(): array
     {
-        return [
-            __('cookie-consent::cookie_consent.navigation_group') => [
-                'sort' => 50,
-            ],
-        ];
+        return [];
     }
 
     /**
@@ -287,8 +286,8 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
                 label: __('cookie-consent::cookie_consent.navigation'),
                 route: 'filament.admin.resources.cookie-categories.index',
                 icon: 'heroicon-o-squares-2x2',
-                group: __('cookie-consent::cookie_consent.navigation_group'),
-                sort: 1,
+                group: PanelNavigationGroup::Site->getLabel(),
+                sort: 60,
                 permissions: ['cookie-consent:cookie_categories.view_any'],
                 module: 'cookie-consent',
             ),

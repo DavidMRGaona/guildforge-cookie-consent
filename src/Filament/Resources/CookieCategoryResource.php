@@ -6,6 +6,7 @@ namespace Modules\CookieConsent\Filament\Resources;
 
 use App\Filament\Actions\RowDetailsAction;
 use App\Filament\Resources\BaseResource;
+use App\Filament\Support\PanelNavigationGroup;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -41,11 +42,11 @@ class CookieCategoryResource extends BaseResource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 60;
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string
     {
-        return __('cookie-consent::cookie_consent.navigation_group');
+        return PanelNavigationGroup::Site->getLabel();
     }
 
     public static function getNavigationLabel(): string

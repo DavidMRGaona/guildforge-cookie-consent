@@ -17,7 +17,7 @@ La lista es informativa: no bloquea ni borra cookies. Lo que se carga o no segú
 
 ## Añadir una cookie
 
-1. En el menú lateral, abre **Configuración** → **Cookies** y pulsa la categoría.
+1. En el menú lateral, abre **Sitio web** → **Cookies** y pulsa la categoría.
 2. Debajo del formulario, en la pestaña **Cookies**, pulsa **Crear cookie**.
 3. Rellena los datos:
    - **Nombre**: el nombre exacto de la cookie, como `_ga`. Si cambia el final, termínalo en `*`: `_ga_*` vale para todas las que empiezan por `_ga_`.

@@ -15,7 +15,7 @@ Los ajustes deciden cómo se ve el aviso de cookies, qué dice y cómo se compor
 
 ## Abrir los ajustes
 
-En el menú lateral, abre **Configuración** y elige **Banner de cookies**. La página se llama **Ajustes del banner de cookies**. Al terminar, pulsa **Guardar**.
+En el menú lateral, abre **Sistema**, elige **Configuración** y después **Banner de cookies**. La página se llama **Ajustes del banner de cookies**. Al terminar, pulsa **Guardar**.
 
 Los cambios se ven en la siguiente página que cargue cada visitante. Guardar los ajustes no vuelve a mostrar el aviso a quien ya eligió, salvo que acortes los **Días de validez del consentimiento** y su elección quede fuera del plazo.
 
@@ -52,7 +52,7 @@ Cada visitante tiene que poder cambiar o retirar su consentimiento tan fácilmen
 
 Para poner el enlace en el pie de página:
 
-1. En el menú lateral, abre **Navegación**.
+1. En el menú lateral, abre **Sitio web** y elige **Navegación**.
 2. Crea un elemento con **Ubicación** **Pie de página** y, en **Página**, elige **Preferencias de cookies**.
 3. Guarda. Si es el primer enlace del pie, sustituye a los que salen por defecto: añade también los que quieras conservar.
 
@@ -73,4 +73,4 @@ Cuándo se carga el contenedor:
 > [!IMPORTANT]
 > La versión del contenedor para navegadores sin JavaScript no recibe lo que ha aceptado el visitante, así que solo se añade si aceptó la **Categoría de Google Tag Manager**, uses o no Consent Mode.
 
-[[action:filament.admin.pages.cookie-consent-settings|Abrir los ajustes del banner]]
+[[action:filament.admin.configuracion.pages.cookie-consent-settings|Abrir los ajustes del banner]]
