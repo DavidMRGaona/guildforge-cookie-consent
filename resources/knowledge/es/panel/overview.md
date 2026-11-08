@@ -58,6 +58,6 @@ Ningún permiso del módulo se concede solo: se dan a cada rol en **Roles**. El 
 
 ## Dónde está cada cosa
 
-En el menú lateral, el grupo **Configuración** tiene **Cookies** (las categorías, con sus cookies y sus scripts), **Consentimientos** y **Banner de cookies**.
+En el menú lateral, el grupo **Sitio web** tiene **Cookies** (las categorías, con sus cookies y sus scripts); **Consentimientos** aparece debajo de **Cookies**. **Banner de cookies** está en **Sistema** → **Configuración**.
 
 [[action:filament.admin.resources.cookie-categories.index|Ver las categorías de cookies|if=cookie-consent:cookie_categories.view_any]]

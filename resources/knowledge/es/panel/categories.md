@@ -11,7 +11,7 @@ conditions:
   permissions:
     all: ['cookie-consent:cookie_categories.view_any']
 ---
-Las categorías son lo que el visitante acepta o rechaza en el aviso de cookies. Están en el menú lateral, en **Configuración** → **Cookies**. La lista muestra de cada una su **Identificador**, si es **Requerida**, su **Orden** y cuántas **Cookies** y **Scripts** tiene.
+Las categorías son lo que el visitante acepta o rechaza en el aviso de cookies. Están en el menú lateral, en **Sitio web** → **Cookies**. La lista muestra de cada una su **Identificador**, si es **Requerida**, su **Orden** y cuántas **Cookies** y **Scripts** tiene.
 
 ## Crear una categoría
 

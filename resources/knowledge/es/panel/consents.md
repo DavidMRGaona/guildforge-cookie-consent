@@ -15,7 +15,7 @@ Cada vez que un visitante elige en el aviso de cookies, se guarda un consentimie
 
 ## La lista
 
-En el menú lateral, abre **Configuración** y elige **Consentimientos**. Los más recientes salen primero.
+En el menú lateral, abre **Sitio web** y elige **Cookies**: **Consentimientos** aparece debajo de **Cookies**. Los más recientes salen primero.
 
 - **ID visitante**: un identificador anónimo que crea el navegador del visitante. Pasa el ratón por encima para verlo entero.
 - **Usuario**: la cuenta del visitante, si había iniciado sesión. Si no, sale **Anónimo**.

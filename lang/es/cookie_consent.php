@@ -5,7 +5,6 @@ declare(strict_types=1);
 return [
     // Navigation
     'navigation' => 'Cookies',
-    'navigation_group' => 'Configuración',
 
     // Resources
     'categories' => [
