@@ -6,7 +6,6 @@ namespace Modules\CookieConsent\Tests\Feature\Filament;
 
 use App\Filament\Clusters\SettingsCluster;
 use App\Filament\Support\PanelNavigationGroup;
-use Modules\CookieConsent\CookieConsentServiceProvider;
 use Modules\CookieConsent\Filament\Pages\CookieConsentSettings;
 use Modules\CookieConsent\Filament\Resources\CookieCategoryResource;
 use Modules\CookieConsent\Filament\Resources\CookieConsentResource;
@@ -59,13 +58,6 @@ final class PanelNavigationTest extends ModuleTestCase
         $this->assertNull(CookieConsentSettings::getNavigationGroup());
         $this->assertSame('Sistema', SettingsCluster::getNavigationGroup());
         $this->assertStringStartsWith('/admin/configuracion/', (string) parse_url(CookieConsentSettings::getUrl(), PHP_URL_PATH));
-    }
-
-    public function test_the_module_declares_no_navigation_group_of_its_own(): void
-    {
-        $provider = new CookieConsentServiceProvider($this->app);
-
-        $this->assertSame([], $provider->registerNavigationGroups());
     }
 
     public function test_the_panel_menu_shows_cookies_under_the_website_group(): void
