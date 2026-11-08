@@ -460,6 +460,36 @@ final class CookieConsentPanelTest extends ModuleTestCase
             ]);
     }
 
+    /**
+     * @return iterable<string, array{string, array<string, string>}>
+     */
+    public static function bannerTextDefaults(): iterable
+    {
+        yield 'Spanish' => ['es', [
+            'banner_title' => 'Utilizamos cookies',
+            'accept_all_text' => 'Aceptar todas',
+            'privacy_policy_link_text' => 'Política de privacidad',
+        ]];
+        yield 'English' => ['en', [
+            'banner_title' => 'We use cookies',
+            'accept_all_text' => 'Accept all',
+            'privacy_policy_link_text' => 'Privacy policy',
+        ]];
+    }
+
+    /**
+     * @param  array<string, string>  $expected
+     */
+    #[DataProvider('bannerTextDefaults')]
+    public function test_the_settings_page_shows_the_banner_texts_in_the_language_of_the_site_when_none_is_stored(string $locale, array $expected): void
+    {
+        app()->setLocale($locale);
+        SettingModel::query()->where('key', 'like', 'cookie-consent.%')->delete();
+        app(SettingsServiceInterface::class)->clearCache();
+
+        Livewire::test(CookieConsentSettings::class)->assertFormSet($expected);
+    }
+
     public function test_the_generic_module_settings_page_no_longer_edits_the_banner(): void
     {
         $bannerSettings = fn (): array => SettingModel::query()

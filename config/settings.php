@@ -12,14 +12,7 @@ return [
     'background_color' => '#FFFFFF',
     'text_color' => '#1F2937',
 
-    // Texts
-    'banner_title' => 'Utilizamos cookies',
-    'banner_description' => 'Usamos cookies propias y de terceros para mejorar tu experiencia y mostrar contenido personalizado.',
-    'accept_all_text' => 'Aceptar todas',
-    'reject_all_text' => 'Rechazar todas',
-    'settings_text' => 'Configurar',
-    'save_settings_text' => 'Guardar preferencias',
-    'privacy_policy_link_text' => 'Política de privacidad',
+    // Texts: the banner texts have no value here, they default to the translations (BannerTextDefaults)
     'privacy_policy_url' => '/politica-de-privacidad',
 
     // Behavior

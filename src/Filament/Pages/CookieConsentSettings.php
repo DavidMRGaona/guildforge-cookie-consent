@@ -30,6 +30,7 @@ use Modules\CookieConsent\Domain\Enums\BannerPosition;
 use Modules\CookieConsent\Domain\Enums\BannerTheme;
 use Modules\CookieConsent\Domain\Repositories\CookieCategoryRepositoryInterface;
 use Modules\CookieConsent\Domain\ValueObjects\GtmContainerId;
+use Modules\CookieConsent\Infrastructure\Services\BannerTextDefaults;
 
 /**
  * Banner settings, stored as "cookie-consent.<key>" settings: the same place
@@ -122,13 +123,14 @@ final class CookieConsentSettings extends Page implements HasForms
 
     public function mount(SettingsServiceInterface $settings): void
     {
-        // A setting never stored shows the module default (config/settings.php)
+        // A setting never stored shows the default: the banner texts in the language of the site,
+        // the rest from the module's config/settings.php
         /** @var array<string, mixed> $defaults */
         $defaults = config('modules.settings.cookie-consent', []);
         $state = [];
 
         foreach (self::KEYS as $key) {
-            $value = $settings->get(self::PREFIX.$key, $defaults[$key] ?? null);
+            $value = $settings->get(self::PREFIX.$key, BannerTextDefaults::for($key) ?? $defaults[$key] ?? null);
 
             $state[$key] = in_array($key, self::BOOLEAN_KEYS, true)
                 ? filter_var($value, FILTER_VALIDATE_BOOLEAN)
@@ -221,37 +223,30 @@ final class CookieConsentSettings extends Page implements HasForms
                 ->description(__('cookie-consent::cookie_consent.settings.texts_description'))
                 ->schema([
                     TextInput::make('banner_title')
-                        ->label(__('cookie-consent::cookie_consent.settings.banner_title'))
-                        ->default('Utilizamos cookies'),
+                        ->label(__('cookie-consent::cookie_consent.settings.banner_title')),
 
                     Textarea::make('banner_description')
                         ->label(__('cookie-consent::cookie_consent.settings.banner_description'))
                         ->rows(3)
-                        ->default('Usamos cookies propias y de terceros para mejorar tu experiencia y mostrar contenido personalizado.')
                         ->columnSpanFull(),
 
                     Grid::make(2)
                         ->schema([
                             TextInput::make('accept_all_text')
-                                ->label(__('cookie-consent::cookie_consent.settings.accept_all_text'))
-                                ->default('Aceptar todas'),
+                                ->label(__('cookie-consent::cookie_consent.settings.accept_all_text')),
 
                             TextInput::make('reject_all_text')
-                                ->label(__('cookie-consent::cookie_consent.settings.reject_all_text'))
-                                ->default('Rechazar todas'),
+                                ->label(__('cookie-consent::cookie_consent.settings.reject_all_text')),
 
                             TextInput::make('settings_text')
-                                ->label(__('cookie-consent::cookie_consent.settings.settings_text'))
-                                ->default('Configurar'),
+                                ->label(__('cookie-consent::cookie_consent.settings.settings_text')),
 
                             TextInput::make('save_settings_text')
-                                ->label(__('cookie-consent::cookie_consent.settings.save_settings_text'))
-                                ->default('Guardar preferencias'),
+                                ->label(__('cookie-consent::cookie_consent.settings.save_settings_text')),
                         ]),
 
                     TextInput::make('privacy_policy_link_text')
-                        ->label(__('cookie-consent::cookie_consent.settings.privacy_policy_link_text'))
-                        ->default('Política de privacidad'),
+                        ->label(__('cookie-consent::cookie_consent.settings.privacy_policy_link_text')),
 
                     TextInput::make('privacy_policy_url')
                         ->label(__('cookie-consent::cookie_consent.settings.privacy_policy_url'))

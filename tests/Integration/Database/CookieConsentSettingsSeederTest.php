@@ -46,6 +46,23 @@ final class CookieConsentSettingsSeederTest extends ModuleTestCase
         $this->assertSame('bottom', SettingModel::query()->where('key', 'cookie-consent.banner_position')->value('value'));
     }
 
+    public function test_the_banner_texts_are_seeded_in_the_language_of_the_site(): void
+    {
+        app()->setLocale('en');
+        SettingModel::query()->where('key', 'like', 'cookie-consent.%')->delete();
+
+        $this->seedSettings();
+
+        $stored = fn (string $key): ?string => SettingModel::query()->where('key', "cookie-consent.{$key}")->value('value');
+        $this->assertSame('We use cookies', $stored('banner_title'));
+        $this->assertSame(__('cookie-consent::cookie_consent.frontend.default_description'), $stored('banner_description'));
+        $this->assertSame('Accept all', $stored('accept_all_text'));
+        $this->assertSame('Reject all', $stored('reject_all_text'));
+        $this->assertSame('Configure', $stored('settings_text'));
+        $this->assertSame('Save preferences', $stored('save_settings_text'));
+        $this->assertSame('Privacy policy', $stored('privacy_policy_link_text'));
+    }
+
     public function test_it_does_not_seed_the_removed_logo_and_page_blocking_settings(): void
     {
         $this->seedSettings();

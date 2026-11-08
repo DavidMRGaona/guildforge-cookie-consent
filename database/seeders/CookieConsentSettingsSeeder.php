@@ -6,6 +6,7 @@ namespace Modules\CookieConsent\Database\Seeders;
 
 use App\Infrastructure\Persistence\Eloquent\Models\SettingModel;
 use Illuminate\Database\Seeder;
+use Modules\CookieConsent\Infrastructure\Services\BannerTextDefaults;
 
 final class CookieConsentSettingsSeeder extends Seeder
 {
@@ -21,14 +22,8 @@ final class CookieConsentSettingsSeeder extends Seeder
             'background_color' => '#FFFFFF',
             'text_color' => '#1C1917',        // Stone-900
 
-            // Texts
-            'banner_title' => 'Utilizamos cookies',
-            'banner_description' => 'Usamos cookies propias y de terceros para mejorar tu experiencia, analizar el tráfico y mostrarte contenido personalizado. Puedes aceptar todas las cookies, rechazarlas o configurar tus preferencias.',
-            'accept_all_text' => 'Aceptar todas',
-            'reject_all_text' => 'Rechazar todas',
-            'settings_text' => 'Configurar',
-            'save_settings_text' => 'Guardar preferencias',
-            'privacy_policy_link_text' => 'Política de privacidad',
+            // Texts: the banner ones in the language of the site
+            ...BannerTextDefaults::all(),
             'privacy_policy_url' => '/politica-de-privacidad',
 
             // Behavior
