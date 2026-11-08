@@ -13,6 +13,7 @@ use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Illuminate\Support\Str;
+use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Modules\CookieConsent\Application\Services\BannerConfigServiceInterface;
 use Modules\CookieConsent\Application\Services\ConsentServiceInterface;
@@ -443,6 +444,96 @@ final class CookieConsentPanelTest extends ModuleTestCase
         $this->assertSame($checksum, md5_file($settingsFile));
     }
 
+    /**
+     * @return iterable<string, array{array<string, string>, array<string, mixed>}>
+     */
+    public static function settingsThatChangeTheCategoriesShown(): iterable
+    {
+        yield 'turning the container on' => [
+            ['gtm_enabled' => '0', 'consent_mode_enabled' => '0'],
+            ['gtm_enabled' => true, 'gtm_container_id' => 'GTM-TEST123', 'gtm_category' => 'analytics'],
+        ];
+        yield 'moving the container to another category' => [
+            ['gtm_enabled' => '1', 'gtm_container_id' => 'GTM-OLD0001', 'gtm_category' => 'analytics', 'consent_mode_enabled' => '0'],
+            ['gtm_category' => 'marketing'],
+        ];
+        yield 'turning Consent Mode off while the container reads it' => [
+            ['gtm_enabled' => '1', 'gtm_container_id' => 'GTM-OLD0001', 'gtm_category' => 'analytics', 'consent_mode_enabled' => '1'],
+            ['consent_mode_enabled' => false],
+        ];
+    }
+
+    /**
+     * The banner then offers other categories, so visitors are asked again.
+     *
+     * @param  array<string, string>  $stored
+     * @param  array<string, mixed>  $changes
+     */
+    #[DataProvider('settingsThatChangeTheCategoriesShown')]
+    public function test_settings_that_change_the_categories_shown_ask_visitors_again(array $stored, array $changes): void
+    {
+        $this->withoutCookiesOrScripts($stored);
+        $before = $this->configVersion();
+
+        Livewire::test(CookieConsentSettings::class)
+            ->fillForm($changes)
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame($before + 1, $this->configVersion());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, string>, array<string, mixed>}>
+     */
+    public static function settingsThatKeepTheCategoriesShown(): iterable
+    {
+        yield 'a banner text' => [
+            ['gtm_enabled' => '1', 'gtm_container_id' => 'GTM-OLD0001', 'gtm_category' => 'analytics', 'consent_mode_enabled' => '0'],
+            ['banner_title' => 'Cookies en la guarida'],
+        ];
+        // With Consent Mode the container reads every category's signal: all are offered already
+        yield 'moving the container while Consent Mode is on' => [
+            ['gtm_enabled' => '1', 'gtm_container_id' => 'GTM-OLD0001', 'gtm_category' => 'analytics', 'consent_mode_enabled' => '1'],
+            ['gtm_category' => 'marketing'],
+        ];
+    }
+
+    /**
+     * @param  array<string, string>  $stored
+     * @param  array<string, mixed>  $changes
+     */
+    #[DataProvider('settingsThatKeepTheCategoriesShown')]
+    public function test_settings_that_keep_the_categories_shown_keep_the_version(array $stored, array $changes): void
+    {
+        $this->withoutCookiesOrScripts($stored);
+        $before = $this->configVersion();
+
+        Livewire::test(CookieConsentSettings::class)
+            ->fillForm($changes)
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame($before, $this->configVersion());
+    }
+
+    public function test_the_category_list_marks_the_categories_visitors_do_not_see(): void
+    {
+        $this->withoutCookiesOrScripts(['gtm_enabled' => '0']);
+        $necessary = CookieCategoryModel::query()->where('slug', 'necessary')->firstOrFail();
+        $marketing = CookieCategoryModel::query()->where('slug', 'marketing')->firstOrFail();
+        $unused = __('cookie-consent::cookie_consent.categories.unused');
+
+        /** @var Testable<ListCookieCategories> $list */
+        $list = Livewire::test(ListCookieCategories::class);
+
+        $column = $list->instance()->getTable()->getColumn('name');
+        $this->assertInstanceOf(TextColumn::class, $column);
+        $this->assertSame($unused, $column->record($marketing)->getDescriptionBelow());
+        $this->assertNull($column->record($necessary)->getDescriptionBelow());
+        $list->assertSee($unused);
+    }
+
     public function test_the_settings_page_shows_the_stored_settings_or_the_module_defaults(): void
     {
         $settings = app(SettingsServiceInterface::class);
@@ -524,6 +615,20 @@ final class CookieConsentPanelTest extends ModuleTestCase
             'is_system' => $isSystem,
             'sort_order' => 100,
         ]);
+    }
+
+    /**
+     * Categories with nothing behind them but what the given settings add.
+     *
+     * @param  array<string, string>  $settings
+     */
+    private function withoutCookiesOrScripts(array $settings): void
+    {
+        CookieModel::query()->delete();
+        CookieScriptModel::query()->delete();
+        foreach ($settings as $key => $value) {
+            app(SettingsServiceInterface::class)->set("cookie-consent.{$key}", $value);
+        }
     }
 
     private function configVersion(): int

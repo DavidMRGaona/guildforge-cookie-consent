@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Infrastructure\Services;
 
-use Modules\CookieConsent\Application\DTOs\BannerConfigDTO;
 use Modules\CookieConsent\Application\Services\BannerConfigServiceInterface;
 use Modules\CookieConsent\Application\Services\ConsentModeServiceInterface;
 use Modules\CookieConsent\Application\Services\ScriptInjectorServiceInterface;
@@ -55,7 +54,7 @@ final readonly class ScriptInjectorService implements ScriptInjectorServiceInter
 
         // With Consent Mode the container loads on every page and follows the consent
         // signals above; without it, only once the visitor accepts its category
-        $containerId = $this->containerId($config);
+        $containerId = $config->gtmContainer();
         if ($containerId instanceof GtmContainerId
             && ($config->consentModeEnabled || in_array($config->gtmCategory, $consentedCategories, true))) {
             $scripts[] = $this->getGtmHeadScript($containerId);
@@ -85,7 +84,7 @@ final readonly class ScriptInjectorService implements ScriptInjectorServiceInter
 
         // The noscript container gets no consent signals, so even with Consent Mode it
         // waits for its category
-        $containerId = $this->containerId($config);
+        $containerId = $config->gtmContainer();
         if ($containerId instanceof GtmContainerId && in_array($config->gtmCategory, $consentedCategories, true)) {
             $scripts[] = $this->getGtmBodyStartScript($containerId);
         }
@@ -142,14 +141,6 @@ final readonly class ScriptInjectorService implements ScriptInjectorServiceInter
         }
 
         return implode("\n", $scripts);
-    }
-
-    /**
-     * Null when the container is off or its ID is malformed: it goes into the page as it is.
-     */
-    private function containerId(BannerConfigDTO $config): ?GtmContainerId
-    {
-        return $config->gtmEnabled ? GtmContainerId::tryFrom(trim($config->gtmContainerId)) : null;
     }
 
     private function getGtmHeadScript(GtmContainerId $containerId): string

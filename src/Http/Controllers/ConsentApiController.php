@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Modules\CookieConsent\Application\DTOs\SaveConsentDTO;
 use Modules\CookieConsent\Application\Services\BannerConfigServiceInterface;
 use Modules\CookieConsent\Application\Services\ConsentServiceInterface;
+use Modules\CookieConsent\Application\Services\VisibleCategoriesServiceInterface;
 use Modules\CookieConsent\Domain\Enums\ConsentMethod;
 use Modules\CookieConsent\Domain\Exceptions\InvalidConsentException;
 use Modules\CookieConsent\Http\Requests\SaveConsentRequest;
@@ -25,11 +26,11 @@ final class ConsentApiController extends Controller
     ) {}
 
     /**
-     * Get all cookie categories with their cookies.
+     * The categories the banner offers, with their cookies.
      */
-    public function categories(): JsonResponse
+    public function categories(VisibleCategoriesServiceInterface $visibleCategories): JsonResponse
     {
-        $categories = $this->consentService->getCategories();
+        $categories = $visibleCategories->getVisibleCategories();
 
         return response()->json([
             'data' => array_map(fn ($category) => $category->toArray(), $categories),

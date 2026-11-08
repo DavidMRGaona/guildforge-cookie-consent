@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Modules\CookieConsent\Application\DTOs;
 
+use Modules\CookieConsent\Domain\ValueObjects\GtmContainerId;
+
 final readonly class BannerConfigDTO
 {
     /**
@@ -34,6 +36,15 @@ final readonly class BannerConfigDTO
         // Every Consent Mode key with its value before the visitor chooses
         public array $consentModeDefaults = [],
     ) {}
+
+    /**
+     * The Google Tag Manager container the page loads: null when it is off or its ID is
+     * malformed, since a malformed ID goes into the page as it is.
+     */
+    public function gtmContainer(): ?GtmContainerId
+    {
+        return $this->gtmEnabled ? GtmContainerId::tryFrom(trim($this->gtmContainerId)) : null;
+    }
 
     /**
      * @return array<string, mixed>

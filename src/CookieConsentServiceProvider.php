@@ -21,11 +21,13 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Event;
 use Inertia\Inertia;
 use Livewire\Livewire;
+use Modules\CookieConsent\Application\DTOs\CategoryDTO;
 use Modules\CookieConsent\Application\Services\BannerConfigServiceInterface;
 use Modules\CookieConsent\Application\Services\ConsentModeServiceInterface;
 use Modules\CookieConsent\Application\Services\ConsentServiceInterface;
 use Modules\CookieConsent\Application\Services\DeclaredCookieSynchronizerInterface;
 use Modules\CookieConsent\Application\Services\ScriptInjectorServiceInterface;
+use Modules\CookieConsent\Application\Services\VisibleCategoriesServiceInterface;
 use Modules\CookieConsent\Console\Commands\SyncDeclaredCookiesCommand;
 use Modules\CookieConsent\Domain\Events\CookieConfigurationChanged;
 use Modules\CookieConsent\Domain\Repositories\CookieCategoryRepositoryInterface;
@@ -50,6 +52,7 @@ use Modules\CookieConsent\Infrastructure\Services\ConsentModeService;
 use Modules\CookieConsent\Infrastructure\Services\ConsentService;
 use Modules\CookieConsent\Infrastructure\Services\DeclaredCookieSynchronizer;
 use Modules\CookieConsent\Infrastructure\Services\ScriptInjectorService;
+use Modules\CookieConsent\Infrastructure\Services\VisibleCategoriesService;
 use Modules\CookieConsent\Listeners\IncrementConfigVersionOnChange;
 use Modules\CookieConsent\Listeners\SyncDeclaredCookiesAfterMigrations;
 use Modules\CookieConsent\Policies\CookieCategoryPolicy;
@@ -80,6 +83,7 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
         $this->app->bind(BannerConfigServiceInterface::class, BannerConfigService::class);
         $this->app->bind(ConsentModeServiceInterface::class, ConsentModeService::class);
         $this->app->bind(ScriptInjectorServiceInterface::class, ScriptInjectorService::class);
+        $this->app->bind(VisibleCategoriesServiceInterface::class, VisibleCategoriesService::class);
 
         // Other modules declare their cookies here during boot: it must outlive each resolution
         $this->app->bind(DeclaredCookieSynchronizerInterface::class, DeclaredCookieSynchronizer::class);
@@ -135,13 +139,14 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
                 }
 
                 try {
-                    $consentService = $this->app->make(ConsentServiceInterface::class);
+                    $visibleCategories = $this->app->make(VisibleCategoriesServiceInterface::class);
                     $bannerConfigService = $this->app->make(BannerConfigServiceInterface::class);
 
                     return [
+                        // Only categories that change something: visitors are not asked about the rest
                         'categories' => array_map(
-                            fn ($dto) => $dto->toArray(),
-                            $consentService->getCategories()
+                            fn (CategoryDTO $dto): array => $dto->toArray(),
+                            $visibleCategories->getVisibleCategories()
                         ),
                         'config' => $bannerConfigService->getBannerConfig()->toArray(),
                     ];
