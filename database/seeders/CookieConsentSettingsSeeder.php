@@ -6,7 +6,6 @@ namespace Modules\CookieConsent\Database\Seeders;
 
 use App\Infrastructure\Persistence\Eloquent\Models\SettingModel;
 use Illuminate\Database\Seeder;
-use Modules\CookieConsent\Infrastructure\Services\BannerTextDefaults;
 
 final class CookieConsentSettingsSeeder extends Seeder
 {
@@ -22,8 +21,9 @@ final class CookieConsentSettingsSeeder extends Seeder
             'background_color' => '#FFFFFF',
             'text_color' => '#1C1917',        // Stone-900
 
-            // Texts: the banner ones in the language of the site
-            ...BannerTextDefaults::all(),
+            // The banner texts are not seeded: until the admin writes his own they come from the
+            // translations, in the language of the site (BannerTextDefaults). This seeder runs while
+            // the module is enabled, before its translations are known.
             'privacy_policy_url' => '/politica-de-privacidad',
 
             // Behavior
