@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Modules\CookieConsent\Filament\Resources;
 
 use App\Application\Services\TimezoneServiceInterface;
+use App\Filament\Actions\RowDetailsAction;
 use App\Filament\Resources\BaseResource;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -133,7 +135,10 @@ class CookieConsentResource extends BaseResource
                     ->toggle(),
             ])
             ->recordActions([
-                ViewAction::make(),
+                ActionGroup::make([
+                    RowDetailsAction::make(),
+                    ViewAction::make(),
+                ]),
             ])
             ->defaultSort('consented_at', 'desc');
     }
