@@ -24,7 +24,7 @@ En el menú lateral, abre **Configuración** y elige **Consentimientos**. Los m�
 - **Preferencias**: los identificadores de las categorías que aceptó.
 - **Fecha consentimiento**: cuándo eligió.
 
-Las columnas **Expira** y **Hash IP** están ocultas: muéstralas con el botón de columnas de la tabla.
+Las columnas **Expira** y **Hash IP** están ocultas: muéstralas con el botón de columnas de la tabla. En una ventana estrecha la lista también oculta **Método**, **Usuario**, **Preferencias** y **Versión config** para que quepa la fila; con **Ver** los tienes todos.
 
 ## Filtrar
 

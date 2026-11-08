@@ -36,7 +36,7 @@ El código se añade a la página tal cual lo pegas. Pega el fragmento completo 
 - Nunca antes de que el visitante elija en el aviso, ni siquiera en una categoría requerida.
 - En cuanto el visitante acepta su categoría: la página se recarga sola para cargarlo. Si después la retira, se recarga otra vez y el script deja de estar.
 
-Crear, editar o borrar un script desde su fila cambia la configuración: si está activado **Volver a solicitar consentimiento al cambiar configuración**, el aviso vuelve a salir a todos los visitantes.
+Para editar o borrar un script, abre el menú **⋯** de su fila. Crear, editar o borrar un script desde su fila cambia la configuración: si está activado **Volver a solicitar consentimiento al cambiar configuración**, el aviso vuelve a salir a todos los visitantes.
 
 > [!TIP]
 > Google Tag Manager no se añade como script: se activa en los ajustes del banner.
