@@ -412,6 +412,7 @@ final class CookieConsentPanelTest extends ModuleTestCase
             'script injection' => ["GTM-ABC');alert(1);//"],
             'another tag id' => ['G-ABC123'],
             'lower case' => ['gtm-abc123'],
+            'trailing newline' => ["GTM-ABC123\n"],
         ];
     }
 
