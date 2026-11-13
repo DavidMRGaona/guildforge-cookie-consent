@@ -10,7 +10,8 @@ namespace Modules\CookieConsent\Domain\ValueObjects;
  */
 final readonly class GtmContainerId
 {
-    public const string PATTERN = '/^GTM-[A-Z0-9]+$/';
+    // \z, not $: $ also matches before a final "\n"
+    public const string PATTERN = '/^GTM-[A-Z0-9]+\z/';
 
     private function __construct(
         public string $value,
