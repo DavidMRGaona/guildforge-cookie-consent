@@ -15,7 +15,7 @@ Gestión del consentimiento de cookies conforme al RGPD para GuildForge: banner 
 
 ## Requisitos
 
-- GuildForge core `^3.67`
+- GuildForge core `^3.75`
 - PHP >= 8.5, Laravel >= 13, Filament 5
 
 El core rechaza el módulo si no se cumplen (`module.json` → `requires`).
@@ -90,7 +90,7 @@ La finalidad (`purpose`) se muestra bajo el nombre de cada cookie en la lista de
 
 ### Consultar el consentimiento desde el navegador
 
-El banner es el proveedor del contrato de consentimiento del core (`@/contracts/cookieConsent`, core ^3.19): se registra con `registerCookieConsentProvider()` y avisa con `notifyCookieConsentChanged()` al guardar una elección (aceptar todo, rechazar todo o guardar preferencias) y cuando cambian su configuración o sus categorías. Los demás módulos no nombran este módulo: preguntan al core con `hasCookieConsent('preferences')`, que es reactiva y, sin este módulo en la página, responde «sin consentimiento». El uso está en la guía de módulos del core, «Cookie consent in the browser».
+El banner es el proveedor del contrato de consentimiento del core (`@/contracts/cookieConsent`, core ^3.19): se registra con `registerCookieConsentProvider()` y avisa con `notifyCookieConsentChanged()` cuando cambian su configuración, sus categorías o si el banner se muestra (también en cada visita, sin que eso cuente como decisión). Declara ante el core que es el proveedor (`providesCookieConsent()` en su `ServiceProvider`, prop compartida `cookieConsentModule`, core ^3.75), implementa `hasDecided()` («el banner no está esperando respuesta»: se respondió, o no se muestra, por ejemplo porque su configuración no llegó) y llama a `notifyCookieConsentDecided()` solo cuando el visitante acepta todo, rechaza todo o guarda preferencias, desde el banner o desde la ventana de preferencias. Así `whenConsentDecided()` permite a otros módulos (las ventanas emergentes de anuncios) esperar a que se responda al banner. Los demás módulos no nombran este módulo: preguntan al core con `hasCookieConsent('preferences')`, que es reactiva y, sin este módulo en la página, responde «sin consentimiento». El uso está en la guía de módulos del core, «Cookie consent in the browser».
 
 La respuesta del banner:
 

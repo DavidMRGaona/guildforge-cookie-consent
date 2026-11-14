@@ -67,6 +67,11 @@ final class CookieConsentServiceProvider extends ModuleServiceProvider
         return 'cookie-consent';
     }
 
+    public function providesCookieConsent(): bool
+    {
+        return true;
+    }
+
     public function register(): void
     {
         parent::register();
