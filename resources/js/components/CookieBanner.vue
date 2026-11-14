@@ -3,6 +3,7 @@ import { Cookie } from '@lucide/vue';
 import { computed, ref, onBeforeUnmount, onMounted, watch } from 'vue';
 import {
     notifyCookieConsentChanged,
+    notifyCookieConsentDecided,
     registerCookieConsentProvider,
 } from '@/contracts/cookieConsent';
 import { bannerColorScheme } from '../utils/banner-theme';
@@ -175,9 +176,12 @@ registerCookieConsentProvider({
                 .map((category) => category.slug)
         );
     },
+    // The banner is not waiting for an answer: answered, or not showing (its configuration did not arrive)
+    hasDecided: (): boolean => !(isVisible.value && config.value),
 });
-// The answer depends on the configuration and the categories too
-watch([config, categories], notifyCookieConsentChanged);
+// The answer depends on the configuration and the categories too, and the banner showing or hiding
+// moves `hasDecided()`. This runs on page visits as well, so it only reports a change, never a decision
+watch([config, categories, isVisible], notifyCookieConsentChanged);
 
 const positionClasses = computed(() => {
     if (!config.value) return '';
@@ -325,7 +329,8 @@ async function applyChoice(preferences: Record<string, boolean>): Promise<boolea
             consentModeUpdate(categories.value, preferences, current.consentModeDefaults)
         );
     }
-    notifyCookieConsentChanged();
+    // The visitor answered: tell whoever waits for it (also tells readers of the new choice)
+    notifyCookieConsentDecided();
 
     if (choiceNeedsReload(categories.value, pagePreferences, preferences, current)) {
         reloadPage();
