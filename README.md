@@ -15,7 +15,7 @@ Gestión del consentimiento de cookies conforme al RGPD para GuildForge: banner 
 
 ## Requisitos
 
-- GuildForge core `^3.35`
+- GuildForge core `^3.67`
 - PHP >= 8.5, Laravel >= 13, Filament 5
 
 El core rechaza el módulo si no se cumplen (`module.json` → `requires`).
@@ -213,6 +213,8 @@ El resto de etiquetas del modal de preferencias («Obligatoria», «Ver cookies�
 | `light` | Claro, también con la web en modo oscuro |
 | `dark` | Oscuro, también con la web en modo claro |
 | `custom` | Personalizado |
+
+«Claro» y «Oscuro» no guardan colores propios: el banner y la ventana de ajustes llevan `data-color-scheme` y el core les da los colores del sitio en ese modo, con la paleta elegida en el panel (core ≥ 3.67).
 
 ### CookieType
 
