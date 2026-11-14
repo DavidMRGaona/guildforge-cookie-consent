@@ -5,7 +5,7 @@ import {
     notifyCookieConsentChanged,
     registerCookieConsentProvider,
 } from '@/contracts/cookieConsent';
-import { bannerThemeVariables } from '../utils/banner-theme';
+import { bannerColorScheme } from '../utils/banner-theme';
 import type { CookieCategory, BannerConfig } from '../types/cookie-consent';
 import { choiceNeedsReload } from '../utils/choice-effects';
 import {
@@ -218,11 +218,14 @@ const bannerClasses = computed(() => {
     return `${base} ${themeClasses} ${layoutClasses}`;
 });
 
-const bannerStyles = computed(() => {
-    if (!config.value) return {};
+// «Claro» and «Oscuro» take the site colours of that mode from the core, so they look the same
+// in any site mode and follow the palette chosen in the panel
+const bannerScheme = computed(() =>
+    config.value ? bannerColorScheme(config.value.theme) : undefined
+);
 
-    // «Claro» and «Oscuro» set their own colour tokens, so they look the same in any site mode
-    if (config.value.theme !== 'custom') return bannerThemeVariables(config.value.theme);
+const bannerStyles = computed(() => {
+    if (!config.value || config.value.theme !== 'custom') return {};
 
     return {
         backgroundColor: config.value.colors.background,
@@ -391,7 +394,12 @@ async function handleSaveSettings(preferences: Record<string, boolean>): Promise
             leave-to-class="opacity-0 translate-y-4"
         >
             <div v-if="isVisible && config" :class="positionClasses">
-                <div :class="bannerClasses" :style="bannerStyles" class="p-4 md:p-6">
+                <div
+                    :class="bannerClasses"
+                    :style="bannerStyles"
+                    :data-color-scheme="bannerScheme"
+                    class="p-4 md:p-6"
+                >
                     <div class="max-w-7xl mx-auto">
                         <div
                             class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"

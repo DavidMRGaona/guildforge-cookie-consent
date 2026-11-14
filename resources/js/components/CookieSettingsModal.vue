@@ -3,7 +3,7 @@ import { ChevronDown, X } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import HelpLink from '@/components/knowledge/HelpLink.vue';
 import type { CookieCategory, BannerConfig } from '../types/cookie-consent';
-import { bannerThemeVariables } from '../utils/banner-theme';
+import { bannerColorScheme } from '../utils/banner-theme';
 import { getStoredConsent, needsConsent } from '../utils/consent-manager';
 
 interface Props {
@@ -51,8 +51,11 @@ const modalClasses = computed(() => {
     return `${base} bg-surface text-base-primary`;
 });
 
+// «Claro» and «Oscuro» take the site colours of that mode from the core (see banner-theme.ts)
+const modalScheme = computed(() => bannerColorScheme(props.config.theme));
+
 const modalStyles = computed(() => {
-    if (props.config.theme !== 'custom') return bannerThemeVariables(props.config.theme);
+    if (props.config.theme !== 'custom') return {};
 
     return {
         backgroundColor: props.config.colors.background,
@@ -113,7 +116,7 @@ function close(): void {
             class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4"
             @click.self="close"
         >
-            <div :class="modalClasses" :style="modalStyles">
+            <div :class="modalClasses" :style="modalStyles" :data-color-scheme="modalScheme">
                 <!-- Header -->
                 <div class="flex items-center justify-between p-4 border-b border-default">
                     <div class="flex items-center gap-2">

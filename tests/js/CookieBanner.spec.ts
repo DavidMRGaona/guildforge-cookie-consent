@@ -120,25 +120,28 @@ describe('CookieBanner themes', () => {
         localStorage.clear();
     });
 
-    function surface(theme: BannerConfig['theme']): string {
-        const wrapper = mountBanner(config({ theme }));
-
-        return (wrapper.find('div.shadow-lg').element as HTMLElement).style.getPropertyValue(
-            '--color-bg-surface'
-        );
+    function banner(theme: BannerConfig['theme']): HTMLElement {
+        return mountBanner(config({ theme })).find('div.shadow-lg').element as HTMLElement;
     }
 
-    it('paints the light and dark themes differently', () => {
-        expect(surface('light')).toBe('#ffffff');
-        expect(surface('dark')).toBe('#302d2a');
+    it('asks the core for the site colours of the light and dark modes', () => {
+        expect(banner('light').dataset.colorScheme).toBe('light');
+        expect(banner('dark').dataset.colorScheme).toBe('dark');
     });
 
-    it('sets no theme colours with the custom theme', () => {
-        expect(surface('custom')).toBe('');
+    it('keeps no copy of the site colours, so a palette change in the panel reaches it', () => {
+        for (const theme of ['light', 'dark', 'auto'] as const) {
+            expect(banner(theme).style.getPropertyValue('--color-bg-surface')).toBe('');
+            expect(banner(theme).style.getPropertyValue('--color-primary')).toBe('');
+        }
     });
 
-    it('sets no theme colours with the automatic theme, so it follows the site mode', () => {
-        expect(surface('auto')).toBe('');
+    it('fixes no mode with the custom theme', () => {
+        expect(banner('custom').dataset.colorScheme).toBeUndefined();
+    });
+
+    it('fixes no mode with the automatic theme, so it follows the site mode', () => {
+        expect(banner('auto').dataset.colorScheme).toBeUndefined();
     });
 });
 
