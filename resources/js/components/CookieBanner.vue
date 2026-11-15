@@ -7,7 +7,7 @@ import {
     registerCookieConsentProvider,
 } from '@/contracts/cookieConsent';
 import { bannerColorScheme } from '../utils/banner-theme';
-import type { CookieCategory, BannerConfig } from '../types/cookie-consent';
+import type { CookieCategory, BannerConfig, StoredConsent } from '../types/cookie-consent';
 import { choiceNeedsReload } from '../utils/choice-effects';
 import {
     getStoredConsent,
@@ -81,6 +81,9 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const isVisible = ref(false);
+// The last answer saved from this page, in memory: when the browser cannot keep it (storage
+// blocked or full), a later visit uses it instead of asking again
+let lastAnswer: StoredConsent | null = null;
 const showSettingsModal = ref(false);
 // Set when the server did not record the last choice, which was then not applied either
 const saveError = ref<string | null>(null);
@@ -157,8 +160,10 @@ onBeforeUnmount(() => {
     document.removeEventListener('click', openPreferencesFromLink, true);
 });
 
-// Answer the core's cookie consent contract, which the other modules ask per category
-registerCookieConsentProvider({
+// Answer the core's cookie consent contract, which the other modules ask per category.
+// Withdrawn on unmount: a page outside the layout that holds the banner must not leave a provider
+// that keeps saying the banner is waiting
+const unregisterProvider = registerCookieConsentProvider({
     hasConsent: (categorySlug: string): boolean => {
         const current = config.value;
         if (!current) return false;
@@ -173,11 +178,26 @@ registerCookieConsentProvider({
             current.reconsentOnChange,
             categories.value
                 .filter((category) => category.isRequired)
-                .map((category) => category.slug)
+                .map((category) => category.slug),
+            lastAnswer
         );
     },
     // The banner is not waiting for an answer: answered, or not showing (its configuration did not arrive)
     hasDecided: (): boolean => !(isVisible.value && config.value),
+});
+onBeforeUnmount(unregisterProvider);
+
+// The layout is persistent, so the banner is not mounted again on a visit of Inertia: a new
+// configuration (published meanwhile, or the decision expired by `validityDays`) must ask again
+watch(config, (current) => {
+    if (!current) return;
+
+    isVisible.value = needsConsent(
+        current.configVersion,
+        current.validityDays,
+        current.reconsentOnChange,
+        lastAnswer
+    );
 });
 // The answer depends on the configuration and the categories too, and the banner showing or hiding
 // moves `hasDecided()`. This runs on page visits as well, so it only reports a change, never a decision
@@ -308,7 +328,7 @@ async function applyChoice(preferences: Record<string, boolean>): Promise<boolea
 
     saving.value = true;
     try {
-        await saveConsent(preferences, current.configVersion);
+        lastAnswer = await saveConsent(preferences, current.configVersion);
     } catch {
         saveError.value = current.texts.saveError;
 
