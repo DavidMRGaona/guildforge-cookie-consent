@@ -85,13 +85,15 @@ export function hasConsentFor(
     configVersion: number,
     validityDays: number,
     reconsentOnChange: boolean,
-    requiredSlugs: string[]
+    requiredSlugs: string[],
+    lastAnswer: StoredConsent | null = null
 ): boolean {
     if (requiredSlugs.includes(slug)) return true;
 
-    if (needsConsent(configVersion, validityDays, reconsentOnChange)) return false;
+    if (needsConsent(configVersion, validityDays, reconsentOnChange, lastAnswer)) return false;
 
-    return getStoredConsent()?.preferences?.[slug] === true;
+    // The same answer the banner decided with: the stored one, else the last given in this page
+    return (getStoredConsent() ?? lastAnswer)?.preferences?.[slug] === true;
 }
 
 /**

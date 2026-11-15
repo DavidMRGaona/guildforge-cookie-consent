@@ -178,7 +178,8 @@ const unregisterProvider = registerCookieConsentProvider({
             current.reconsentOnChange,
             categories.value
                 .filter((category) => category.isRequired)
-                .map((category) => category.slug)
+                .map((category) => category.slug),
+            lastAnswer
         );
     },
     // The banner is not waiting for an answer: answered, or not showing (its configuration did not arrive)

@@ -247,6 +247,39 @@ describe('the banner as the cookie consent provider', () => {
             expect(banner.text()).not.toContain(config.texts.acceptAll);
         });
 
+        it('lets readers see the answer just given when the browser could not keep it', async () => {
+            vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+                throw new Error('Storage is full');
+            });
+            const analytics = computed(() => hasCookieConsent('analytics'));
+            const banner = mountBanner();
+            expect(analytics.value).toBe(false);
+
+            await click(banner, config.texts.acceptAll);
+
+            expect(hasCookieConsent('analytics')).toBe(true);
+            expect(analytics.value).toBe(true);
+        });
+
+        it('stops counting the answer kept in memory once the configuration version changes', async () => {
+            vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+                throw new Error('Storage is full');
+            });
+            const banner = mountBanner();
+            await click(banner, config.texts.acceptAll);
+            expect(hasCookieConsent('analytics')).toBe(true);
+
+            await banner.setProps({
+                cookieConsent: {
+                    categories,
+                    config: { ...config, configVersion: config.configVersion + 1 },
+                },
+            });
+            await flushPromises();
+
+            expect(hasCookieConsent('analytics')).toBe(false);
+        });
+
         it('still asks again about the answer kept in memory when the configuration version changes', async () => {
             vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
                 throw new Error('Storage is full');
