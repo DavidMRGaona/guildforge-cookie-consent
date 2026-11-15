@@ -28,6 +28,8 @@ const config = bannerConfig();
 const categories = [category('necessary', { isRequired: true }), category('analytics')];
 
 let wrapper: VueWrapper | null = null;
+// Listeners of the contract live as long as the module: every one is stopped after its test
+const stopListening: Array<() => void> = [];
 
 function mountBanner(): VueWrapper {
     wrapper = mount(CookieBanner, {
@@ -53,6 +55,7 @@ describe('the banner as the cookie consent provider', () => {
     });
 
     afterEach(() => {
+        stopListening.splice(0).forEach((stop) => stop());
         wrapper?.unmount();
         wrapper = null;
         vi.unstubAllGlobals();
@@ -127,14 +130,118 @@ describe('the banner as the cookie consent provider', () => {
     });
 
     describe('the banner answering whoever waits for it', () => {
-        function countDecisions(): { count: () => number; stop: () => void } {
+        function countDecisions(): { count: () => number } {
             let decisions = 0;
-            const stop = onCookieConsentDecided(() => {
-                decisions += 1;
-            });
+            stopListening.push(
+                onCookieConsentDecided(() => {
+                    decisions += 1;
+                })
+            );
 
-            return { count: () => decisions, stop };
+            return { count: () => decisions };
         }
+
+        function storeDecision(overrides: { version?: number; ageInDays?: number } = {}): void {
+            const timestamp = new Date(Date.now() - (overrides.ageInDays ?? 0) * 86_400_000);
+            localStorage.setItem(
+                'guildforge_cookie_consent',
+                JSON.stringify({
+                    visitorId: 'visitor',
+                    version: overrides.version ?? config.configVersion,
+                    timestamp: timestamp.toISOString(),
+                    preferences: { necessary: true, analytics: false },
+                })
+            );
+        }
+
+        it('is waiting for an answer when the stored decision is of an older configuration version', () => {
+            storeDecision({ version: config.configVersion - 1 });
+
+            mountBanner();
+
+            expect(hasCookieConsentDecided()).toBe(false);
+        });
+
+        it('is waiting for an answer when the stored decision has expired', () => {
+            storeDecision({ ageInDays: config.validityDays + 1 });
+
+            mountBanner();
+
+            expect(hasCookieConsentDecided()).toBe(false);
+        });
+
+        it('asks again in an open tab when a new configuration version arrives', async () => {
+            storeDecision();
+            const banner = mountBanner();
+            const decided = computed(() => hasCookieConsentDecided());
+            expect(decided.value).toBe(true);
+
+            // A visit of Inertia brings the configuration published meanwhile
+            await banner.setProps({
+                cookieConsent: {
+                    categories,
+                    config: { ...config, configVersion: config.configVersion + 1 },
+                },
+            });
+            await flushPromises();
+
+            expect(decided.value).toBe(false);
+            expect(banner.text()).toContain(config.texts.acceptAll);
+        });
+
+        it('asks again in an open tab when the decision expires', async () => {
+            storeDecision();
+            const banner = mountBanner();
+            const decided = computed(() => hasCookieConsentDecided());
+            expect(decided.value).toBe(true);
+
+            // Time passes while the tab stays open; the next visit brings the configuration again
+            storeDecision({ ageInDays: config.validityDays + 1 });
+            await banner.setProps({ cookieConsent: { categories, config: { ...config } } });
+            await flushPromises();
+
+            expect(decided.value).toBe(false);
+            expect(banner.text()).toContain(config.texts.acceptAll);
+        });
+
+        it('keeps the banner hidden on a visit when the decision still stands', async () => {
+            storeDecision();
+            const banner = mountBanner();
+
+            await banner.setProps({ cookieConsent: { categories, config: { ...config } } });
+            await flushPromises();
+
+            expect(hasCookieConsentDecided()).toBe(true);
+            expect(banner.text()).not.toContain(config.texts.acceptAll);
+        });
+
+        it('does not decide anything when it asks again: readers only get a change notice', async () => {
+            const decisions = countDecisions();
+            storeDecision();
+            const banner = mountBanner();
+
+            await banner.setProps({
+                cookieConsent: {
+                    categories,
+                    config: { ...config, configVersion: config.configVersion + 1 },
+                },
+            });
+            await flushPromises();
+
+            expect(decisions.count()).toBe(0);
+        });
+
+        it('withdraws the provider when the banner unmounts', () => {
+            storeDecision();
+            const banner = mountBanner();
+            expect(hasCookieConsent('necessary')).toBe(true);
+
+            banner.unmount();
+            wrapper = null;
+
+            expect(hasCookieConsent('necessary')).toBe(false);
+            expect(hasCookieConsentDecided()).toBe(false);
+        });
 
         it('is waiting for an answer while it shows, and decided once it is answered', async () => {
             const banner = mountBanner();
@@ -181,7 +288,6 @@ describe('the banner as the cookie consent provider', () => {
             await click(banner, label());
 
             expect(decisions.count()).toBe(1);
-            decisions.stop();
         });
 
         it('emits the decision once when the preferences are saved', async () => {
@@ -195,7 +301,6 @@ describe('the banner as the cookie consent provider', () => {
             await flushPromises();
 
             expect(decisions.count()).toBe(1);
-            decisions.stop();
         });
 
         it('does not emit a decision when the choice could not be saved', async () => {
@@ -207,7 +312,6 @@ describe('the banner as the cookie consent provider', () => {
 
             expect(decisions.count()).toBe(0);
             expect(hasCookieConsentDecided()).toBe(false);
-            decisions.stop();
         });
 
         it('does not emit a decision on a page visit, answered or not', async () => {
@@ -233,7 +337,6 @@ describe('the banner as the cookie consent provider', () => {
             wrapper?.unmount();
             mountBanner();
             expect(decisions.count()).toBe(1);
-            decisions.stop();
         });
     });
 });
