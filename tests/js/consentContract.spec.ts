@@ -55,6 +55,7 @@ describe('the banner as the cookie consent provider', () => {
     });
 
     afterEach(() => {
+        vi.restoreAllMocks();
         stopListening.splice(0).forEach((stop) => stop());
         wrapper?.unmount();
         wrapper = null;
@@ -229,6 +230,55 @@ describe('the banner as the cookie consent provider', () => {
             await flushPromises();
 
             expect(decisions.count()).toBe(0);
+        });
+
+        it('does not ask again on a visit when the browser could not keep the answer just given', async () => {
+            vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+                throw new Error('Storage is full');
+            });
+            const banner = mountBanner();
+            await click(banner, config.texts.acceptAll);
+            expect(hasCookieConsentDecided()).toBe(true);
+
+            await banner.setProps({ cookieConsent: { categories, config: { ...config } } });
+            await flushPromises();
+
+            expect(hasCookieConsentDecided()).toBe(true);
+            expect(banner.text()).not.toContain(config.texts.acceptAll);
+        });
+
+        it('still asks again about the answer kept in memory when the configuration version changes', async () => {
+            vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+                throw new Error('Storage is full');
+            });
+            const banner = mountBanner();
+            await click(banner, config.texts.acceptAll);
+
+            await banner.setProps({
+                cookieConsent: {
+                    categories,
+                    config: { ...config, configVersion: config.configVersion + 1 },
+                },
+            });
+            await flushPromises();
+
+            expect(hasCookieConsentDecided()).toBe(false);
+        });
+
+        it('keeps the provider of a banner mounted again when the old one unmounts', () => {
+            storeDecision();
+            const first = mountBanner();
+            const second = mount(CookieBanner, {
+                props: { cookieConsent: { categories, config } },
+                global: { stubs: { teleport: true } },
+            });
+            wrapper = second;
+            expect(hasCookieConsent('necessary')).toBe(true);
+
+            first.unmount();
+
+            expect(hasCookieConsent('necessary')).toBe(true);
+            expect(hasCookieConsentDecided()).toBe(true);
         });
 
         it('withdraws the provider when the banner unmounts', () => {

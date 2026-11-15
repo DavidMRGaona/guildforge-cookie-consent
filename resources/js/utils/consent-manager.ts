@@ -50,13 +50,17 @@ export function getStoredConsent(): StoredConsent | null {
 
 /**
  * Check if consent is needed based on config version and validity days.
+ * The stored answer is the one in the browser; without it, the optional last answer given in this page.
  */
 export function needsConsent(
     configVersion: number,
     validityDays: number,
-    reconsentOnChange: boolean
+    reconsentOnChange: boolean,
+    lastAnswer: StoredConsent | null = null
 ): boolean {
-    const consent = getStoredConsent();
+    // `lastAnswer` is what this page itself saved: it stands in when the browser keeps nothing
+    // readable (storage blocked or full), so a visit does not ask again about an answer just given
+    const consent = getStoredConsent() ?? lastAnswer;
 
     // No consent stored - needs consent
     if (!consent) return true;
@@ -110,7 +114,7 @@ export class ConsentNotSavedError extends Error {
 export async function saveConsent(
     preferences: Record<string, boolean>,
     configVersion: number
-): Promise<void> {
+): Promise<StoredConsent> {
     const visitorId = getOrCreateVisitorId();
 
     let response: Response;
@@ -152,6 +156,8 @@ export async function saveConsent(
 
     // Also set as a cookie for server-side middleware
     setCookieConsent(consent);
+
+    return consent;
 }
 
 /**

@@ -7,7 +7,7 @@ import {
     registerCookieConsentProvider,
 } from '@/contracts/cookieConsent';
 import { bannerColorScheme } from '../utils/banner-theme';
-import type { CookieCategory, BannerConfig } from '../types/cookie-consent';
+import type { CookieCategory, BannerConfig, StoredConsent } from '../types/cookie-consent';
 import { choiceNeedsReload } from '../utils/choice-effects';
 import {
     getStoredConsent,
@@ -81,6 +81,9 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const isVisible = ref(false);
+// The last answer saved from this page, in memory: when the browser cannot keep it (storage
+// blocked or full), a later visit uses it instead of asking again
+let lastAnswer: StoredConsent | null = null;
 const showSettingsModal = ref(false);
 // Set when the server did not record the last choice, which was then not applied either
 const saveError = ref<string | null>(null);
@@ -191,7 +194,8 @@ watch(config, (current) => {
     isVisible.value = needsConsent(
         current.configVersion,
         current.validityDays,
-        current.reconsentOnChange
+        current.reconsentOnChange,
+        lastAnswer
     );
 });
 // The answer depends on the configuration and the categories too, and the banner showing or hiding
@@ -323,7 +327,7 @@ async function applyChoice(preferences: Record<string, boolean>): Promise<boolea
 
     saving.value = true;
     try {
-        await saveConsent(preferences, current.configVersion);
+        lastAnswer = await saveConsent(preferences, current.configVersion);
     } catch {
         saveError.value = current.texts.saveError;
 
